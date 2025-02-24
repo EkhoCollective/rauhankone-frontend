@@ -36,6 +36,7 @@
 		"vite": "6.1.1"
 	},
 	"dependencies": {
+		"@sveltejs/adapter-static": "^3.0.8",
 		"@theatre/core": "^0.7.2",
 		"@theatre/studio": "^0.7.2",
 		"@threlte/core": "^8.0.1",
