@@ -8,13 +8,18 @@
 </svelte:head>
 
 <div class="homepage-title-card">
-	<h1>Layers in the Peace Machine</h1>
+	<h1 class="prose-xl">Layers in the Peace Machine</h1>
 	<p>
 		... is part of the dynamic discourse about actions, choices, mutual interactions and power,
 		which all greatly affect the processes of peace.
 	</p>
-
-	<button class="btn btn-primary">Button</button>
+	<button class="btn">Take Part</button>
+	<p>
+		Read more about the piece <a href="http://" target="_blank" rel="noopener noreferrer">here</a>
+	</p>
+	<div class="footer">
+		<p>© 2025 Ekho Collective</p>
+	</div>
 </div>
 
 <div class="homepage-scene">
@@ -37,5 +42,8 @@
 	.homepage-title-card {
 		z-index: 9999; /* Ensure this is on top of everything */
 		position: relative; /* Ensure it is positioned above the canvas */
+		/* display: grid; */
+		/* grid-template-columns: 1fr 1fr 1fr; */
+		/* grid-template-rows: 5; */
 	}
 </style>
