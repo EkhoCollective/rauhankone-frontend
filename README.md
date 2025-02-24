@@ -6,6 +6,12 @@ This is the main repository for the frontend of the Rauhankone project. The proj
 
 To get started with the project, and continue development, follow the instructions below.
 
+### Prerequisites
+
+You need to have PostCSS Language Server installed in your editor. You can find the installation instructions [here](https://marketplace.visualstudio.com/items?itemName=csstools.postcss).
+
+### Installation
+
 1. Clone the repository
 
 ```bash
