@@ -1,6 +1,7 @@
 <script>
 	import { Canvas } from '@threlte/core';
-	import Scene from '../lib/Scene/Scene.svelte';
+	import Scene from '../lib/components/Scene.svelte';
+	import Card from '$lib/components/Card.svelte';
 </script>
 
 <svelte:head>
@@ -8,42 +9,54 @@
 </svelte:head>
 
 <div class="homepage-title-card">
-	<h1 class="prose-xl">Layers in the Peace Machine</h1>
-	<p>
-		... is part of the dynamic discourse about actions, choices, mutual interactions and power,
-		which all greatly affect the processes of peace.
-	</p>
-	<button class="btn">Take Part</button>
-	<p>
-		Read more about the piece <a href="http://" target="_blank" rel="noopener noreferrer">here</a>
-	</p>
-	<div class="footer">
-		<p>© 2025 Ekho Collective</p>
-	</div>
+	<Card
+		title="Layers in the Peace Machine"
+		subtitle="... is part of the dynamic discourse about actions, choices, mutual interactions and power, which all greatly affect the processes of peace."
+		btnText="Take Part"
+	/>
 </div>
 
-<div class="homepage-scene">
+<div class="homepage-img-container">
+	<enhanced:img class="homepage-img" src="../lib/images/background_1.png" alt="An alt text" />
+</div>
+
+<!-- <div class="homepage-scene">
 	<Canvas>
 		<Scene />
 	</Canvas>
-</div>
+</div> -->
 
 <style>
-	.homepage-scene {
+	/* .homepage-scene {
 		background-color: black;
 		width: 100vw;
 		height: 100vh;
 		position: fixed;
 		top: 0;
 		left: 0;
-		z-index: 1; /* Ensure the canvas is behind other elements */
+		z-index: 1; 
+	} */
+
+	.homepage-img-container {
+		width: 100vw;
+		height: 100vh;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 1;
+	}
+
+	.homepage-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 
 	.homepage-title-card {
-		z-index: 9999; /* Ensure this is on top of everything */
-		position: relative; /* Ensure it is positioned above the canvas */
-		/* display: grid; */
-		/* grid-template-columns: 1fr 1fr 1fr; */
-		/* grid-template-rows: 5; */
+		z-index: 9999;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
 	}
 </style>
