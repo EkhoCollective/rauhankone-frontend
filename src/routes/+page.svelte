@@ -1,7 +1,13 @@
 <script>
-	import { Canvas } from '@threlte/core';
-	import Scene from '../lib/components/Scene.svelte';
-	import Card from '$lib/components/Card.svelte';
+	import Card from '../lib/components/Card-Main.svelte';
+	import { submitData } from '../lib/utils/api'; // Decoupled API helper
+
+	let response = null;
+
+	// async function handleCardSubmit(event) {
+	//       const inputValue = event.detail.value;
+	//       response = await submitData(inputValue);
+	//   }
 </script>
 
 <svelte:head>
@@ -9,15 +15,11 @@
 </svelte:head>
 
 <div class="homepage-title-card">
-	<Card
-		title="Layers in the Peace Machine"
-		subtitle="... is part of the dynamic discourse about actions, choices, mutual interactions and power, which all greatly affect the processes of peace."
-		btnText="Take Part"
-	/>
+	<Card onSubmit={(value) => console.log('Submitted value:', value)} />
 </div>
 
 <div class="homepage-img-container">
-	<enhanced:img class="homepage-img" src="../lib/images/background_1.png" alt="An alt text" />
+	<enhanced:img class="homepage-img" src="$lib/images/background_1.png" alt="An alt text" />
 </div>
 
 <!-- <div class="homepage-scene">
@@ -27,16 +29,6 @@
 </div> -->
 
 <style>
-	/* .homepage-scene {
-		background-color: black;
-		width: 100vw;
-		height: 100vh;
-		position: fixed;
-		top: 0;
-		left: 0;
-		z-index: 1; 
-	} */
-
 	.homepage-img-container {
 		width: 100vw;
 		height: 100vh;
