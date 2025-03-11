@@ -4,10 +4,10 @@
 
 	let response = null;
 
-	// async function handleCardSubmit(event) {
-	//       const inputValue = event.detail.value;
-	//       response = await submitData(inputValue);
-	//   }
+	async function handleCardSubmit() {
+		response = await submitData();
+		console.log('Response:', response);
+	}
 </script>
 
 <svelte:head>
@@ -15,7 +15,7 @@
 </svelte:head>
 
 <div class="homepage-title-card">
-	<Card onSubmit={(value) => console.log('Submitted value:', value)} />
+	<Card onSubmit={handleCardSubmit} />
 </div>
 
 <div class="homepage-img-container">

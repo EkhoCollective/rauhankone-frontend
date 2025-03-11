@@ -1,9 +1,12 @@
-export async function submitData(inputValue: string) {
+export async function submitData() {
   try {
-      const response = await fetch('https://your-api-endpoint.com/submit', {
+      const response = await fetch('http://localhost:8888/get_clusters', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data: inputValue })
+          body: JSON.stringify({
+            "language": "Finnish",
+            "max_stories": 10
+          })
       });
 
       if (!response.ok) {
