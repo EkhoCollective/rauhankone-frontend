@@ -13,3 +13,10 @@
 		<a href={localizeHref(page.url.pathname, { locale })}>{locale}</a>
 	{/each}
 </div>
+
+<style>
+	:global(body) {
+		background-color: black;
+		color: white;
+	}
+</style>

@@ -17,14 +17,6 @@
 	});
 </script>
 
-<!-- <T.PerspectiveCamera
-	makeDefault
-	position={[10, 10, 10]}
-	oncreate={(ref) => {
-		ref.lookAt(0, 1, 0);
-	}}
-/> -->
-
 <T.PerspectiveCamera makeDefault position.z={5}>
 	<OrbitControls autoRotate={autoRotateCamera} />
 </T.PerspectiveCamera>

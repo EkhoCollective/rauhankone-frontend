@@ -3,7 +3,7 @@
 	import { setLocale, locales } from '$lib/paraglide/runtime.js';
 	import { m } from '$lib/paraglide/messages.js';
 	import { Canvas } from '@threlte/core';
-	import Scene from '../lib/components/Scene.svelte';
+	import Scene from '../lib/components/ScenePoints.svelte';
 
 	type Locale = (typeof locales)[number];
 
@@ -30,6 +30,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Rauhankoneen Kerroksia</title>
+</svelte:head>
+
 <p>
 	<select bind:value={selectedLocale} on:change={handleLocaleChange}>
 		{#each locales as l}
@@ -40,6 +44,8 @@
 
 <p>{m.greeting({ username })}</p>
 
-<Canvas>
-	<Scene />
-</Canvas>
+<div style="width: 100%; height: 100vh;">
+	<Canvas>
+		<Scene />
+	</Canvas>
+</div>
