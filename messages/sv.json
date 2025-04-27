@@ -1,4 +1,8 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"greeting": "Hej {username}!"
+	"rk_title": "Dássut dábálašvuoda mášinain",
+	"description": "... lea oassi dinamihkalaš diskusiuvnnas doaibmárbuid, válljeheapmuid, oktasaš vuolláičállima ja válddi birra, mat buot stuorra váikkuhit ráfiidprosessaide. Váldde oassi ráfiidmáššina ráhkadeamis ja juo åvdame iežat árvvusat ráfi birra.",
+	"btn_take_part": "Váldde oassi",
+	"btn_explore": "Čuovvue",
+	"read_more": "Lohkat eanet birra dáhpáhusa"
 }

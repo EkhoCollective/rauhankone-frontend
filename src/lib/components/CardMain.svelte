@@ -1,11 +1,18 @@
 <script lang="ts">
+	import Icon from 'svelte-awesome';
+	import language from 'svelte-awesome/icons/language';
 	import { m } from '$lib/paraglide/messages.js';
+	export let toLang = () => {};
 	export let toSubmit = () => {};
 	export let toExplore = () => {};
 </script>
 
 <div class="card">
 	<div class="card-content">
+		<!-- Header/Language Selector -->
+		<div class="card-header-container">
+			<button class="btn btn-lang" on:click={toLang}><Icon data={language} scale={1} /> </button>
+		</div>
 		<!-- Title -->
 		<div class="card-title-container">
 			<p>
@@ -18,30 +25,34 @@
 		</div>
 		<!-- Main Text -->
 		<div class="card-text-container">
-			<p>
-				... is part of the dynamic discourse about actions, choices, mutual interactions and power,
-				which all greatly affect the processes of peace. <br />
-				<br />
-				Participate in building a peace machine and share your personal memory about peace.
-			</p>
+			<p>{m.description()}</p>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
-			<div class="card-btn">
-				<button class="btn" on:click={toSubmit}>Take Part</button>
+			<div>
+				<button class="btn" on:click={toSubmit}>{m.btn_take_part()}</button>
 			</div>
-			<div class="card-btn">
-				<button class="btn" on:click={toExplore}>Explore</button>
+			<div>
+				<button class="btn" on:click={toExplore}>{m.btn_explore()}</button>
 			</div>
 		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
-			<p>Read more about the piece</p>
+			<p>{m.read_more()}</p>
 			<p>© Ekho Collective</p>
 			<p>GDPR</p>
 		</div>
 	</div>
 </div>
+
+<!-- NOTES
+ 
+- change icon
+- check font style
+- buttons styling
+- title separtion to paraglide schema
+
+-->
 
 <style>
 	.card {
@@ -56,8 +67,12 @@
 		height: 100%;
 		padding: 25px;
 	}
+	.card-header-container {
+		display: grid;
+		justify-items: end;
+	}
 	.card-title-container {
-		margin: 15% 0 10% 0;
+		margin: 10% 0 10% 0;
 		font-size: 3em;
 		line-height: 1em;
 	}
@@ -74,6 +89,10 @@
 	.btn {
 		background-color: black;
 		border-color: white;
+	}
+	.btn-lang {
+		border: none;
+		box-shadow: none;
 	}
 	.card-footer-container {
 		margin-top: 20%;

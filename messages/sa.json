@@ -1,4 +1,8 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"greeting": "Bures {username}!"
+	"rk_title": "Layers of the Piece Machine",
+	"description": "... är en del av den dynamiska diskussionen om handlingar, val, ömsesidiga interaktioner och makt, som alla starkt påverkar fredsprocesserna. Delta i att bygga en fredsmaskin och dela ditt personliga minne av fred.",
+	"btn_take_part": "Delta",
+	"btn_explore": "Utforska",
+	"read_more": "Läs mer om verket"
 }
