@@ -1,32 +1,10 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { setLocale, locales } from '$lib/paraglide/runtime.js';
-	import { m } from '$lib/paraglide/messages.js';
 	import { Canvas } from '@threlte/core';
 	import Scene from '../lib/components/ScenePoints.svelte';
+	import CardMain from '../lib/components/CardMain.svelte';
 
-	type Locale = (typeof locales)[number];
-
-	let selectedLocale: Locale = 'en'; // fallback
-	const username = 'Vertti';
-
-	onMount(() => {
-		const savedLocale = localStorage.getItem('locale') as Locale | null;
-		if (savedLocale && locales.includes(savedLocale)) {
-			selectedLocale = savedLocale;
-			setLocale(savedLocale);
-		} else {
-			setLocale(selectedLocale);
-		}
-	});
-
-	function handleLocaleChange(event: Event) {
-		const target = event.target as HTMLSelectElement | null;
-		if (target) {
-			const newLocale = target.value as Locale;
-			localStorage.setItem('locale', newLocale);
-			setLocale(newLocale);
-		}
+	function handleCardSubmit() {
+		console.log('Card submitted');
 	}
 </script>
 
@@ -34,18 +12,24 @@
 	<title>Rauhankoneen Kerroksia</title>
 </svelte:head>
 
-<p>
-	<select bind:value={selectedLocale} on:change={handleLocaleChange}>
-		{#each locales as l}
-			<option value={l}>{l}</option>
-		{/each}
-	</select>
-</p>
-
-<p>{m.greeting({ username })}</p>
+<div class="main-container">
+	<CardMain toSubmit={handleCardSubmit} />
+</div>
 
 <div style="width: 100%; height: 100vh;">
 	<Canvas>
 		<Scene />
 	</Canvas>
 </div>
+
+<style>
+	.main-container {
+		width: 100vw;
+		height: 100vh;
+		z-index: 9999;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+</style>
