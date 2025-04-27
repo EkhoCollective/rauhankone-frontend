@@ -1,20 +1,20 @@
 <script>
-	// // import { T, useTask } from '@threlte/core';
-	// import { interactivity } from '@threlte/extras';
-	// import { Spring } from 'svelte/motion';
-	// import { Environment, OrbitControls } from '@threlte/extras';
+	import { T, useTask } from '@threlte/core';
+	import { interactivity } from '@threlte/extras';
+	import { Spring } from 'svelte/motion';
+	import { Environment, OrbitControls } from '@threlte/extras';
 
-	// interactivity();
+	interactivity();
 
-	// const scale = new Spring(1);
+	const scale = new Spring(1);
 
-	// let autoRotateCamera = false;
-	// // let  useEnvironment = true;
+	let autoRotateCamera = false;
+	// let  useEnvironment = true;
 
-	// let rotation = 0;
-	// useTask((delta) => {
-	// 	rotation += delta;
-	// });
+	let rotation = 0;
+	useTask((delta) => {
+		rotation += delta;
+	});
 </script>
 
 <!-- <T.PerspectiveCamera
@@ -23,7 +23,7 @@
 	oncreate={(ref) => {
 		ref.lookAt(0, 1, 0);
 	}}
-/>
+/> -->
 
 <T.PerspectiveCamera makeDefault position.z={5}>
 	<OrbitControls autoRotate={autoRotateCamera} />
@@ -50,4 +50,4 @@
 <T.Mesh rotation.x={-Math.PI / 2} receiveShadow>
 	<T.CircleGeometry args={[4, 40]} />
 	<T.MeshStandardMaterial color="white" />
-</T.Mesh> -->
+</T.Mesh>

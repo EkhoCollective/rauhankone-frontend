@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 	import { setLocale, locales } from '$lib/paraglide/runtime.js';
 	import { m } from '$lib/paraglide/messages.js';
-	// import Canvas from '@threlte/core';
+	import { Canvas } from '@threlte/core';
+	import Scene from '../lib/components/Scene.svelte';
 
 	type Locale = (typeof locales)[number];
 
@@ -39,8 +40,6 @@
 
 <p>{m.greeting({ username })}</p>
 
-<!-- <div class="homepage-scene">
-	<Canvas>
-		<Scene />
-	</Canvas>
-</div> -->
+<Canvas>
+	<Scene />
+</Canvas>
