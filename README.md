@@ -1,41 +1,58 @@
-# rauhankone-frontend
+# Svelte library
 
-This is the main repository for the frontend of the Rauhankone project. The project is a web application that allows users to create and share peace agreements.
+Everything you need to build a Svelte library, powered by [`sv`](https://npmjs.com/package/sv).
 
-## Getting started
+Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
 
-To get started with the project, and continue development, follow the instructions below.
+## Creating a project
 
-### Prerequisites
-
-You need to have PostCSS Language Server installed in your editor. You can find the installation instructions [here](https://marketplace.visualstudio.com/items?itemName=csstools.postcss).
-
-### Installation
-
-1. Clone the repository
+If you're seeing this, you've probably already done this step. Congrats!
 
 ```bash
+# create a new project in the current directory
+npx sv create
 
-git clone https://github.com/EkhoCollective/rauhankone-frontend.git
-
+# create a new project in my-app
+npx sv create my-app
 ```
 
-2. Install dependencies
+## Developing
+
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
 ```bash
-
-npm install
-
-```
-
-3. Start the development server
-
-```bash
-
 npm run dev
 
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
 ```
 
-## Contributing
+Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
 
-If you would like to contribute to the project, please make a pull request with your changes. The project maintainers will review the changes and merge them if they are suitable.
+## Building
+
+To build your library:
+
+```bash
+npm run package
+```
+
+To create a production version of your showcase app:
+
+```bash
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+
+## Publishing
+
+Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
+
+To publish your library to [npm](https://www.npmjs.com):
+
+```bash
+npm publish
+```
