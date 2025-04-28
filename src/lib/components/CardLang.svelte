@@ -86,7 +86,7 @@
 				<button class="btn" on:click={() => handleLocaleChange('sv')}> Svenska </button>
 			</div>
 			<div>
-				<button class="btn" on:click={() => handleLocaleChange('sa')}> Sámi </button>
+				<button class="btn" on:click={() => handleLocaleChange('sa')}> Sámegiella </button>
 			</div>
 		</div>
 		<!-- Extra Selector -->

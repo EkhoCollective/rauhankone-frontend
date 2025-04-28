@@ -4,5 +4,7 @@
 	"description": "... on osa dynaamista keskustelua teoista, valinnoista, keskinäisistä vuorovaikutuksista ja vallasta, jotka kaikki vaikuttavat merkittävästi rauhan prosesseihin.Osallistu rauhakoneen rakentamiseen ja jaa oma muistosi rauhasta.",
 	"btn_take_part": "Osallistu",
 	"btn_explore": "Tutki",
-	"read_more": "Lue lisää teoksesta"
+	"read_more": "Lue lisää teoksesta",
+	"submit": "Lähetä",
+	"submit_info": "Jaa henkilökohtainen muistosi rauhasta. Kuvaile se mahdollisimman tarkasti."
 }

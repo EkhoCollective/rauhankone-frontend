@@ -15,7 +15,7 @@
 		<!-- Main Text -->
 		<div class="card-text-container">
 			<p>
-				Share a personal memory you have about peace. Describe it in as much detail as possible.
+				{m.submit_info()}
 			</p>
 		</div>
 		<!-- Input Area -->
@@ -25,7 +25,7 @@
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<div>
-				<button class="btn" on:click={toExplore}>Submit</button>
+				<button class="btn" on:click={toExplore}>{m.submit()}</button>
 			</div>
 		</div>
 		<!-- Footer -->

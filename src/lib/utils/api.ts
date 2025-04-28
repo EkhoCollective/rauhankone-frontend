@@ -5,7 +5,7 @@ export async function submitData() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             "language": "Finnish",
-            "max_stories": 10
+            "max_stories": 100
           })
       });
 

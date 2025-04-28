@@ -10,7 +10,7 @@
 	// Configuration
 	let pointCount: number = 1000;
 	let distributionWidth: number = 5; // Standard deviation for normal distribution
-	let pointSize: number = 0.15;
+	let pointSize: number = 0.5;
 	let pointColor: string = 'white';
 	let hoverColor: string = '#FF0000'; // Red color for hover
 	let autoRotateCamera: boolean = false;

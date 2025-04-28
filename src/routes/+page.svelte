@@ -4,8 +4,6 @@
 	import { goto } from '$app/navigation';
 
 	let showLang = false;
-	let showSubmit = false;
-	let showExplore = false;
 
 	function handleToggleLang() {
 		showLang = !showLang;

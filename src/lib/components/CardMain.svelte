@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import Icon from 'svelte-awesome';
 	import language from 'svelte-awesome/icons/language';
-	import { m } from '$lib/paraglide/messages.js';
 	export let toLang = () => {};
 	export let toSubmit = () => {};
 	export let toExplore = () => {};
