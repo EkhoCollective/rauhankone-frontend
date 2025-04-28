@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 
 	function handleToMain() {
-		goto('.');
+		goto('');
 	}
 
 	function handleToExplore() {
