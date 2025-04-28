@@ -1,1 +1,0 @@
-import{g as t}from"./DT1H58Z6.js";const o=()=>"Read more about the piece",a=()=>"Lue lisää teoksesta",n=()=>"Lohkat eanet birra dáhpáhusa",s=()=>"Läs mer om verket",m=(u={},r={})=>{const e=r.locale??t();return e==="en"?o():e==="fi"?a():e==="sv"?n():e==="sa"?s():"read_more"};export{m as r};
