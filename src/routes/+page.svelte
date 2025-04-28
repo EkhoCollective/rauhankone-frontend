@@ -1,20 +1,23 @@
 <script lang="ts">
 	import CardMain from '$lib/components/CardMain.svelte';
 	import CardLang from '$lib/components/CardLang.svelte';
-	import { goto } from '$app/navigation';
+	import CardSubmit from '$lib/components/CardSubmit.svelte';
+	import CardExplore from '$lib/components/CardExplore.svelte';
 
 	let showLang = false;
+	let showSubmit = false;
+	let showExplore = false;
 
 	function handleToggleLang() {
 		showLang = !showLang;
 	}
 
-	function handleToSubmit() {
-		goto('/submit');
+	function handleToggleSubmit() {
+		showSubmit = !showSubmit;
 	}
 
-	function handleToExplore() {
-		goto('/explorer');
+	function handleToggleExplore() {
+		showExplore = !showExplore;
 	}
 </script>
 
@@ -24,12 +27,28 @@
 
 {#if showLang}
 	<div class="main-container lang-container">
-		<CardLang toMain={handleToggleLang} />
+		<CardLang toggleLang={handleToggleLang} />
+	</div>
+{/if}
+
+{#if showSubmit}
+	<div class="main-container submit-container">
+		<CardSubmit toggleLang={handleToggleLang} toExplore={handleToggleExplore} />
+	</div>
+{/if}
+
+{#if showExplore}
+	<div class="main-container explore-container">
+		<CardExplore />
 	</div>
 {/if}
 
 <div class="main-container">
-	<CardMain toLang={handleToggleLang} toSubmit={handleToSubmit} toExplore={handleToExplore} />
+	<CardMain
+		toLang={handleToggleLang}
+		toSubmit={handleToggleSubmit}
+		toExplore={handleToggleExplore}
+	/>
 </div>
 
 <style>
@@ -45,5 +64,13 @@
 
 	.lang-container {
 		z-index: 9999;
+	}
+
+	.submit-container {
+		z-index: 2;
+	}
+
+	.explore-container {
+		z-index: 3;
 	}
 </style>

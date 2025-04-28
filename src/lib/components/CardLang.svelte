@@ -2,15 +2,10 @@
 	import { onMount } from 'svelte';
 	import { setLocale, locales } from '$lib/paraglide/runtime.js';
 	import { m } from '$lib/paraglide/messages.js';
-
 	import { SquareCheck } from 'lucide-svelte';
 	import { X } from 'lucide-svelte';
-	// import Icon from 'svelte-awesome';
-	// import close from 'svelte-awesome/icons/close';
-	// import checkSquareO from 'svelte-awesome/icons/checkSquareO';
 
 	type Locale = (typeof locales)[number];
-
 	let selectedLocale: Locale = 'en'; // fallback
 
 	onMount(() => {
@@ -23,27 +18,19 @@
 		}
 	});
 
-	// function handleLocaleChange(event: Event) {
-	// 	const target = event.target as HTMLSelectElement | null;
-	// 	if (target) {
-	// 		const newLocale = target.value as Locale;
-	// 		localStorage.setItem('locale', newLocale);
-	// 		setLocale(newLocale);
-	// 	}
-	// }
 	function handleLocaleChange(locale: Locale) {
 		localStorage.setItem('locale', locale);
 		setLocale(locale);
 		selectedLocale = locale;
 	}
-	export let toMain = () => {};
+	export let toggleLang = () => {};
 </script>
 
 <div class="card">
 	<div class="card-content">
 		<!-- Header/Language Selector -->
 		<div class="card-header-container">
-			<button class="btn btn-lang" on:click={toMain}><X /></button>
+			<button class="btn btn-lang" on:click={toggleLang}><X /></button>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">

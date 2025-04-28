@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import { ArrowLeft } from 'lucide-svelte';
-	export let toMain = () => {};
+	import { Globe } from 'lucide-svelte';
+
+	export let toggleLang = () => {};
 	export let toExplore = () => {};
 </script>
 
@@ -9,7 +10,7 @@
 	<div class="card-content">
 		<!-- Header/Language Selector -->
 		<div class="card-header-container">
-			<button class="btn btn-lang" on:click={toMain}><ArrowLeft /> </button>
+			<button class="btn btn-lang" on:click={toggleLang}><Globe /></button>
 		</div>
 		<!-- Main Text -->
 		<div class="card-text-container">
@@ -58,15 +59,15 @@
 		height: 100%;
 		padding: 25px;
 	}
+
 	.card-header-container {
 		display: grid;
 		justify-items: end;
 	}
+
 	.card-input-container {
 		margin: 10% 0 10% 0;
 		border: 1px solid white;
-		/* font-size: 3em; */
-		/* line-height: 1em; */
 	}
 
 	textarea {
@@ -87,10 +88,12 @@
 		background-color: black;
 		border-color: white;
 	}
+
 	.btn-lang {
 		border: none;
 		box-shadow: none;
 	}
+
 	.card-footer-container {
 		margin-top: 50%;
 		font-size: 0.75em;
