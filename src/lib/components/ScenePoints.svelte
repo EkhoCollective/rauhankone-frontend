@@ -41,7 +41,7 @@
 
 			positions.push(x, y, z);
 			colors.push(baseColor.r, baseColor.g, baseColor.b);
-			sizes.push(pointSize);
+			sizes.push(pointSize); // Default size
 		}
 
 		return {
@@ -70,9 +70,9 @@
 
 	// Point hovering variables
 	let hoveredPoint: number | null = null;
+	let previousHoveredPoint: number | null = null;
 	let hoverSphereVisible: boolean = false;
 	let hoverPosition = { x: 0, y: 0, z: 0 };
-	const hoverScale = new Spring(1);
 
 	// Scene rotation
 	let rotation: number = 0;
@@ -112,52 +112,59 @@
 				};
 
 				hoverSphereVisible = true;
-				hoverScale.target = 1.5;
 
-				// Change color of the hovered point
-				hoveredPoint = index;
+				// Store previous hovered point to reset it
+				if (hoveredPoint !== index) {
+					previousHoveredPoint = hoveredPoint;
+					hoveredPoint = index;
+
+					// Update point colors and sizes
+					updatePointAttributes();
+				}
 
 				// Trigger pointer enter for cursor state
 				onPointerEnter();
 			}
 		} else {
-			// No intersection, hide hover sphere with animation
-			hoverScale.target = 1;
+			// No intersection, reset hover state
+			previousHoveredPoint = hoveredPoint;
 			hoveredPoint = null;
+
+			// Update point attributes to reset the previously hovered point
+			updatePointAttributes();
 
 			// Trigger pointer leave for cursor state
 			onPointerLeave();
 		}
 	}
 
-	// Update point colors when hovering
-	$: if (geometryRef && hoveredPoint !== null) {
+	// Function to update point colors and sizes
+	function updatePointAttributes(): void {
+		if (!geometryRef) return;
+
 		const colors = geometryRef.attributes.color.array;
+		const sizes = geometryRef.attributes.size.array;
 		const hoverColorObj = new THREE.Color(hoverColor);
 		const baseColorObj = new THREE.Color(pointColor);
 
-		// Reset all colors
-		for (let i = 0; i < pointCount; i++) {
-			colors[i * 3] = baseColorObj.r;
-			colors[i * 3 + 1] = baseColorObj.g;
-			colors[i * 3 + 2] = baseColorObj.b;
+		// Reset previous hovered point if it exists
+		if (previousHoveredPoint !== null) {
+			colors[previousHoveredPoint * 3] = baseColorObj.r;
+			colors[previousHoveredPoint * 3 + 1] = baseColorObj.g;
+			colors[previousHoveredPoint * 3 + 2] = baseColorObj.b;
+			sizes[previousHoveredPoint] = pointSize;
 		}
 
-		// Set hover color for hovered point
+		// Set hover color and increased size for current hovered point
 		if (hoveredPoint !== null) {
 			colors[hoveredPoint * 3] = hoverColorObj.r;
 			colors[hoveredPoint * 3 + 1] = hoverColorObj.g;
 			colors[hoveredPoint * 3 + 2] = hoverColorObj.b;
-
-			// Make hovered point larger if we have size attribute
-			if (geometryRef.attributes.size) {
-				const sizes = geometryRef.attributes.size.array;
-				sizes[hoveredPoint] = pointSize * 2;
-				geometryRef.attributes.size.needsUpdate = true;
-			}
+			sizes[hoveredPoint] = pointSize * 2.5; // Increase size for hovered point
 		}
 
 		geometryRef.attributes.color.needsUpdate = true;
+		geometryRef.attributes.size.needsUpdate = true;
 	}
 
 	// Reactive color based on hovering state
@@ -178,24 +185,6 @@
 	}
 </script>
 
-<!-- Controls
-<div class="controls" style="position: absolute; top: 10px; left: 10px; color: white; z-index: 100; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;">
-  <label>
-    Points: <input type="range" bind:value={pointCount} min="100" max="5000" step="100" on:change={updatePoints} />
-    {pointCount}
-  </label>
-  <br />
-  <label>
-    Distribution Width: <input type="range" bind:value={distributionWidth} min="1" max="10" step="0.5" on:change={updatePoints} />
-    {distributionWidth}
-  </label>
-  <br />
-  <label>
-    <input type="checkbox" bind:checked={autoRotateCamera} />
-    Auto Rotate Camera
-  </label>
-</div> -->
-
 <!-- Scene -->
 <T.PerspectiveCamera makeDefault position={[0, 0, 15]}>
 	<OrbitControls autoRotate={autoRotateCamera} />
@@ -208,16 +197,13 @@
 <T.Points
 	bind:ref={pointsRef}
 	onpointermove={handlePointerMove}
-	scale={hoverScale.current}
-	onpointerenter={() => {
-		hoverScale.target = 1.5;
-		onPointerEnter();
-	}}
 	onpointerleave={() => {
-		hoverScale.target = 1;
+		previousHoveredPoint = hoveredPoint;
+		hoveredPoint = null;
+		updatePointAttributes();
 		onPointerLeave();
-		// hoveredPoint = null;
 	}}
+	rotation.y={rotation}
 >
 	<T.BufferGeometry bind:ref={geometryRef}>
 		<T.Float32BufferAttribute attach="attributes.position" args={[pointData.positions, 3]} />
@@ -232,19 +218,3 @@
 		alphaTest={0.2}
 	/>
 </T.Points>
-
-<!-- Hover indicator sphere
-<T.Mesh
-	bind:ref={hoverSphereRef}
-	position={[hoverPosition.x, hoverPosition.y, hoverPosition.z]}
-	scale={$hovering ? 0.2 : 0}
-	visible={hoverSphereVisible}
->
-	<T.SphereGeometry args={[1, 16, 16]} />
-	<T.MeshStandardMaterial color={currentColor} transparent={true} opacity={0.7} />
-</T.Mesh> -->
-
-<!-- // NOTES 
- - the whole "world" scales when hovering bug 
- - points are not scaling when hover (Related
-to above) -->

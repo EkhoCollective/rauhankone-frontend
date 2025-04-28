@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { setLocale, locales } from '$lib/paraglide/runtime.js';
+	import { m } from '$lib/paraglide/messages.js';
 	import Icon from 'svelte-awesome';
 	import close from 'svelte-awesome/icons/close';
-	import { m } from '$lib/paraglide/messages.js';
+	import checkSquareO from 'svelte-awesome/icons/checkSquareO';
 
 	type Locale = (typeof locales)[number];
 
@@ -85,11 +86,12 @@
 				<button class="btn" on:click={() => handleLocaleChange('sv')}> Svenska </button>
 			</div>
 			<div>
-				<button class="btn" on:click={() => handleLocaleChange('sa')}> Deutsch </button>
+				<button class="btn" on:click={() => handleLocaleChange('sa')}> Sámi </button>
 			</div>
 		</div>
 		<!-- Extra Selector -->
 		<div class="card-extra-container">
+			<p style="justify-self: end; padding-right: 20px"><Icon data={checkSquareO} /></p>
 			<p>Translate all stories to selected language</p>
 		</div>
 		<!-- Footer -->
@@ -133,6 +135,15 @@
 	.btn {
 		background-color: black;
 		border-color: white;
+		margin-bottom: 20px;
+	}
+	.card-extra-container {
+		display: grid;
+		grid-template-columns: 30% 1fr;
+		/* margin: 0 0 10% 0; */
+		font-size: 0.75em;
+		/* width: 50%; */
+		text-align: left;
 	}
 	/* 
 	button {
@@ -153,7 +164,7 @@
 		box-shadow: none;
 	}
 	.card-footer-container {
-		margin-top: 60%;
+		margin-top: 20%;
 		font-size: 0.75em;
 	}
 </style>
