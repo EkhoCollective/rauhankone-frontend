@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import Icon from 'svelte-awesome';
-	import arrowLeft from 'svelte-awesome/icons/arrowLeft';
+	import { ArrowLeft } from 'lucide-svelte';
 	export let toMain = () => {};
 	export let toExplore = () => {};
 </script>
@@ -10,7 +9,7 @@
 	<div class="card-content">
 		<!-- Header/Language Selector -->
 		<div class="card-header-container">
-			<button class="btn btn-lang" on:click={toMain}><Icon data={arrowLeft} scale={1} /> </button>
+			<button class="btn btn-lang" on:click={toMain}><ArrowLeft /> </button>
 		</div>
 		<!-- Main Text -->
 		<div class="card-text-container">

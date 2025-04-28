@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { Canvas } from '@threlte/core';
-	import Scene from '$lib/components/ScenePoints.svelte';
-	import Icon from 'svelte-awesome';
-	import close from 'svelte-awesome/icons/close';
+	import Scene from '$lib/components/visual-module/ScenePoints.svelte';
+	import { X } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 
 	function handleToMain() {
@@ -13,7 +12,7 @@
 <div class="main-container">
 	<!-- Header/Language Selector -->
 	<div class="card-header-container">
-		<button class="btn btn-lang" on:click={handleToMain}><Icon data={close} scale={1} /> </button>
+		<button class="btn btn-lang" on:click={handleToMain}><X /></button>
 	</div>
 </div>
 

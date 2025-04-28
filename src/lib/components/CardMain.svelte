@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import Icon from 'svelte-awesome';
-	import language from 'svelte-awesome/icons/language';
+	import { Globe } from 'lucide-svelte';
 	export let toLang = () => {};
 	export let toSubmit = () => {};
 	export let toExplore = () => {};
@@ -11,7 +10,7 @@
 	<div class="card-content">
 		<!-- Header/Language Selector -->
 		<div class="card-header-container">
-			<button class="btn btn-lang" on:click={toLang}><Icon data={language} scale={1} /> </button>
+			<button class="btn btn-lang" on:click={toLang}><Globe /></button>
 		</div>
 		<!-- Title -->
 		<div class="card-title-container">

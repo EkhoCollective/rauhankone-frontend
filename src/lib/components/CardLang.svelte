@@ -2,9 +2,12 @@
 	import { onMount } from 'svelte';
 	import { setLocale, locales } from '$lib/paraglide/runtime.js';
 	import { m } from '$lib/paraglide/messages.js';
-	import Icon from 'svelte-awesome';
-	import close from 'svelte-awesome/icons/close';
-	import checkSquareO from 'svelte-awesome/icons/checkSquareO';
+
+	import { SquareCheck } from 'lucide-svelte';
+	import { X } from 'lucide-svelte';
+	// import Icon from 'svelte-awesome';
+	// import close from 'svelte-awesome/icons/close';
+	// import checkSquareO from 'svelte-awesome/icons/checkSquareO';
 
 	type Locale = (typeof locales)[number];
 
@@ -40,7 +43,7 @@
 	<div class="card-content">
 		<!-- Header/Language Selector -->
 		<div class="card-header-container">
-			<button class="btn btn-lang" on:click={toMain}><Icon data={close} scale={1} /></button>
+			<button class="btn btn-lang" on:click={toMain}><X /></button>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
@@ -91,7 +94,7 @@
 		</div>
 		<!-- Extra Selector -->
 		<div class="card-extra-container">
-			<p style="justify-self: end; padding-right: 20px"><Icon data={checkSquareO} /></p>
+			<p style="justify-self: end; padding-right: 20px"><SquareCheck /></p>
 			<p>Translate all stories to selected language</p>
 		</div>
 		<!-- Footer -->
