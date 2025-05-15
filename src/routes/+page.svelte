@@ -3,11 +3,15 @@
 	import CardLang from '$lib/components/CardLang.svelte';
 	import CardSubmit from '$lib/components/CardSubmit.svelte';
 	import CardExplore from '$lib/components/CardExplore.svelte';
-	import { submitData } from '$lib/utils/api';
+	import { getAuthToken } from '$lib/utils/api_token';
+	import { getClusters } from '$lib/utils/api_clusters';
 
 	let showLang = false;
 	let showSubmit = false;
 	let showExplore = false;
+
+	const API_URL = 'https://peacemachine.eu';
+	const API_CLUSTERS_OPTIONS = { language: 'Any', max_stories: 100, story: null };
 
 	function handleToggleLang() {
 		showLang = !showLang;
@@ -23,10 +27,35 @@
 	}
 
 	let response = null;
+	let response_clusters = null;
 
 	async function handleGetData() {
-		response = await submitData();
+		response = await getAuthToken(API_URL);
 		console.log('Response:', response);
+		if (response) {
+			const token = response.token;
+			console.log('Token:', token);
+			// localStorage.setItem('token', token);
+		} else {
+			console.error('Failed to get token');
+		}
+
+		// getClusters(API_URL, API_CLUSTERS_OPTIONS);
+		response_clusters = await getClusters(API_URL, API_CLUSTERS_OPTIONS);
+		console.log('Clusters:', response_clusters);
+		if (response_clusters) {
+			const clusters = response_clusters.clusters;
+			console.log('Clusters:', clusters);
+			// localStorage.setItem('clusters', JSON.stringify(clusters));
+		} else {
+			console.error('Failed to get clusters');
+		}
+
+		// // For backward compatibility (deprecated)
+		// export async function getToken() {
+		//   console.warn('getToken() is deprecated. Please use getClusters() instead.');
+		//   return getClusters();
+		// }
 	}
 </script>
 
