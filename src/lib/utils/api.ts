@@ -1,11 +1,14 @@
 export async function submitData() {
   try {
-      const response = await fetch('http://localhost:8888/get_clusters', {
+      const response = await fetch('https://peacemachine.eu/docs/get_clusters', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-API-Key': '2KJkiKMXcP9SnY' 
+            },
           body: JSON.stringify({
-            "language": "Finnish",
-            "max_stories": 100
+            "language": "Any",
+            "max_stories": 1000
           })
       });
 
@@ -18,3 +21,4 @@ export async function submitData() {
       return null;
   }
 }
+

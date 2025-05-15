@@ -3,6 +3,7 @@
 	import CardLang from '$lib/components/CardLang.svelte';
 	import CardSubmit from '$lib/components/CardSubmit.svelte';
 	import CardExplore from '$lib/components/CardExplore.svelte';
+	import { submitData } from '$lib/utils/api';
 
 	let showLang = false;
 	let showSubmit = false;
@@ -14,10 +15,18 @@
 
 	function handleToggleSubmit() {
 		showSubmit = !showSubmit;
+		handleGetData();
 	}
 
 	function handleToggleExplore() {
 		showExplore = !showExplore;
+	}
+
+	let response = null;
+
+	async function handleGetData() {
+		response = await submitData();
+		console.log('Response:', response);
 	}
 </script>
 
