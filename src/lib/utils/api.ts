@@ -8,7 +8,7 @@ export async function submitData() {
             },
           body: JSON.stringify({
             "language": "Any",
-            "max_stories": 1000
+            "max_stories": 100
           })
       });
 
