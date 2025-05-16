@@ -1,5 +1,11 @@
-// Get clusters with authentication
-export async function getClusters(API_URL:string, options = { language: 'Any', max_stories: 100, story: null }) {
+// Get questions
+export interface ApiRequestOptions {
+  API_ENDPOINT: string;
+  API_METHOD: string;
+  REQUEST_BODY?: any;
+}
+
+export async function apiRequest(API_URL:string, OPTIONS: ApiRequestOptions) {
   try {
     // Get token from localStorage
     const token = localStorage.getItem('accessToken');
@@ -8,14 +14,14 @@ export async function getClusters(API_URL:string, options = { language: 'Any', m
       throw new Error('No authentication token found. Get a token first.');
     }
     
-    const response = await fetch(`${API_URL}/get_clusters`, {
-      method: 'POST',
+    const response = await fetch(`${API_URL}${OPTIONS.API_ENDPOINT}`, {
+      method: OPTIONS.API_METHOD,
       headers: { 
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(options)
+    body: JSON.stringify(OPTIONS.REQUEST_BODY)
     });
     
     if (!response.ok) {
@@ -25,7 +31,7 @@ export async function getClusters(API_URL:string, options = { language: 'Any', m
     
     return await response.json();
   } catch (error) {
-    console.error('Error getting clusters:', error);
+    console.error('Error from endpoint "', OPTIONS.API_ENDPOINT, '":', error);
     return null;
   }
 }
