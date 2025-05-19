@@ -1,12 +1,58 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { Globe } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+	import { apiRequest } from '$lib/utils/api_request';
+	import { getLocaleFullName } from '$lib/utils/locale_handler';
 
 	// API URL and options
 	// check langselector
 	// call get_question
 	// call suggestions
 	// submit add_story
+
+	const API_QUESTIONS_OPTIONS = {
+		API_ENDPOINT: '/get_questions',
+		API_METHOD: 'POST',
+		REQUEST_BODY: { language: getLocaleFullName(), question_type: 'starter' }
+	};
+
+	const API_SUGGESTION_OPTIONS = {
+		API_ENDPOINT: '/get_suggestion',
+		API_METHOD: 'POST',
+		REQUEST_BODY: { suggestion: null }
+	};
+	const API_ADD_STORY_OPTIONS = {
+		API_ENDPOINT: '/add_story',
+		API_METHOD: 'POST',
+		REQUEST_BODY: { text: null, question: null, language: getLocaleFullName() }
+	};
+
+	// response_suggestion = await apiRequest( API_SUGGESTION_OPTIONS);
+	// console.log('Response:', response_suggestion);
+
+	// response_add_story = await apiRequest( API_ADD_STORY_OPTIONS);
+	// console.log('Response:', response_add_story);
+
+	function handleSubmit() {
+		console.log('Submit');
+	}
+
+	async function handleGetQuestions() {
+		await apiRequest(API_QUESTIONS_OPTIONS).then((response) => {
+			console.log('Response:', response);
+		});
+		// console.log('Get Questions');
+	}
+
+	function handleGetSuggestions() {
+		console.log('Get Suggestions');
+	}
+
+	onMount(() => {
+		handleGetQuestions();
+		// handleGetSuggestions();
+	});
 
 	export let toggleLang = () => {};
 	export let toExplore = () => {};
