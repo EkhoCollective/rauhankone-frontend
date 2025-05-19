@@ -2,6 +2,12 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import { Globe } from 'lucide-svelte';
 
+	// API URL and options
+	// check langselector
+	// call get_question
+	// call suggestions
+	// submit add_story
+
 	export let toggleLang = () => {};
 	export let toExplore = () => {};
 </script>

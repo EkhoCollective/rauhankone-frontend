@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { T, useTask } from '@threlte/core';
 	import { interactivity } from '@threlte/extras';
 	import { Spring } from 'svelte/motion';
@@ -15,6 +15,24 @@
 	useTask((delta) => {
 		rotation += delta;
 	});
+
+	interface Cluster {
+		id: string;
+		position: [number, number, number];
+		// Add other cluster properties as needed
+	}
+
+	interface ClusterResponse {
+		id: string;
+		created_at: number;
+		clusters: Cluster[];
+	}
+
+	export const data: ClusterResponse = {
+		id: '',
+		created_at: 0,
+		clusters: []
+	};
 </script>
 
 <T.PerspectiveCamera makeDefault position.z={5}>

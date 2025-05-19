@@ -23,7 +23,7 @@
 
 	// API URL and options
 
-	const API_URL = 'https://peacemachine.eu';
+	// const API_URL = 'https://peacemachine.eu';
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
 		API_METHOD: 'POST',
@@ -33,7 +33,7 @@
 	const API_QUESTIONS_OPTIONS = {
 		API_ENDPOINT: '/get_questions',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { language: 'Any' }
+		REQUEST_BODY: { language: 'Any', question_type: 'starter' }
 	};
 
 	const API_SUGGESTION_OPTIONS = {
@@ -44,7 +44,7 @@
 	const API_ADD_STORY_OPTIONS = {
 		API_ENDPOINT: '/add_story',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { question: null, text: null, language: null }
+		REQUEST_BODY: { text: null, question: null, language: null }
 	};
 	const API_GET_STORIES_OPTIONS = {
 		API_ENDPOINT: '/get_stories',
@@ -66,24 +66,24 @@
 	}
 
 	async function handleGetData() {
-		response = await getAuthToken(API_URL).then((response) => {
+		response = await getAuthToken().then((response) => {
 			console.log('Response:', response);
 		});
 
-		response_clusters = await apiRequest(API_URL, API_CLUSTERS_OPTIONS);
+		response_clusters = await apiRequest(API_CLUSTERS_OPTIONS);
 		console.log('Response:', response_clusters);
 
-		response_questions = await apiRequest(API_URL, API_QUESTIONS_OPTIONS);
-		console.log('Response:', response_questions);
+		// response_questions = await apiRequest(API_QUESTIONS_OPTIONS);
+		// console.log('Response:', response_questions);
 
-		response_suggestion = await apiRequest(API_URL, API_SUGGESTION_OPTIONS);
-		console.log('Response:', response_suggestion);
+		// response_suggestion = await apiRequest( API_SUGGESTION_OPTIONS);
+		// console.log('Response:', response_suggestion);
 
-		response_add_story = await apiRequest(API_URL, API_ADD_STORY_OPTIONS);
-		console.log('Response:', response_add_story);
+		// response_add_story = await apiRequest( API_ADD_STORY_OPTIONS);
+		// console.log('Response:', response_add_story);
 
-		response_get_stories = await apiRequest(API_URL, API_GET_STORIES_OPTIONS);
-		console.log('Response:', response_get_stories);
+		// response_get_stories = await apiRequest( API_GET_STORIES_OPTIONS);
+		// console.log('Response:', response_get_stories);
 	}
 </script>
 

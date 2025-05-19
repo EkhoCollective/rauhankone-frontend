@@ -5,7 +5,7 @@ export interface ApiRequestOptions {
   REQUEST_BODY?: any;
 }
 
-export async function apiRequest(API_URL:string, OPTIONS: ApiRequestOptions) {
+export async function apiRequest(OPTIONS: ApiRequestOptions) {
   try {
     // Get token from localStorage
     const token = localStorage.getItem('accessToken');
@@ -13,7 +13,9 @@ export async function apiRequest(API_URL:string, OPTIONS: ApiRequestOptions) {
     if (!token) {
       throw new Error('No authentication token found. Get a token first.');
     }
-    
+
+    const API_URL = 'https://peacemachine.eu';
+
     const response = await fetch(`${API_URL}${OPTIONS.API_ENDPOINT}`, {
       method: OPTIONS.API_METHOD,
       headers: { 
