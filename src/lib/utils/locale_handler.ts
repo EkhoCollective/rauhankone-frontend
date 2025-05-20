@@ -3,9 +3,9 @@ export function getLocaleFullName(): string {
     
     const localeMap: { [key: string]: string } = {
         'en': 'English',
+        'fi': 'Finnish',
         'sv': 'Swedish', 
-        'se': 'Sami',
-        'fi': 'Finnish'
+        'sa': 'North Sámi'
     };
 
     return localeMap[localeShort] || 'English'; // Default to English if locale not found

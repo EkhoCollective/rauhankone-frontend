@@ -1,81 +1,68 @@
 <script lang="ts">
-	// import { m } from '$lib/paraglide/messages.js';
+	import { _ } from 'svelte-i18n';
 	import { Globe } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 
-	// API URL and options
-	// check langselector
-	// call get_question
-	// call suggestions
-	// submit add_story
+	let { toExplore, toggleLang2 } = $props();
 
-	let story = '';
+	let question = $state<string | null>(null);
+	let story = $state('');
+	let suggestion = $state('');
 
-	const API_QUESTIONS_OPTIONS = {
+	const API_QUESTIONS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_questions',
 		API_METHOD: 'POST',
 		REQUEST_BODY: { language: getLocaleFullName(), question_type: 'starter' }
-	};
+	});
 
-	const API_SUGGESTION_OPTIONS = {
+	const API_SUGGESTION_OPTIONS = () => ({
 		API_ENDPOINT: '/get_suggestion',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { suggestion: null }
-	};
-	const API_ADD_STORY_OPTIONS = {
+		REQUEST_BODY: { suggestion: story }
+	});
+
+	const API_ADD_STORY_OPTIONS = () => ({
 		API_ENDPOINT: '/add_story',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { text: story, question: null, language: getLocaleFullName() }
-	};
-
-	// response_suggestion = await apiRequest( API_SUGGESTION_OPTIONS);
-	// console.log('Response:', response_suggestion);
-
-	// response_add_story = await apiRequest( API_ADD_STORY_OPTIONS);
-	// console.log('Response:', response_add_story);
-
-	async function handleSubmit() {
-		// await apiRequest(API_ADD_STORY_OPTIONS).then((response) => {
-		// 	console.log('Add Story Response:', response);
-		// });
-		console.log('Add Story');
-	}
+		REQUEST_BODY: { text: story, question: question, language: getLocaleFullName() }
+	});
 
 	async function handleGetQuestions() {
-		await apiRequest(API_QUESTIONS_OPTIONS).then((response) => {
+		await apiRequest(API_QUESTIONS_OPTIONS()).then((response) => {
 			console.log('Get Questions Response:', response);
+			question = response.questions[0].text;
 		});
-		// console.log('Get Questions');
 	}
 
-	function handleGetSuggestions() {
-		console.log('Get Suggestions');
+	async function handleSubmit() {
+		await apiRequest(API_ADD_STORY_OPTIONS()).then((response) => {
+			console.log('Add Story Response:', response);
+		});
+		// toExplore(true);
+	}
+
+	async function handleGetSuggestions() {
+		await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
+			console.log('Get Suggestions Response:', response);
+		});
 	}
 
 	onMount(() => {
 		handleGetQuestions();
-		// handleGetSuggestions();
 	});
-
-	export let toggleLang = () => {};
-	export let toExplore = () => {
-		// handleSubmit();
-	};
 </script>
 
 <div class="card">
 	<div class="card-content">
 		<!-- Header/Language Selector -->
 		<div class="card-header-container">
-			<button class="btn btn-lang" on:click={toggleLang}><Globe /></button>
+			<button class="btn btn-lang" onclick={toggleLang2(true)}><Globe /></button>
 		</div>
 		<!-- Main Text -->
 		<div class="card-text-container">
-			<p>
-				<!-- {m.submit_info()} -->
-			</p>
+			<p>{question}</p>
 		</div>
 		<!-- Input Area -->
 		<div class="card-input-container">
@@ -84,26 +71,17 @@
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<div>
-				<button class="btn" on:click={toExplore}>submit</button>
+				<button class="btn" onclick={handleSubmit}>{$_('submit')}</button>
 			</div>
 		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
-			<!-- <p>{m.read_more()}</p> -->
+			<p>{$_('read_more')}</p>
 			<p>© Ekho Collective</p>
 			<p>GDPR</p>
 		</div>
 	</div>
 </div>
-
-<!-- NOTES
- 
-- change icon
-- check font style
-- buttons styling
-- title separtion to paraglide schema
-
--->
 
 <style>
 	.card {

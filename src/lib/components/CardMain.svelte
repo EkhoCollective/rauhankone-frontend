@@ -5,8 +5,6 @@
 	export let toLang = () => {};
 	export let toSubmit = () => {};
 	export let toExplore = () => {};
-
-	// export let rk_title: string;
 </script>
 
 <div class="card">
@@ -17,18 +15,11 @@
 		</div>
 		<!-- Title -->
 		<div class="card-title-container">
-			<p>
-				Layers<br />
-				of<br />
-				the<br />
-				Peace<br />
-				Machine
-			</p>
+			<div>{$_('rk_title')}</div>
 		</div>
 		<!-- Main Text -->
 		<div class="card-text-container">
-			<!-- <p>{m.description()}</p> -->
-			<div>{$_('rk_title')}</div>
+			<div>{$_('description')}</div>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
@@ -41,7 +32,7 @@
 		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
-			<!-- <p>{m.read_more()}</p> -->
+			<p>{$_('read_more')}</p>
 			<p>© Ekho Collective</p>
 			<p>GDPR</p>
 		</div>

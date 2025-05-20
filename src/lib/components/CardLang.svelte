@@ -1,19 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	// import { setLocale, locales } from '$lib/paraglide/runtime.js';
-	// import { m } from '$lib/paraglide/messages.js';
-
-	import { locale } from 'svelte-i18n';
-
+	import { _, locale } from 'svelte-i18n';
 	import { SquareCheck } from 'lucide-svelte';
 	import { X } from 'lucide-svelte';
-	// import Icon from 'svelte-awesome';
-	// import close from 'svelte-awesome/icons/close';
-	// import checkSquareO from 'svelte-awesome/icons/checkSquareO';
 
-	// type Locale = (typeof locales)[number];
-
-	// let selectedLocale: Locale = 'en'; // fallback
+	let { toggleLang } = $props();
 
 	const languages = [
 		{ code: 'en', name: 'English' },
@@ -22,106 +12,39 @@
 		{ code: 'sa', name: 'Sámegiella' }
 	];
 
-	// onMount(() => {
-	// 	const savedLocale = localStorage.getItem('locale') as Locale | null;
-	// 	if (savedLocale && locales.includes(savedLocale)) {
-	// 		selectedLocale = savedLocale;
-	// 		setLocale(savedLocale);
-	// 	} else {
-	// 		setLocale(selectedLocale);
-	// 	}
-	// });
-
-	// function handleLocaleChange(event: Event) {
-	// 	const target = event.target as HTMLSelectElement | null;
-	// 	if (target) {
-	// 		const newLocale = target.value as Locale;
-	// 		localStorage.setItem('locale', newLocale);
-	// 		setLocale(newLocale);
-	// 	}
-	// }
 	function handleLocaleChange(lang_code: string) {
 		locale.set(lang_code);
 		localStorage.setItem('locale', lang_code);
+		toggleLang(false);
 		console.log(lang_code);
 	}
-	export let toggleLang = () => {};
 </script>
 
 <div class="card">
 	<div class="card-content">
 		<!-- Header/Language Selector -->
 		<div class="card-header-container">
-			<button class="btn btn-lang" on:click={toggleLang}><X /></button>
+			<button class="btn btn-lang" onclick={() => toggleLang(false)}><X /></button>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
-			<!-- <div>
-				<button
-					class={selectedLocale === 'en' ? 'active' : ''}
-					on:click={() => handleLocaleChange('en')}
-				>
-					English
-				</button>
-			</div>
-			<div>
-				<button
-					class={selectedLocale === 'fi' ? 'active' : ''}
-					on:click={() => handleLocaleChange('fi')}
-				>
-					Suomi
-				</button>
-			</div>
-			<div>
-				<button
-					class={selectedLocale === 'sv' ? 'active' : ''}
-					on:click={() => handleLocaleChange('sv')}
-				>
-					Svenska
-				</button>
-			</div>
-			<div>
-				<button
-					class={selectedLocale === 'sa' ? 'active' : ''}
-					on:click={() => handleLocaleChange('sa')}
-				>
-					Deutsch
-				</button>
-			</div> -->
-			<!-- <div>
-				<button class="btn" on:click={() => handleLocaleChange('en')}> English </button>
-			</div>
-			<div>
-				<button class="btn" on:click={() => handleLocaleChange('fi')}> Suomi </button>
-			</div>
-			<div>
-				<button class="btn" on:click={() => handleLocaleChange('sv')}> Svenska </button>
-			</div>
-			<div>
-				<button class="btn" on:click={() => handleLocaleChange('sa')}> Sámegiella </button>
-			</div> -->
 			{#each languages as { code, name }}
-				<button class="btn" on:click={() => handleLocaleChange(code)}>{name}</button>
+				<button class="btn" onclick={() => handleLocaleChange(code)}>{name}</button>
 			{/each}
 		</div>
 		<!-- Extra Selector -->
 		<div class="card-extra-container">
 			<p style="justify-self: end; padding-right: 20px"><SquareCheck /></p>
-			<p>Translate all stories to selected language</p>
+			<p>{$_('btn_translate')}</p>
 		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
-			<!-- <p>{m.read_more()}</p> -->
+			<p>{$_('read_more')}</p>
 			<p>© Ekho Collective</p>
 			<p>GDPR</p>
 		</div>
 	</div>
 </div>
-
-<!-- NOTES
- 
-
--->
 
 <style>
 	.card {

@@ -40,6 +40,10 @@
 		});
 	}
 
+	function setShowLang(state: boolean) {
+		showLang = state;
+	}
+
 	onMount(() => {
 		handleGetToken();
 	});
@@ -51,13 +55,13 @@
 
 {#if showLang}
 	<div class="main-container lang-container">
-		<CardLang toggleLang={handleToggleLang} />
+		<CardLang toggleLang={setShowLang} />
 	</div>
 {/if}
 
 {#if showSubmit}
 	<div class="main-container submit-container">
-		<CardSubmit toggleLang={handleToggleLang} toExplore={handleToggleExplore} />
+		<CardSubmit toggleLang2={handleToggleLang} toExplore={handleToggleExplore} />
 	</div>
 {/if}
 
