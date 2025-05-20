@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	// import { m } from '$lib/paraglide/messages.js';
 	import { Globe } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
@@ -10,6 +10,8 @@
 	// call get_question
 	// call suggestions
 	// submit add_story
+
+	let story = '';
 
 	const API_QUESTIONS_OPTIONS = {
 		API_ENDPOINT: '/get_questions',
@@ -25,7 +27,7 @@
 	const API_ADD_STORY_OPTIONS = {
 		API_ENDPOINT: '/add_story',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { text: null, question: null, language: getLocaleFullName() }
+		REQUEST_BODY: { text: story, question: null, language: getLocaleFullName() }
 	};
 
 	// response_suggestion = await apiRequest( API_SUGGESTION_OPTIONS);
@@ -34,13 +36,16 @@
 	// response_add_story = await apiRequest( API_ADD_STORY_OPTIONS);
 	// console.log('Response:', response_add_story);
 
-	function handleSubmit() {
-		console.log('Submit');
+	async function handleSubmit() {
+		// await apiRequest(API_ADD_STORY_OPTIONS).then((response) => {
+		// 	console.log('Add Story Response:', response);
+		// });
+		console.log('Add Story');
 	}
 
 	async function handleGetQuestions() {
 		await apiRequest(API_QUESTIONS_OPTIONS).then((response) => {
-			console.log('Response:', response);
+			console.log('Get Questions Response:', response);
 		});
 		// console.log('Get Questions');
 	}
@@ -55,7 +60,9 @@
 	});
 
 	export let toggleLang = () => {};
-	export let toExplore = () => {};
+	export let toExplore = () => {
+		// handleSubmit();
+	};
 </script>
 
 <div class="card">
@@ -67,22 +74,22 @@
 		<!-- Main Text -->
 		<div class="card-text-container">
 			<p>
-				{m.submit_info()}
+				<!-- {m.submit_info()} -->
 			</p>
 		</div>
 		<!-- Input Area -->
 		<div class="card-input-container">
-			<textarea rows="10" cols="50" placeholder="Your memory here..."></textarea>
+			<textarea rows="10" cols="50" placeholder="Your memory here..." bind:value={story}></textarea>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<div>
-				<button class="btn" on:click={toExplore}>{m.submit()}</button>
+				<button class="btn" on:click={toExplore}>submit</button>
 			</div>
 		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
-			<p>{m.read_more()}</p>
+			<!-- <p>{m.read_more()}</p> -->
 			<p>© Ekho Collective</p>
 			<p>GDPR</p>
 		</div>

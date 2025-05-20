@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { getAuthToken } from '$lib/utils/api_token';
+	import { waitLocale } from 'svelte-i18n';
 
 	import CardMain from '$lib/components/CardMain.svelte';
 	import CardLang from '$lib/components/CardLang.svelte';
@@ -66,13 +67,17 @@
 	</div>
 {/if}
 
-<div class="main-container">
-	<CardMain
-		toLang={handleToggleLang}
-		toSubmit={handleToggleSubmit}
-		toExplore={handleToggleExplore}
-	/>
-</div>
+{#await waitLocale()}
+	<p>Loading...</p>
+{:then}
+	<div class="main-container">
+		<CardMain
+			toLang={handleToggleLang}
+			toSubmit={handleToggleSubmit}
+			toExplore={handleToggleExplore}
+		/>
+	</div>
+{/await}
 
 <style>
 	.main-container {

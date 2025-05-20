@@ -1,9 +1,12 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	// import { m } from '$lib/paraglide/messages.js';
+	import { _ } from 'svelte-i18n';
 	import { Globe } from 'lucide-svelte';
 	export let toLang = () => {};
 	export let toSubmit = () => {};
 	export let toExplore = () => {};
+
+	// export let rk_title: string;
 </script>
 
 <div class="card">
@@ -24,20 +27,21 @@
 		</div>
 		<!-- Main Text -->
 		<div class="card-text-container">
-			<p>{m.description()}</p>
+			<!-- <p>{m.description()}</p> -->
+			<div>{$_('rk_title')}</div>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<div>
-				<button class="btn" on:click={toSubmit}>{m.btn_take_part()}</button>
+				<button class="btn" on:click={toSubmit}>Take Part</button>
 			</div>
 			<div>
-				<button class="btn" on:click={toExplore}>{m.btn_explore()}</button>
+				<button class="btn" on:click={toExplore}>Explore</button>
 			</div>
 		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
-			<p>{m.read_more()}</p>
+			<!-- <p>{m.read_more()}</p> -->
 			<p>© Ekho Collective</p>
 			<p>GDPR</p>
 		</div>

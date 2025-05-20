@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { setLocale, locales } from '$lib/paraglide/runtime.js';
-	import { m } from '$lib/paraglide/messages.js';
+	// import { setLocale, locales } from '$lib/paraglide/runtime.js';
+	// import { m } from '$lib/paraglide/messages.js';
+
+	import { locale } from 'svelte-i18n';
 
 	import { SquareCheck } from 'lucide-svelte';
 	import { X } from 'lucide-svelte';
@@ -9,19 +11,26 @@
 	// import close from 'svelte-awesome/icons/close';
 	// import checkSquareO from 'svelte-awesome/icons/checkSquareO';
 
-	type Locale = (typeof locales)[number];
+	// type Locale = (typeof locales)[number];
 
-	let selectedLocale: Locale = 'en'; // fallback
+	// let selectedLocale: Locale = 'en'; // fallback
 
-	onMount(() => {
-		const savedLocale = localStorage.getItem('locale') as Locale | null;
-		if (savedLocale && locales.includes(savedLocale)) {
-			selectedLocale = savedLocale;
-			setLocale(savedLocale);
-		} else {
-			setLocale(selectedLocale);
-		}
-	});
+	const languages = [
+		{ code: 'en', name: 'English' },
+		{ code: 'fi', name: 'Suomi' },
+		{ code: 'sv', name: 'Svenska' },
+		{ code: 'sa', name: 'Sámegiella' }
+	];
+
+	// onMount(() => {
+	// 	const savedLocale = localStorage.getItem('locale') as Locale | null;
+	// 	if (savedLocale && locales.includes(savedLocale)) {
+	// 		selectedLocale = savedLocale;
+	// 		setLocale(savedLocale);
+	// 	} else {
+	// 		setLocale(selectedLocale);
+	// 	}
+	// });
 
 	// function handleLocaleChange(event: Event) {
 	// 	const target = event.target as HTMLSelectElement | null;
@@ -31,10 +40,10 @@
 	// 		setLocale(newLocale);
 	// 	}
 	// }
-	function handleLocaleChange(locale: Locale) {
-		localStorage.setItem('locale', locale);
-		setLocale(locale);
-		selectedLocale = locale;
+	function handleLocaleChange(lang_code: string) {
+		locale.set(lang_code);
+		localStorage.setItem('locale', lang_code);
+		console.log(lang_code);
 	}
 	export let toggleLang = () => {};
 </script>
@@ -79,7 +88,7 @@
 					Deutsch
 				</button>
 			</div> -->
-			<div>
+			<!-- <div>
 				<button class="btn" on:click={() => handleLocaleChange('en')}> English </button>
 			</div>
 			<div>
@@ -90,7 +99,10 @@
 			</div>
 			<div>
 				<button class="btn" on:click={() => handleLocaleChange('sa')}> Sámegiella </button>
-			</div>
+			</div> -->
+			{#each languages as { code, name }}
+				<button class="btn" on:click={() => handleLocaleChange(code)}>{name}</button>
+			{/each}
 		</div>
 		<!-- Extra Selector -->
 		<div class="card-extra-container">
@@ -99,7 +111,7 @@
 		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
-			<p>{m.read_more()}</p>
+			<!-- <p>{m.read_more()}</p> -->
 			<p>© Ekho Collective</p>
 			<p>GDPR</p>
 		</div>

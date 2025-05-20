@@ -31,7 +31,7 @@
 	}
 
 	onMount(() => {
-		fetchClusters();
+		// fetchClusters();
 	});
 
 	interactivity();
