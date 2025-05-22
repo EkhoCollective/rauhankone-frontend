@@ -3,7 +3,7 @@
 	import { SquareCheck } from 'lucide-svelte';
 	import { X } from 'lucide-svelte';
 
-	let { toggleLang } = $props();
+	let { closeLangCard } = $props();
 
 	const languages = [
 		{ code: 'en', name: 'English' },
@@ -15,7 +15,7 @@
 	function handleLocaleChange(lang_code: string) {
 		locale.set(lang_code);
 		localStorage.setItem('locale', lang_code);
-		toggleLang(false);
+		closeLangCard(false);
 		console.log(lang_code);
 	}
 </script>
@@ -24,7 +24,7 @@
 	<div class="card-content">
 		<!-- Header/Language Selector -->
 		<div class="card-header-container">
-			<button class="btn btn-lang" onclick={() => toggleLang(false)}><X /></button>
+			<button class="btn btn-lang" onclick={() => closeLangCard(false)}><X /></button>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">

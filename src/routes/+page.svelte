@@ -3,6 +3,8 @@
 	import { getAuthToken } from '$lib/utils/api_token';
 	import { waitLocale } from 'svelte-i18n';
 
+	import Header from '$lib/components/Header.svelte';
+
 	import CardMain from '$lib/components/CardMain.svelte';
 	import CardLang from '$lib/components/CardLang.svelte';
 	import CardSubmit from '$lib/components/CardSubmit.svelte';
@@ -10,9 +12,9 @@
 
 	// UI Toggles
 
-	let showLang = false;
-	let showSubmit = false;
-	let showExplore = false;
+	let showLang = $state(false);
+	let showSubmit = $state(false);
+	let showExplore = $state(false);
 
 	// function handleToggle(state: boolean) {
 	// 	return () => {
@@ -22,9 +24,9 @@
 	// 	};
 	// }
 
-	function handleToggleLang() {
-		showLang = !showLang;
-	}
+	let handleToggleLang = (value: boolean) => {
+		showLang = value;
+	};
 
 	function handleToggleSubmit() {
 		showSubmit = !showSubmit;
@@ -55,7 +57,7 @@
 
 {#if showLang}
 	<div class="main-container lang-container">
-		<CardLang toggleLang={setShowLang} />
+		<CardLang closeLangCard={handleToggleLang} />
 	</div>
 {/if}
 
@@ -75,11 +77,8 @@
 	<p>Loading...</p>
 {:then}
 	<div class="main-container">
-		<CardMain
-			toLang={handleToggleLang}
-			toSubmit={handleToggleSubmit}
-			toExplore={handleToggleExplore}
-		/>
+		<Header openLangCard={handleToggleLang} />
+		<CardMain toSubmit={handleToggleSubmit} toExplore={handleToggleExplore} />
 	</div>
 {/await}
 

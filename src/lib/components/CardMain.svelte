@@ -1,8 +1,8 @@
 <script lang="ts">
 	// import { m } from '$lib/paraglide/messages.js';
 	import { _ } from 'svelte-i18n';
-	import { Globe } from 'lucide-svelte';
-	export let toLang = () => {};
+	// import { Globe } from 'lucide-svelte';
+
 	export let toSubmit = () => {};
 	export let toExplore = () => {};
 </script>
@@ -10,9 +10,9 @@
 <div class="card">
 	<div class="card-content">
 		<!-- Header/Language Selector -->
-		<div class="card-header-container">
+		<!-- <div class="card-header-container">
 			<button class="btn btn-lang" on:click={toLang}><Globe /></button>
-		</div>
+		</div> -->
 		<!-- Title -->
 		<div class="card-title-container">
 			<div>{$_('rk_title')}</div>
@@ -61,10 +61,7 @@
 		height: 100%;
 		padding: 25px;
 	}
-	.card-header-container {
-		display: grid;
-		justify-items: end;
-	}
+
 	.card-title-container {
 		margin: 10% 0 10% 0;
 		font-size: 3em;
@@ -84,10 +81,7 @@
 		background-color: black;
 		border-color: white;
 	}
-	.btn-lang {
-		border: none;
-		box-shadow: none;
-	}
+
 	.card-footer-container {
 		margin-top: 20%;
 		font-size: 0.75em;
