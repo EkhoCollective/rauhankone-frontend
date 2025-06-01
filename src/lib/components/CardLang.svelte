@@ -24,7 +24,7 @@
 	<div class="card-content">
 		<!-- Header/Language Selector -->
 		<div class="card-header-container">
-			<button class="btn btn-lang" onclick={() => closeLangCard(false)}><X /></button>
+			<button class="btn btn-lang" onclick={() => closeLangCard()}><X /></button>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">

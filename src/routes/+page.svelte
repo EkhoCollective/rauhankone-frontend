@@ -24,8 +24,9 @@
 	// 	};
 	// }
 
-	let handleToggleLang = (value: boolean) => {
-		showLang = value;
+	let handleToggleLang = () => {
+		console.log('handleToggleLang');
+		showLang = !showLang;
 	};
 
 	function handleToggleSubmit() {
@@ -61,7 +62,7 @@
 	</div>
 {/if}
 
-{#if showSubmit}
+<!-- {#if showSubmit}
 	<div class="main-container submit-container">
 		<CardSubmit toggleLang2={handleToggleLang} toExplore={handleToggleExplore} />
 	</div>
@@ -71,14 +72,31 @@
 	<div class="main-container explore-container">
 		<CardExplore />
 	</div>
-{/if}
+{/if} -->
 
 {#await waitLocale()}
 	<p>Loading...</p>
 {:then}
 	<div class="main-container">
-		<Header openLangCard={handleToggleLang} />
-		<CardMain toSubmit={handleToggleSubmit} toExplore={handleToggleExplore} />
+		<div class="header-container">
+			<Header openLangCard={handleToggleLang} />
+		</div>
+
+		<div class="card-container">
+			{#if showSubmit}
+				<div class="submit-container">
+					<CardSubmit toggleLang2={handleToggleLang} toExplore={handleToggleExplore} />
+				</div>
+			{/if}
+
+			{#if showExplore}
+				<div class="explore-container">
+					<CardExplore />
+				</div>
+			{/if}
+
+			<CardMain toSubmit={handleToggleSubmit} toExplore={handleToggleExplore} />
+		</div>
 	</div>
 {/await}
 
@@ -93,8 +111,17 @@
 		transform: translate(-50%, -50%);
 	}
 
-	.lang-container {
+	.card-container {
+		top: 50px;
+	}
+
+	.header-container {
+		height: 50px;
 		z-index: 9999;
+	}
+
+	.lang-container {
+		z-index: 5000;
 	}
 
 	.submit-container {

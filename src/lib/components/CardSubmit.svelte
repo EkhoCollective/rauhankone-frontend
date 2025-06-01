@@ -57,9 +57,9 @@
 <div class="card">
 	<div class="card-content">
 		<!-- Header/Language Selector -->
-		<div class="card-header-container">
+		<!-- <div class="card-header-container">
 			<button class="btn btn-lang" onclick={toggleLang2(true)}><Globe /></button>
-		</div>
+		</div> -->
 		<!-- Main Text -->
 		<div class="card-text-container">
 			<p>{question}</p>
@@ -97,10 +97,10 @@
 		padding: 25px;
 	}
 
-	.card-header-container {
+	/* .card-header-container {
 		display: grid;
 		justify-items: end;
-	}
+	} */
 
 	.card-input-container {
 		margin: 10% 0 10% 0;
@@ -126,10 +126,10 @@
 		border-color: white;
 	}
 
-	.btn-lang {
+	/* .btn-lang {
 		border: none;
 		box-shadow: none;
-	}
+	} */
 
 	.card-footer-container {
 		margin-top: 50%;

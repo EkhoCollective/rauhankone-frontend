@@ -9,7 +9,7 @@
 	<div class="card-content">
 		<!-- Header/Language Selector -->
 		<div class="card-header-container">
-			<button class="btn btn-lang" onclick={() => openLangCard(true)}><Globe /></button>
+			<button class="btn btn-lang" onclick={() => openLangCard()}><Globe /></button>
 		</div>
 	</div>
 </div>
