@@ -30,12 +30,6 @@
 				<button class="btn" on:click={toExplore}>Explore</button>
 			</div>
 		</div>
-		<!-- Footer -->
-		<div class="card-footer-container">
-			<p>{$_('read_more')}</p>
-			<p>© Ekho Collective</p>
-			<p>GDPR</p>
-		</div>
 	</div>
 </div>
 
@@ -82,8 +76,8 @@
 		border-color: white;
 	}
 
-	.card-footer-container {
+	/* .card-footer-container {
 		margin-top: 20%;
 		font-size: 0.75em;
-	}
+	} */
 </style>

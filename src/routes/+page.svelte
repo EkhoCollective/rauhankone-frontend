@@ -4,6 +4,8 @@
 	import { waitLocale } from 'svelte-i18n';
 
 	import Header from '$lib/components/Header.svelte';
+	import Footer from '$lib/components/Footer.svelte';
+	import Loader from '$lib/components/Loader.svelte';
 
 	import CardMain from '$lib/components/CardMain.svelte';
 	import CardLang from '$lib/components/CardLang.svelte';
@@ -25,7 +27,6 @@
 	// }
 
 	let handleToggleLang = () => {
-		console.log('handleToggleLang');
 		showLang = !showLang;
 	};
 
@@ -38,9 +39,7 @@
 	}
 
 	async function handleGetToken() {
-		await getAuthToken().then((response) => {
-			console.log('Response:', response);
-		});
+		await getAuthToken();
 	}
 
 	function setShowLang(state: boolean) {
@@ -75,7 +74,7 @@
 {/if} -->
 
 {#await waitLocale()}
-	<p>Loading...</p>
+	<Loader />
 {:then}
 	<div class="main-container">
 		<div class="header-container">
@@ -95,7 +94,12 @@
 				</div>
 			{/if}
 
-			<CardMain toSubmit={handleToggleSubmit} toExplore={handleToggleExplore} />
+			{#if !showSubmit}
+				<CardMain toSubmit={handleToggleSubmit} toExplore={handleToggleExplore} />
+			{/if}
+		</div>
+		<div class="footer-container">
+			<Footer />
 		</div>
 	</div>
 {/await}
@@ -130,5 +134,9 @@
 
 	.explore-container {
 		z-index: 3;
+	}
+
+	.footer-container {
+		z-index: 4;
 	}
 </style>

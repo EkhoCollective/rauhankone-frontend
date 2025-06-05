@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
+	import DOMPurify from 'dompurify';
 
 	let { toExplore, toggleLang2 } = $props();
 
@@ -14,7 +15,7 @@
 	const API_QUESTIONS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_questions',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { language: getLocaleFullName(), question_type: 'starter' }
+		REQUEST_BODY: { language: 'Any', question_type: 'starter' }
 	});
 
 	const API_SUGGESTION_OPTIONS = () => ({
@@ -26,7 +27,11 @@
 	const API_ADD_STORY_OPTIONS = () => ({
 		API_ENDPOINT: '/add_story',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { text: story, question: question, language: getLocaleFullName() }
+		REQUEST_BODY: {
+			text: DOMPurify.sanitize(story),
+			question: question,
+			language: getLocaleFullName()
+		}
 	});
 
 	async function handleGetQuestions() {
@@ -75,11 +80,11 @@
 			</div>
 		</div>
 		<!-- Footer -->
-		<div class="card-footer-container">
+		<!-- <div class="card-footer-container">
 			<p>{$_('read_more')}</p>
 			<p>© Ekho Collective</p>
 			<p>GDPR</p>
-		</div>
+		</div> -->
 	</div>
 </div>
 
@@ -131,8 +136,8 @@
 		box-shadow: none;
 	} */
 
-	.card-footer-container {
+	/* .card-footer-container {
 		margin-top: 50%;
 		font-size: 0.75em;
-	}
+	} */
 </style>

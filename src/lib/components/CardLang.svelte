@@ -38,11 +38,11 @@
 			<p>{$_('btn_translate')}</p>
 		</div>
 		<!-- Footer -->
-		<div class="card-footer-container">
+		<!-- <div class="card-footer-container">
 			<p>{$_('read_more')}</p>
 			<p>© Ekho Collective</p>
 			<p>GDPR</p>
-		</div>
+		</div> -->
 	</div>
 </div>
 
@@ -101,8 +101,8 @@
 		border: none;
 		box-shadow: none;
 	}
-	.card-footer-container {
+	/* .card-footer-container {
 		margin-top: 20%;
 		font-size: 0.75em;
-	}
+	} */
 </style>
