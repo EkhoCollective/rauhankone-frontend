@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { getAuthToken } from '$lib/utils/api_token';
-	import { waitLocale } from 'svelte-i18n';
-	import { _ } from 'svelte-i18n';
+	import { _, waitLocale } from 'svelte-i18n';
 
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';

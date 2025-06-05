@@ -1,11 +1,11 @@
 {
 	"rk_title": "Dássut dábálašvuoda mášinain",
-	"description": "... lea oassi dinamihkalaš diskusiuvnnas doaibmárbuid, válljeheapmuid, oktasaš vuolláičállima ja válddi birra, mat buot stuorra váikkuhit ráfiidprosessaide. Váldde oassi ráfiidmáššina ráhkadeamis ja juo åvdame iežat árvvusat ráfi birra.",
-	"btn_take_part": "Váldde oassi",
+	"rk_layer": "Juohkama gierddu",
+	"description": "Ráfi­mašiidna­laš gierduid galget ođasmahttot oktan­go, buot beassat searvat sihke iežaset máidnasiid ja fuomášumiid ráfái. Seavvat ráfimašiidna­laš ávdnasiidda ja juohke iežat muittu ráfái. Don sáhtát maiddái geahččat earáid muittuide mearkkašupmi­kártas.",
+	"btn_take_part": "Sádda",
 	"btn_explore": "Čuovvue",
-	"btn_translate": "Jorgal buot muitalusaid válljejuvvon gillii",
-	"read_more": "Lohkat eanet birra dáhpáhusa",
-	"submit": "Sádda",
-	"submit_info": "Juo åvdame iežat ovddasriekta muittu ráfi birra. Muital dan mahdollisimus earásti.",
+	"btn_translate_check": "Jorgal buot máidnasat válljejuvvon giellii",
+	"btn_submit": "Sádda",
+	"input_placeholder": "Dán máidnasa...",
 	"disclaimer": "Čálliin duođaštan ahte muhto lea vuoigatvuohta álggahit dán máidnasa ja in juohkka persovnnalaš dieđuid."
 }

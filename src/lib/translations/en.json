@@ -4,9 +4,8 @@
 	"description": "Layers of the Peace machine will be built together, by using everyone’s input - stories and views on peace. Participate in building a peace machine and share your personal memory about peace. You can also explore other’s memories in the map of meaning.",
 	"btn_take_part": "Take Part",
 	"btn_explore": "Explore",
-	"btn_translate": "Translate all stories to selected language",
-	"read_more": "Read more about the piece",
-	"submit": "Submit",
-	"submit_info": "Share a personal memory you have about peace. Describe it in as much detail as possible.",
+	"btn_translate_check": "Translate all stories to selected language",
+	"btn_submit": "Submit",
+	"input_placeholder": "Your memory here...",
 	"disclaimer": "By submitting I confirm that I have the right to publish this story and not sharing any personal information."
 }

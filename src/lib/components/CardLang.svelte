@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { _, locale } from 'svelte-i18n';
+	import { _, locale, waitLocale } from 'svelte-i18n';
 	import { SquareCheck } from 'lucide-svelte';
 	import { X } from 'lucide-svelte';
+
+	import Loader from '$lib/components/Loader.svelte';
 
 	let { closeLangCard } = $props();
 
@@ -12,13 +14,21 @@
 		{ code: 'sa', name: 'Sámegiella' }
 	];
 
-	function handleLocaleChange(lang_code: string) {
+	async function handleLocaleChange(lang_code: string) {
 		locale.set(lang_code);
 		localStorage.setItem('locale', lang_code);
-		closeLangCard(false);
-		console.log(lang_code);
+		await waitLocale().then(() => {
+			console.log('Locale loaded');
+			closeLangCard(false);
+		});
+
+		// console.log(lang_code);
 	}
 </script>
+
+{#await waitLocale()}
+	<Loader />
+{/await}
 
 <div class="card">
 	<div class="card-content">

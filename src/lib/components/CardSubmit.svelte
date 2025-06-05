@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { _, locale } from 'svelte-i18n';
 	import { CircleAlert } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
@@ -37,7 +37,7 @@
 	async function handleGetQuestions() {
 		await apiRequest(API_QUESTIONS_OPTIONS()).then((response) => {
 			console.log('Get Questions Response:', response);
-			question = response.questions[0].text;
+			getLangFilteredQuestion(response);
 		});
 	}
 
@@ -48,30 +48,60 @@
 		toExplore();
 	}
 
-	async function handleGetSuggestions() {
-		await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
-			console.log('Get Suggestions Response:', response);
-		});
+	// async function handleGetSuggestions() {
+	// 	await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
+	// 		console.log('Get Suggestions Response:', response);
+	// 	});
+	// }
+
+	function getLangFilteredQuestion(obj: any) {
+		const questionsArray = obj.questions;
+
+		if (Array.isArray(questionsArray) && questionsArray.length > 0) {
+			const currentLocale = getLocaleFullName();
+			const filteredQuestions = questionsArray.filter((q) => q.language === currentLocale);
+
+			if (filteredQuestions.length > 0) {
+				const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
+				question = filteredQuestions[randomIndex].text;
+			} else {
+				// Fallback: if no questions for the current locale, pick a random one from all questions
+				console.warn(
+					`No questions found for locale: ${currentLocale}. Displaying a random question from all available.`
+				);
+				const randomIndex = Math.floor(Math.random() * questionsArray.length);
+				question = questionsArray[randomIndex].text;
+			}
+		} else {
+			console.error('Questions array is missing or empty in the response:', obj);
+			question = 'No questions available at the moment.'; // Default message
+		}
 	}
+
+	locale.subscribe(() => {
+		handleGetQuestions();
+	});
 
 	onMount(() => {
 		handleGetQuestions();
 	});
+
+	// $inspect('isLoading', isLoading);
 </script>
 
+<!-- {#await waitLocale()}
+	<Loader />
+{:then} -->
 <div class="card">
 	<div class="card-content">
-		<!-- Header/Language Selector -->
-		<!-- <div class="card-header-container">
-			<button class="btn btn-lang" onclick={toggleLang2(true)}><Globe /></button>
-		</div> -->
 		<!-- Main Text -->
 		<div class="card-text-container">
 			<p>{question}</p>
 		</div>
 		<!-- Input Area -->
 		<div class="card-input-container">
-			<textarea rows="10" cols="50" placeholder="Your memory here..." bind:value={story}></textarea>
+			<textarea rows="10" cols="50" placeholder={$_('input_placeholder')} bind:value={story}
+			></textarea>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
@@ -85,6 +115,8 @@
 		</div>
 	</div>
 </div>
+
+<!-- {/await} -->
 
 <style>
 	.card {
@@ -100,16 +132,10 @@
 		padding: 25px;
 	}
 
-	/* .card-header-container {
-		display: grid;
-		justify-items: end;
-	} */
-
 	.card-input-container {
 		margin: 10% 0 10% 0;
 		border: 1px solid white;
 	}
-
 	textarea {
 		width: 100%;
 		height: 200px;
@@ -128,19 +154,8 @@
 		background-color: black;
 		border-color: white;
 	}
-
 	.card-disclaimer-container {
 		font-size: 0.75em;
 		margin: 10% 0 0 0;
 	}
-
-	/* .btn-lang {
-		border: none;
-		box-shadow: none;
-	} */
-
-	/* .card-footer-container {
-		margin-top: 50%;
-		font-size: 0.75em;
-	} */
 </style>

@@ -1,11 +1,11 @@
 {
 	"rk_title": "Rauhankoneen Kerroksia",
-	"description": "... on osa dynaamista keskustelua teoista, valinnoista, keskinäisistä vuorovaikutuksista ja vallasta, jotka kaikki vaikuttavat merkittävästi rauhan prosesseihin.Osallistu rauhakoneen rakentamiseen ja jaa oma muistosi rauhasta.",
+	"rk_layer": "Kertomisen kerros",
+	"description": "Rauhankoneen kerroksia -teos rakennetaan yhdessä hyödyntämällä osallistujien muistoja ja näkemyksiä rauhasta. Osallistu rauhankoneen rakentamiseen jakamalla oma henkilökohtainen muistosi. Pääseet myös tutustumaan muiden jakamiin muistoihin merkityskartassa.",
 	"btn_take_part": "Osallistu",
 	"btn_explore": "Tutki",
-	"btn_translate": "Käännä kaikki muistot valitulleesta kielelle",
-	"read_more": "Lue lisää teoksesta",
-	"submit": "Lähetä",
-	"submit_info": "Jaa henkilökohtainen muistosi rauhasta. Kuvaile se mahdollisimman tarkasti.",
+	"btn_translate_check": "Käännä kaikki muistot valitulleesta kielelle",
+	"btn_submit": "Lähetä",
+	"input_placeholder": "Kirjoita muistosi tähän...",
 	"disclaimer": "Lähettämällä vahvistan, että minulla on oikeus julkaista tämä tarina enkä jaa mitään henkilökohtaisia tietoja."
 }
