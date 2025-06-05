@@ -71,7 +71,7 @@
 			/>
 		</div>
 
-		<div class="card-container">
+		<!-- <div class="card-container">
 			{#if showSubmit}
 				<div class="submit-container">
 					<CardSubmit toExplore={handleToggleExplore} />
@@ -89,7 +89,7 @@
 					<CardMain toSubmit={handleToggleSubmit} toExplore={handleToggleExplore} />
 				</div>
 			{/if}
-		</div>
+		</div> -->
 	</div>
 {/await}
 
@@ -111,10 +111,10 @@
 		grid-row-start: 1;
 	}
 
-	.card-container {
+	/* .card-container {
 		height: 100%;
 		grid-row-start: 2;
-	}
+	} */
 
 	.lang-container {
 		width: 100vw;

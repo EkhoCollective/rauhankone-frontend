@@ -34,7 +34,6 @@
 		justify-self: end;
 		height: 100%;
 	}
-
 	.btn {
 		height: 100%;
 		background-color: transparent;
