@@ -8,6 +8,7 @@
 	import CardLang from '$lib/components/CardLang.svelte';
 	import CardSubmit from '$lib/components/CardSubmit.svelte';
 	import CardExplore from '$lib/components/CardExplore.svelte';
+	import { fade } from 'svelte/transition';
 
 	// UI Toggle states
 	let showLang = $state(false);
@@ -53,7 +54,7 @@
 
 <!-- Lnagauge Selector Card -->
 {#if showLang}
-	<div class="lang-container">
+	<div transition:fade={{ duration: 1000 }} class="lang-container">
 		<CardLang closeLangCard={handleToggleLang} />
 	</div>
 {/if}
@@ -62,7 +63,7 @@
 {#await waitLocale()}
 	<Loader />
 {:then}
-	<div class="app-container">
+	<div transition:fade={{ duration: 1000 }} class="app-container">
 		<div class="header-container">
 			<Header
 				toggleLang={handleToggleLang}
@@ -73,19 +74,19 @@
 
 		<div class="card-container">
 			{#if showSubmit}
-				<div class="submit-container">
+				<div transition:fade={{ duration: 1000 }} class="submit-container">
 					<CardSubmit toExplore={handleToggleExplore} />
 				</div>
 			{/if}
 
 			{#if showExplore}
-				<div class="explore-container">
+				<div transition:fade={{ duration: 1000 }} class="explore-container">
 					<CardExplore />
 				</div>
 			{/if}
 
 			{#if !showSubmit && !showExplore}
-				<div class="main-container">
+				<div transition:fade={{ duration: 1000 }} class="main-container">
 					<CardMain toSubmit={handleToggleSubmit} toExplore={handleToggleExplore} />
 				</div>
 			{/if}

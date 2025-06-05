@@ -119,31 +119,38 @@
 <!-- {#await waitLocale()}
 	<Loader />
 {:then} -->
-<div class="card">
-	<div class="card-content">
-		<!-- Main Text -->
-		<div class="card-text-container">
+<div class="card-submit-container">
+	<!-- Main Text -->
+	<div class="card-question-container">
+		{#if question}
 			<p>{question}</p>
+		{:else}
+			<p>ERROR. Please reload the page.</p>
+		{/if}
+	</div>
+	<!-- Input Area -->
+	<div class="card-input-container">
+		<textarea
+			id="story-input"
+			rows="10"
+			cols="50"
+			placeholder={$_('input_placeholder')}
+			bind:value={story}
+		></textarea>
+	</div>
+	<!-- Buttons Container -->
+	<div class="card-btn-container">
+		<div>
+			<button class="btn" onclick={() => handleSubmit()}>{$_('btn_submit')}</button>
 		</div>
-		<!-- Input Area -->
-		<div class="card-input-container">
-			<textarea
-				id="story-input"
-				rows="10"
-				cols="50"
-				placeholder={$_('input_placeholder')}
-				bind:value={story}
-			></textarea>
+	</div>
+	<!-- Disclaimer -->
+	<div class="card-disclaimer-container">
+		<div class="card-disclaimer-icon">
+			<CircleAlert />
 		</div>
-		<!-- Buttons Container -->
-		<div class="card-btn-container">
-			<div>
-				<button class="btn" onclick={() => handleSubmit()}>{$_('btn_submit')}</button>
-			</div>
-		</div>
-		<!-- Disclaimer -->
-		<div class="card-disclaimer-container">
-			<p><CircleAlert /> {$_('disclaimer')}</p>
+		<div class="card-disclaimer-text">
+			<p>{$_('disclaimer')}</p>
 		</div>
 	</div>
 </div>
@@ -151,42 +158,51 @@
 <!-- {/await} -->
 
 <style>
-	.card {
+	.card-submit-container {
 		width: 100%;
-		height: 100%;
+		height: calc(100vh - 50px);
 		background-color: black;
-		display: flex;
-	}
-	.card-content {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		padding: 25px;
+		display: grid;
+		grid-template-rows: 1fr 1fr 1fr 1fr;
+		padding: 0 10% 0 10%;
 	}
 	.card-input-container {
-		margin: 10% 0 10% 0;
+		grid-row-start: 2;
 		border: 1px solid white;
 	}
 	textarea {
 		width: 100%;
 		height: 200px;
+		padding: 10px;
 	}
-	.card-text-container {
+	.card-question-container {
 		font-size: 0.75em;
-		margin: 0 0 10% 0;
+		grid-row-start: 1;
+		align-self: center;
 	}
 	.card-btn-container {
-		display: grid;
-		grid-template-columns: 1fr;
-		align-items: start;
-		justify-items: end;
+		grid-row-start: 3;
+		justify-self: end;
+		padding-top: 20px;
+		font-size: 0.75em;
 	}
 	.btn {
 		background-color: black;
 		border-color: white;
 	}
 	.card-disclaimer-container {
+		grid-row-start: 4;
 		font-size: 0.75em;
-		margin: 10% 0 0 0;
+		display: grid;
+		grid-template-columns: 40px 1fr;
+		align-items: start;
+		justify-items: start;
+	}
+
+	.card-disclaimer-icon {
+		grid-column-start: 1;
+	}
+	.card-disclaimer-text {
+		grid-column-start: 2;
 	}
 </style>

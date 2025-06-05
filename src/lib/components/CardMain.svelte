@@ -63,8 +63,6 @@
 		gap: 20px;
 		align-items: center;
 		justify-items: center;
-		/* margin-top: 10%; */
-		/* margin-bottom: 10%; */
 	}
 	.btn-submit {
 		background-color: black;
