@@ -1,23 +1,36 @@
 <script lang="ts">
-	import { Globe } from 'lucide-svelte';
+	import { Globe, ArrowLeft } from 'lucide-svelte';
 	// export let toLang = () => {};
 
-	let { openLangCard } = $props();
+	let { openLangCard, backToHome, showBackBtn } = $props();
 </script>
 
-<div class="card">
-	<div class="card-content">
-		<!-- Header/Language Selector -->
-		<div class="card-header-container">
-			<button class="btn btn-lang" onclick={() => openLangCard()}><Globe /></button>
+<div class="header">
+	{#if showBackBtn}
+		<div class="back-btn-container">
+			<button class="btn btn-back" onclick={() => backToHome()}><ArrowLeft /> Back to Home</button>
 		</div>
+	{/if}
+	<div class="lang-btn-container">
+		<button class="btn btn-lang" onclick={() => openLangCard()}><Globe /></button>
 	</div>
 </div>
 
 <style>
-	.card-header-container {
+	.header {
 		display: grid;
+		grid-template-columns: 1fr 1fr;
 		justify-items: end;
+	}
+
+	.back-btn-container {
+		grid-column: 1;
+		justify-self: start;
+	}
+
+	.lang-btn-container {
+		grid-column: 2;
+		justify-self: end;
 	}
 
 	.btn-lang {

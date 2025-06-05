@@ -4,7 +4,8 @@
 
 <!-- Footer -->
 <div class="card-footer-container">
-	<p>{$_('read_more')}</p>
+	<p>{$_('rk_title')}</p>
+	<p>Oulu 2026</p>
 	<p>© Ekho Collective</p>
 	<p>GDPR</p>
 </div>

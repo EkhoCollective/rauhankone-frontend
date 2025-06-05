@@ -38,6 +38,11 @@
 		showExplore = !showExplore;
 	}
 
+	function handleBackToHome() {
+		showSubmit = false;
+		showExplore = false;
+	}
+
 	async function handleGetToken() {
 		await getAuthToken();
 	}
@@ -78,7 +83,11 @@
 {:then}
 	<div class="main-container">
 		<div class="header-container">
-			<Header openLangCard={handleToggleLang} />
+			<Header
+				openLangCard={handleToggleLang}
+				backToHome={handleBackToHome}
+				showBackBtn={showSubmit || showExplore}
+			/>
 		</div>
 
 		<div class="card-container">

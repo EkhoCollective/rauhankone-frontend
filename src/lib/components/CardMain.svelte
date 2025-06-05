@@ -1,7 +1,5 @@
 <script lang="ts">
-	// import { m } from '$lib/paraglide/messages.js';
 	import { _ } from 'svelte-i18n';
-	// import { Globe } from 'lucide-svelte';
 
 	export let toSubmit = () => {};
 	export let toExplore = () => {};
