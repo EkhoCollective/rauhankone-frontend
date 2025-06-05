@@ -19,9 +19,9 @@
 	});
 
 	const API_SUGGESTION_OPTIONS = () => ({
-		API_ENDPOINT: '/get_suggestion',
+		API_ENDPOINT: '/suggestion',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { suggestion: story }
+		REQUEST_BODY: { language: getLocaleFullName(), suggestion: story }
 	});
 
 	const API_ADD_STORY_OPTIONS = () => ({
@@ -48,11 +48,11 @@
 		toExplore();
 	}
 
-	// async function handleGetSuggestions() {
-	// 	await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
-	// 		console.log('Get Suggestions Response:', response);
-	// 	});
-	// }
+	async function handleGetSuggestions() {
+		await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
+			console.log('Get Suggestions Response:', response);
+		});
+	}
 
 	function getLangFilteredQuestion(obj: any) {
 		const questionsArray = obj.questions;
@@ -82,12 +82,39 @@
 		handleGetQuestions();
 	});
 
+	function on_key_up(event: KeyboardEvent) {
+		let timer: any;
+		const input = document.querySelector('#story-input');
+		input?.addEventListener('keyup', function () {
+			clearTimeout(timer);
+			timer = setTimeout(() => {
+				// handleGetSuggestions();
+				console.log('timer');
+				// timer.enabled = false;
+			}, 1000);
+		});
+
+		window.addEventListener('keyup', on_key_up);
+
+		return {
+			destroy() {
+				window.removeEventListener('keyup', on_key_up);
+			}
+		};
+	}
+
 	onMount(() => {
 		handleGetQuestions();
 	});
 
 	// $inspect('isLoading', isLoading);
 </script>
+
+<svelte:window on:keyup={on_key_up} />
+
+<div id="test-div">
+	<p>test</p>
+</div>
 
 <!-- {#await waitLocale()}
 	<Loader />
@@ -100,13 +127,18 @@
 		</div>
 		<!-- Input Area -->
 		<div class="card-input-container">
-			<textarea rows="10" cols="50" placeholder={$_('input_placeholder')} bind:value={story}
+			<textarea
+				id="story-input"
+				rows="10"
+				cols="50"
+				placeholder={$_('input_placeholder')}
+				bind:value={story}
 			></textarea>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<div>
-				<button class="btn" onclick={() => handleSubmit()}>{$_('submit')}</button>
+				<button class="btn" onclick={() => handleSubmit()}>{$_('btn_submit')}</button>
 			</div>
 		</div>
 		<!-- Disclaimer -->

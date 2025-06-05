@@ -45,7 +45,7 @@
 		<!-- Extra Selector -->
 		<div class="card-extra-container">
 			<p style="justify-self: end; padding-right: 20px"><SquareCheck /></p>
-			<p>{$_('btn_translate')}</p>
+			<p>{$_('btn_translate_check')}</p>
 		</div>
 		<!-- Footer -->
 		<!-- <div class="card-footer-container">
