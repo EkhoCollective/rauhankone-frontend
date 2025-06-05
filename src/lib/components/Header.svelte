@@ -5,7 +5,7 @@
 	let { toggleLang, backToHome, showBackBtn } = $props();
 </script>
 
-<div class="header">
+<div class="card-header-container">
 	{#if showBackBtn}
 		<div class="back-btn-container">
 			<button class="btn" onclick={() => backToHome()}><ArrowLeft /> {$_('btn_exit')}</button>
@@ -17,7 +17,7 @@
 </div>
 
 <style>
-	.header {
+	.card-header-container {
 		height: 100%;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
