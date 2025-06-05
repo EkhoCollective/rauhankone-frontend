@@ -1,8 +1,38 @@
-<script>
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { apiRequest } from '$lib/utils/api_request';
+	import { getLocaleFullName } from '$lib/utils/locale_handler';
+
 	import { T, useTask } from '@threlte/core';
 	import { interactivity } from '@threlte/extras';
 	import { Spring } from 'svelte/motion';
 	import { Environment, OrbitControls } from '@threlte/extras';
+
+	let response_clusters = null;
+
+	const API_CLUSTERS_OPTIONS = {
+		API_ENDPOINT: '/get_clusters',
+		API_METHOD: 'POST',
+		REQUEST_BODY: { language: getLocaleFullName(), max_stories: 100, story: null }
+	};
+
+	// const API_GET_STORIES_OPTIONS = {
+	// 	API_ENDPOINT: '/get_stories',
+	// 	API_METHOD: 'GET',
+	// 	REQUEST_BODY: { language: 'Any', max_stories: 100 }
+	// };
+
+	async function fetchClusters() {
+		const result = await apiRequest(API_CLUSTERS_OPTIONS);
+		if (result) {
+			response_clusters = result;
+			console.log(response_clusters);
+		}
+	}
+
+	onMount(() => {
+		// fetchClusters();
+	});
 
 	interactivity();
 

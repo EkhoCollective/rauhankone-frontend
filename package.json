@@ -13,8 +13,7 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
-		"test": "npm run test:unit -- --run",
-		"machine-translate": "inlang machine translate --project project.inlang"
+		"test": "npm run test:unit -- --run"
 	},
 	"files": [
 		"dist",
@@ -39,8 +38,7 @@
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
 		"@eslint/js": "^9.18.0",
-		"@inlang/cli": "^3.0.0",
-		"@inlang/paraglide-js": "2.0.12",
+		"@fontsource/roboto": "^5.2.5",
 		"@sveltejs/adapter-auto": "^6.0.0",
 		"@sveltejs/adapter-static": "^3.0.8",
 		"@sveltejs/kit": "^2.16.0",
@@ -80,9 +78,11 @@
 		"@threlte/extras": "^9.1.4",
 		"@threlte/studio": "^0.1.4",
 		"@threlte/theatre": "^3.0.1",
+		"dompurify": "^3.2.6",
 		"esbuild": "^0.25.3",
 		"install": "^0.13.0",
-		"svelte-awesome": "^3.3.5",
+		"lucide-svelte": "^0.503.0",
+		"svelte-i18n": "^4.0.1",
 		"three": "^0.176.0"
 	}
 }

@@ -1,129 +1,79 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { setLocale, locales } from '$lib/paraglide/runtime.js';
-	import { m } from '$lib/paraglide/messages.js';
-	import Icon from 'svelte-awesome';
-	import close from 'svelte-awesome/icons/close';
-	import checkSquareO from 'svelte-awesome/icons/checkSquareO';
+	import { _, locale, waitLocale } from 'svelte-i18n';
+	import { SquareCheck } from 'lucide-svelte';
+	import { X } from 'lucide-svelte';
 
-	type Locale = (typeof locales)[number];
+	let { closeLangCard } = $props();
 
-	let selectedLocale: Locale = 'en'; // fallback
+	const languages = [
+		{ code: 'en', name: 'English' },
+		{ code: 'fi', name: 'Suomi' },
+		{ code: 'sv', name: 'Svenska' },
+		{ code: 'sa', name: 'Sámegiella' }
+	];
 
-	onMount(() => {
-		const savedLocale = localStorage.getItem('locale') as Locale | null;
-		if (savedLocale && locales.includes(savedLocale)) {
-			selectedLocale = savedLocale;
-			setLocale(savedLocale);
-		} else {
-			setLocale(selectedLocale);
-		}
-	});
-
-	// function handleLocaleChange(event: Event) {
-	// 	const target = event.target as HTMLSelectElement | null;
-	// 	if (target) {
-	// 		const newLocale = target.value as Locale;
-	// 		localStorage.setItem('locale', newLocale);
-	// 		setLocale(newLocale);
-	// 	}
-	// }
-	function handleLocaleChange(locale: Locale) {
-		localStorage.setItem('locale', locale);
-		setLocale(locale);
-		selectedLocale = locale;
+	async function handleLocaleChange(lang_code: string) {
+		locale.set(lang_code);
+		localStorage.setItem('locale', lang_code);
+		await waitLocale().then(() => {
+			console.log('Locale loaded');
+			closeLangCard(false);
+		});
 	}
-	export let toMain = () => {};
 </script>
 
-<div class="card">
-	<div class="card-content">
-		<!-- Header/Language Selector -->
-		<div class="card-header-container">
-			<button class="btn btn-lang" on:click={toMain}><Icon data={close} scale={1} /></button>
-		</div>
-		<!-- Buttons Container -->
-		<div class="card-btn-container">
-			<!-- <div>
-				<button
-					class={selectedLocale === 'en' ? 'active' : ''}
-					on:click={() => handleLocaleChange('en')}
-				>
-					English
-				</button>
-			</div>
-			<div>
-				<button
-					class={selectedLocale === 'fi' ? 'active' : ''}
-					on:click={() => handleLocaleChange('fi')}
-				>
-					Suomi
-				</button>
-			</div>
-			<div>
-				<button
-					class={selectedLocale === 'sv' ? 'active' : ''}
-					on:click={() => handleLocaleChange('sv')}
-				>
-					Svenska
-				</button>
-			</div>
-			<div>
-				<button
-					class={selectedLocale === 'sa' ? 'active' : ''}
-					on:click={() => handleLocaleChange('sa')}
-				>
-					Deutsch
-				</button>
-			</div> -->
-			<div>
-				<button class="btn" on:click={() => handleLocaleChange('en')}> English </button>
-			</div>
-			<div>
-				<button class="btn" on:click={() => handleLocaleChange('fi')}> Suomi </button>
-			</div>
-			<div>
-				<button class="btn" on:click={() => handleLocaleChange('sv')}> Svenska </button>
-			</div>
-			<div>
-				<button class="btn" on:click={() => handleLocaleChange('sa')}> Sámegiella </button>
-			</div>
-		</div>
-		<!-- Extra Selector -->
-		<div class="card-extra-container">
-			<p style="justify-self: end; padding-right: 20px"><Icon data={checkSquareO} /></p>
-			<p>Translate all stories to selected language</p>
-		</div>
-		<!-- Footer -->
-		<div class="card-footer-container">
-			<p>{m.read_more()}</p>
-			<p>© Ekho Collective</p>
-			<p>GDPR</p>
-		</div>
+<div class="card-lang-container">
+	<!-- Header/Language Selector -->
+	<div class="card-header-container">
+		<button class="btn btn-close" onclick={() => closeLangCard()}><X /></button>
+	</div>
+	<!-- Buttons Container -->
+	<div class="card-btn-container">
+		{#each languages as { code, name }}
+			<button
+				class="btn btn-lang"
+				class:active-lang={$locale === code}
+				onclick={() => handleLocaleChange(code)}>{name}</button
+			>
+		{/each}
+	</div>
+	<!-- Extra Selector -->
+	<div class="card-extra-container">
+		<input
+			class="lang-check-style"
+			type="checkbox"
+			id="lang-check"
+			name="lang-check"
+			value="selAllLang"
+		/>
+		<label class="lang-label-style" for="lang-check"> {$_('btn_translate_check')}</label>
 	</div>
 </div>
 
-<!-- NOTES
- 
-
--->
-
 <style>
-	.card {
+	.card-lang-container {
 		width: 100%;
 		height: 100%;
 		background-color: black;
-		display: flex;
-	}
-	.card-content {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		padding: 25px;
+		display: grid;
+		grid-template-rows: 50px 1fr 25%;
 	}
 	.card-header-container {
+		grid-row-start: 1;
 		display: grid;
+		grid-template-columns: 1fr 1fr;
 		justify-items: end;
+	}
+
+	.btn {
+		height: 100%;
+	}
+	.btn-close {
+		grid-column-start: 2;
+		background-color: transparent;
+		border-radius: 0;
+		border: none;
+		box-shadow: none;
 	}
 	.card-btn-container {
 		margin: 35% 0 20% 0;
@@ -132,39 +82,28 @@
 		align-items: start;
 		justify-items: center;
 	}
-	.btn {
-		background-color: black;
-		border-color: white;
-		margin-bottom: 20px;
-	}
-	.card-extra-container {
-		display: grid;
-		grid-template-columns: 30% 1fr;
-		/* margin: 0 0 10% 0; */
-		font-size: 0.75em;
-		/* width: 50%; */
-		text-align: left;
-	}
-	/* 
-	button {
-		padding: 1em 0 1em 0;
-		margin: 1em 0 0 0;
-		border: 1px solid #ccc;
-		background: transparent;
-		cursor: pointer;
-		width: 100%;
-	}
-
-	button.active {
-		background: grey;
-		font-weight: bold;
-	} */
 	.btn-lang {
+		background-color: black;
 		border: none;
 		box-shadow: none;
 	}
-	.card-footer-container {
-		margin-top: 20%;
+	.card-extra-container {
+		grid-row-start: 3;
+		padding: 0 50px 0 50px;
 		font-size: 0.75em;
+		display: grid;
+		grid-template-columns: 20px 1fr;
+		align-items: start;
+		justify-items: start;
+	}
+	.lang-check-style {
+		grid-column-start: 1;
+	}
+	.lang-label-style {
+		grid-column-start: 2;
+	}
+	.active-lang {
+		text-decoration: underline;
+		text-underline-offset: 2px;
 	}
 </style>

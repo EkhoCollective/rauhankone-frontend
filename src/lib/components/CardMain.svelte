@@ -1,101 +1,92 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import Icon from 'svelte-awesome';
-	import language from 'svelte-awesome/icons/language';
-	export let toLang = () => {};
-	export let toSubmit = () => {};
-	export let toExplore = () => {};
+	import { _ } from 'svelte-i18n';
+	import Footer from '$lib/components/Footer.svelte';
+
+	let { toSubmit, toExplore } = $props();
 </script>
 
-<div class="card">
-	<div class="card-content">
-		<!-- Header/Language Selector -->
-		<div class="card-header-container">
-			<button class="btn btn-lang" on:click={toLang}><Icon data={language} scale={1} /> </button>
-		</div>
-		<!-- Title -->
-		<div class="card-title-container">
-			<p>
-				Layers<br />
-				of<br />
-				the<br />
-				Peace<br />
-				Machine
-			</p>
-		</div>
-		<!-- Main Text -->
-		<div class="card-text-container">
-			<p>{m.description()}</p>
-		</div>
-		<!-- Buttons Container -->
-		<div class="card-btn-container">
-			<div>
-				<button class="btn" on:click={toSubmit}>{m.btn_take_part()}</button>
-			</div>
-			<div>
-				<button class="btn" on:click={toExplore}>{m.btn_explore()}</button>
-			</div>
-		</div>
-		<!-- Footer -->
-		<div class="card-footer-container">
-			<p>{m.read_more()}</p>
-			<p>© Ekho Collective</p>
-			<p>GDPR</p>
-		</div>
+<div class="card-main-container">
+	<!-- Title -->
+	<div class="card-title-container">
+		<div>{$_('rk_title')}</div>
+	</div>
+	<!-- Subtitle -->
+	<div class="card-sub-title-container">
+		<div>{$_('rk_layer')}</div>
+	</div>
+	<!-- Main Text -->
+	<div class="card-text-container">
+		<div>{$_('description')}</div>
+	</div>
+	<!-- Buttons Container -->
+	<div class="card-btn-container">
+		<button class="btn btn-submit" onclick={() => toSubmit()}>{$_('btn_take_part')}</button>
+		<button class="btn btn-explore" onclick={() => toExplore()}>{$_('btn_explore')}</button>
+	</div>
+	<div class="card-footer-container">
+		<Footer />
 	</div>
 </div>
 
-<!-- NOTES
- 
-- change icon
-- check font style
-- buttons styling
-- title separtion to paraglide schema
-
--->
-
 <style>
-	.card {
+	.card-main-container {
 		width: 100%;
-		height: 100%;
+		height: calc(100vh - 50px);
 		background-color: black;
-		display: flex;
-	}
-	.card-content {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		padding: 25px;
-	}
-	.card-header-container {
 		display: grid;
-		justify-items: end;
+		grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+		padding: 0 10% 0 10%;
 	}
+
 	.card-title-container {
-		margin: 10% 0 10% 0;
-		font-size: 3em;
-		line-height: 1em;
+		grid-row-start: 1;
+		font-size: 1.25em;
+		width: 50%;
+		line-height: 1.25em;
+		align-self: center;
+	}
+
+	.card-sub-title-container {
+		grid-row-start: 2;
+		font-size: 2.25em;
+		font-weight: bold;
+		line-height: 1.25em;
 	}
 	.card-text-container {
+		grid-row-start: 3;
 		font-size: 0.75em;
-		margin: 0 0 10% 0;
 	}
 	.card-btn-container {
+		grid-row-start: 4;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		align-items: start;
+		gap: 20px;
+		align-items: center;
 		justify-items: center;
 	}
-	.btn {
+	.btn-submit {
 		background-color: black;
 		border-color: white;
+		box-shadow: none;
+		width: 100%;
+		font-size: 0.75em;
 	}
-	.btn-lang {
+
+	.btn-explore {
+		background-color: black;
+		border-color: none;
 		border: none;
 		box-shadow: none;
+		width: 100%;
+		font-size: 0.75em;
+		text-decoration: underline;
+		text-underline-offset: 2px;
 	}
+
 	.card-footer-container {
-		margin-top: 20%;
+		grid-row-start: 5;
+		border-top: 1px solid white;
+		padding-top: 10px;
 		font-size: 0.75em;
 	}
 </style>
