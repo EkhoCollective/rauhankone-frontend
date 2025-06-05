@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 
-	export let toSubmit = () => {};
-	export let toExplore = () => {};
+	let { toSubmit, toExplore } = $props();
 </script>
 
 <div class="card">
@@ -18,10 +17,10 @@
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<div>
-				<button class="btn" on:click={toSubmit}>Take Part</button>
+				<button class="btn" onclick={() => toSubmit()}>{$_('btn_take_part')}</button>
 			</div>
 			<div>
-				<button class="btn" on:click={toExplore}>Explore</button>
+				<button class="btn" onclick={() => toExplore()}>{$_('btn_explore')}</button>
 			</div>
 		</div>
 	</div>

@@ -29,6 +29,7 @@
 
 	function handleToggleExplore() {
 		showExplore = !showExplore;
+		showSubmit = false;
 	}
 
 	function handleBackToHome() {
@@ -78,7 +79,7 @@
 		<div class="card-container">
 			{#if showSubmit}
 				<div class="submit-container">
-					<CardSubmit toggleLang={handleToggleLang} toExplore={handleToggleExplore} />
+					<CardSubmit toExplore={handleToggleExplore} />
 				</div>
 			{/if}
 

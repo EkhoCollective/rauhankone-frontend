@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
-	import { Globe } from 'lucide-svelte';
+	import { CircleAlert } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import DOMPurify from 'dompurify';
 
-	let { toExplore, toggleLang } = $props();
+	let { toExplore } = $props();
 
 	let question = $state<string | null>(null);
 	let story = $state('');
@@ -45,7 +45,7 @@
 		await apiRequest(API_ADD_STORY_OPTIONS()).then((response) => {
 			console.log('Add Story Response:', response);
 		});
-		// toExplore(true);
+		toExplore();
 	}
 
 	async function handleGetSuggestions() {
@@ -76,15 +76,13 @@
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<div>
-				<button class="btn" onclick={handleSubmit}>{$_('submit')}</button>
+				<button class="btn" onclick={() => handleSubmit()}>{$_('submit')}</button>
 			</div>
 		</div>
-		<!-- Footer -->
-		<!-- <div class="card-footer-container">
-			<p>{$_('read_more')}</p>
-			<p>© Ekho Collective</p>
-			<p>GDPR</p>
-		</div> -->
+		<!-- Disclaimer -->
+		<div class="card-disclaimer-container">
+			<p><CircleAlert /> {$_('disclaimer')}</p>
+		</div>
 	</div>
 </div>
 
@@ -129,6 +127,11 @@
 	.btn {
 		background-color: black;
 		border-color: white;
+	}
+
+	.card-disclaimer-container {
+		font-size: 0.75em;
+		margin: 10% 0 0 0;
 	}
 
 	/* .btn-lang {
