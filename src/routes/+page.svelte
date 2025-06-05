@@ -14,6 +14,7 @@
 	let showLang = $state(false);
 	let showSubmit = $state(false);
 	let showExplore = $state(false);
+	let transitionDuration = 1000;
 
 	let handleToggleLang = () => {
 		showLang = !showLang;
@@ -54,7 +55,7 @@
 
 <!-- Lnagauge Selector Card -->
 {#if showLang}
-	<div transition:fade={{ duration: 1000 }} class="lang-container">
+	<div transition:fade={{ duration: transitionDuration }} class="lang-container">
 		<CardLang closeLangCard={handleToggleLang} />
 	</div>
 {/if}
@@ -63,7 +64,7 @@
 {#await waitLocale()}
 	<Loader />
 {:then}
-	<div transition:fade={{ duration: 1000 }} class="app-container">
+	<div transition:fade={{ duration: transitionDuration }} class="app-container">
 		<div class="header-container">
 			<Header
 				toggleLang={handleToggleLang}
@@ -74,19 +75,19 @@
 
 		<div class="card-container">
 			{#if showSubmit}
-				<div transition:fade={{ duration: 1000 }} class="submit-container">
+				<div transition:fade={{ duration: transitionDuration }} class="submit-container">
 					<CardSubmit toExplore={handleToggleExplore} />
 				</div>
 			{/if}
 
 			{#if showExplore}
-				<div transition:fade={{ duration: 1000 }} class="explore-container">
+				<div transition:fade={{ duration: transitionDuration }} class="explore-container">
 					<CardExplore />
 				</div>
 			{/if}
 
 			{#if !showSubmit && !showExplore}
-				<div transition:fade={{ duration: 1000 }} class="main-container">
+				<div transition:fade={{ duration: transitionDuration }} class="main-container">
 					<CardMain toSubmit={handleToggleSubmit} toExplore={handleToggleExplore} />
 				</div>
 			{/if}
