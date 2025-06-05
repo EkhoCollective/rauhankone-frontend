@@ -14,7 +14,7 @@
 	let showLang = $state(false);
 	let showSubmit = $state(false);
 	let showExplore = $state(false);
-	let transitionDuration = 1000;
+	let transitionDuration = 500; // milliseconds
 
 	let handleToggleLang = () => {
 		showLang = !showLang;
