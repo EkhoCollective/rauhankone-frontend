@@ -6,6 +6,7 @@
 	"btn_explore": "Tutki",
 	"btn_translate_check": "Käännä kaikki muistot valitulleesta kielelle",
 	"btn_submit": "Lähetä",
+	"btn_exit": "Poistu kartasta",
 	"input_placeholder": "Kirjoita muistosi tähän...",
 	"disclaimer": "Lähettämällä vahvistan, että minulla on oikeus julkaista tämä tarina enkä jaa mitään henkilökohtaisia tietoja."
 }

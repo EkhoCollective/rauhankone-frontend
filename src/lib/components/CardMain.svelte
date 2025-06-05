@@ -1,14 +1,19 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
+	import Footer from '$lib/components/Footer.svelte';
 
 	let { toSubmit, toExplore } = $props();
 </script>
 
-<div class="card">
+<div class="card-main-container">
 	<div class="card-content">
 		<!-- Title -->
 		<div class="card-title-container">
 			<div>{$_('rk_title')}</div>
+		</div>
+		<!-- Subtitle -->
+		<div class="card-sub-title-container">
+			<div>{$_('rk_layer')}</div>
 		</div>
 		<!-- Main Text -->
 		<div class="card-text-container">
@@ -24,19 +29,13 @@
 			</div>
 		</div>
 	</div>
+	<div class="footer-container">
+		<Footer />
+	</div>
 </div>
 
-<!-- NOTES
- 
-- change icon
-- check font style
-- buttons styling
-- title separtion to paraglide schema
-
--->
-
 <style>
-	.card {
+	.card-main-container {
 		width: 100%;
 		height: 100%;
 		background-color: black;
@@ -50,6 +49,11 @@
 	}
 
 	.card-title-container {
+		margin: 10% 0 10% 0;
+		font-size: 3em;
+		line-height: 1em;
+	}
+	.card-sub-title-container {
 		margin: 10% 0 10% 0;
 		font-size: 3em;
 		line-height: 1em;

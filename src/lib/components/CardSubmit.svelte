@@ -82,26 +82,26 @@
 		handleGetQuestions();
 	});
 
-	function on_key_up(event: KeyboardEvent) {
-		let timer: any;
-		const input = document.querySelector('#story-input');
-		input?.addEventListener('keyup', function () {
-			clearTimeout(timer);
-			timer = setTimeout(() => {
-				// handleGetSuggestions();
-				console.log('timer');
-				// timer.enabled = false;
-			}, 1000);
-		});
+	// function on_key_up(event: KeyboardEvent) {
+	// 	let timer: any;
+	// 	const input = document.querySelector('#story-input');
+	// 	input?.addEventListener('keyup', function () {
+	// 		clearTimeout(timer);
+	// 		timer = setTimeout(() => {
+	// 			// handleGetSuggestions();
+	// 			console.log('timer');
+	// 			// timer.enabled = false;
+	// 		}, 1000);
+	// 	});
 
-		window.addEventListener('keyup', on_key_up);
+	// 	window.addEventListener('keyup', on_key_up);
 
-		return {
-			destroy() {
-				window.removeEventListener('keyup', on_key_up);
-			}
-		};
-	}
+	// 	return {
+	// 		destroy() {
+	// 			window.removeEventListener('keyup', on_key_up);
+	// 		}
+	// 	};
+	// }
 
 	onMount(() => {
 		handleGetQuestions();
@@ -110,11 +110,11 @@
 	// $inspect('isLoading', isLoading);
 </script>
 
-<svelte:window on:keyup={on_key_up} />
+<!-- <svelte:window on:keyup={on_key_up} /> -->
 
-<div id="test-div">
+<!-- <div id="test-div">
 	<p>test</p>
-</div>
+</div> -->
 
 <!-- {#await waitLocale()}
 	<Loader />
@@ -163,7 +163,6 @@
 		height: 100%;
 		padding: 25px;
 	}
-
 	.card-input-container {
 		margin: 10% 0 10% 0;
 		border: 1px solid white;

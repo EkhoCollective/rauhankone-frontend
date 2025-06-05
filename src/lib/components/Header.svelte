@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
 	import { Globe, ArrowLeft } from 'lucide-svelte';
-	// export let toLang = () => {};
 
 	let { toggleLang, backToHome, showBackBtn } = $props();
 </script>
@@ -8,32 +8,37 @@
 <div class="header">
 	{#if showBackBtn}
 		<div class="back-btn-container">
-			<button class="btn btn-back" onclick={() => backToHome()}><ArrowLeft /> Back to Home</button>
+			<button class="btn" onclick={() => backToHome()}><ArrowLeft /> {$_('btn_exit')}</button>
 		</div>
 	{/if}
 	<div class="lang-btn-container">
-		<button class="btn btn-lang" onclick={() => toggleLang()}><Globe /></button>
+		<button class="btn" onclick={() => toggleLang()}><Globe /></button>
 	</div>
 </div>
 
 <style>
 	.header {
+		height: 100%;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		justify-items: end;
 	}
 
 	.back-btn-container {
-		grid-column: 1;
+		grid-column-start: 1;
 		justify-self: start;
 	}
 
 	.lang-btn-container {
-		grid-column: 2;
+		grid-column-start: 2;
 		justify-self: end;
+		height: 100%;
 	}
 
-	.btn-lang {
+	.btn {
+		height: 100%;
+		background-color: transparent;
+		border-radius: 0;
 		border: none;
 		box-shadow: none;
 	}

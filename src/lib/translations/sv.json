@@ -6,6 +6,7 @@
 	"btn_explore": "Utforska",
 	"btn_translate_check": "Översätt alla berättelser till det valda språket",
 	"btn_submit": "Skicka",
+	"btn_exit": "Lämna kartan",
 	"input_placeholder": "Ditt minne här...",
 	"disclaimer": "Genom att skicka in bekräftar jag att jag har rätt att publicera denna berättelse och att jag inte delar någon personlig information."
 }

@@ -21,8 +21,6 @@
 			console.log('Locale loaded');
 			closeLangCard(false);
 		});
-
-		// console.log(lang_code);
 	}
 </script>
 
@@ -47,12 +45,6 @@
 			<p style="justify-self: end; padding-right: 20px"><SquareCheck /></p>
 			<p>{$_('btn_translate_check')}</p>
 		</div>
-		<!-- Footer -->
-		<!-- <div class="card-footer-container">
-			<p>{$_('read_more')}</p>
-			<p>© Ekho Collective</p>
-			<p>GDPR</p>
-		</div> -->
 	</div>
 </div>
 
