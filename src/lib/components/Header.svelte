@@ -2,7 +2,7 @@
 	import { Globe, ArrowLeft } from 'lucide-svelte';
 	// export let toLang = () => {};
 
-	let { openLangCard, backToHome, showBackBtn } = $props();
+	let { toggleLang, backToHome, showBackBtn } = $props();
 </script>
 
 <div class="header">
@@ -12,7 +12,7 @@
 		</div>
 	{/if}
 	<div class="lang-btn-container">
-		<button class="btn btn-lang" onclick={() => openLangCard()}><Globe /></button>
+		<button class="btn btn-lang" onclick={() => toggleLang()}><Globe /></button>
 	</div>
 </div>
 

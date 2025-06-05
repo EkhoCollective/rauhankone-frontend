@@ -6,7 +6,7 @@
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import DOMPurify from 'dompurify';
 
-	let { toExplore, toggleLang2 } = $props();
+	let { toExplore, toggleLang } = $props();
 
 	let question = $state<string | null>(null);
 	let story = $state('');

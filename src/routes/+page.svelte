@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { getAuthToken } from '$lib/utils/api_token';
 	import { waitLocale } from 'svelte-i18n';
+	import { _ } from 'svelte-i18n';
 
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
@@ -12,19 +13,11 @@
 	import CardSubmit from '$lib/components/CardSubmit.svelte';
 	import CardExplore from '$lib/components/CardExplore.svelte';
 
-	// UI Toggles
+	// UI Toggle states
 
 	let showLang = $state(false);
 	let showSubmit = $state(false);
 	let showExplore = $state(false);
-
-	// function handleToggle(state: boolean) {
-	// 	return () => {
-	// 		if (state === showLang) showLang = !showLang;
-	// 		if (state === showSubmit) showSubmit = !showSubmit;
-	// 		if (state === showExplore) showExplore = !showExplore;
-	// 	};
-	// }
 
 	let handleToggleLang = () => {
 		showLang = !showLang;
@@ -54,37 +47,29 @@
 	onMount(() => {
 		handleGetToken();
 	});
+
+	$inspect('showSubmit', showSubmit, 'showExplore', showExplore, 'showLang', showLang);
 </script>
 
 <svelte:head>
-	<title>Rauhankoneen Kerroksia</title>
+	<title>{$_('rk_title')} | Oulu 2026</title>
 </svelte:head>
 
+<!-- Lnagauge Selector Card -->
 {#if showLang}
 	<div class="main-container lang-container">
 		<CardLang closeLangCard={handleToggleLang} />
 	</div>
 {/if}
 
-<!-- {#if showSubmit}
-	<div class="main-container submit-container">
-		<CardSubmit toggleLang2={handleToggleLang} toExplore={handleToggleExplore} />
-	</div>
-{/if}
-
-{#if showExplore}
-	<div class="main-container explore-container">
-		<CardExplore />
-	</div>
-{/if} -->
-
+<!-- Loader -->
 {#await waitLocale()}
 	<Loader />
 {:then}
 	<div class="main-container">
 		<div class="header-container">
 			<Header
-				openLangCard={handleToggleLang}
+				toggleLang={handleToggleLang}
 				backToHome={handleBackToHome}
 				showBackBtn={showSubmit || showExplore}
 			/>
@@ -93,7 +78,7 @@
 		<div class="card-container">
 			{#if showSubmit}
 				<div class="submit-container">
-					<CardSubmit toggleLang2={handleToggleLang} toExplore={handleToggleExplore} />
+					<CardSubmit toggleLang={handleToggleLang} toExplore={handleToggleExplore} />
 				</div>
 			{/if}
 
@@ -107,9 +92,12 @@
 				<CardMain toSubmit={handleToggleSubmit} toExplore={handleToggleExplore} />
 			{/if}
 		</div>
-		<div class="footer-container">
-			<Footer />
-		</div>
+		<!-- Footer -->
+		{#if showSubmit === false && showExplore === false}
+			<div class="footer-container">
+				<Footer />
+			</div>
+		{/if}
 	</div>
 {/await}
 

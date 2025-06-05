@@ -7,10 +7,6 @@
 
 <div class="card">
 	<div class="card-content">
-		<!-- Header/Language Selector -->
-		<!-- <div class="card-header-container">
-			<button class="btn btn-lang" on:click={toLang}><Globe /></button>
-		</div> -->
 		<!-- Title -->
 		<div class="card-title-container">
 			<div>{$_('rk_title')}</div>
