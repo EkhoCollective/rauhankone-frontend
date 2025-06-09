@@ -3,7 +3,7 @@
 	import '../app.css';
 	import '$lib/i18n';
 	import { onMount } from 'svelte';
-	import { locale, waitLocale } from 'svelte-i18n';
+	import { locale, waitLocale, init } from 'svelte-i18n';
 	// import type { LayoutLoad } from './$types';
 
 	// export const load: LayoutLoad = async () => {
@@ -13,21 +13,26 @@
 	// 	await waitLocale();
 	// };
 
-	onMount(() => {
-		if (browser) {
-			const savedLocale = localStorage.getItem('locale');
-			if (savedLocale) {
-				locale.set(savedLocale);
-			} else {
-				// const navigatorLang = window.navigator.language.split('-')[0]; // Get base language code
-				// FIX THIS BASED ON USER BROWSER LANGUAGE
-				// console.log(navigatorLang);
-				const lang_code = 'en';
-				localStorage.setItem('locale', lang_code);
-				locale.set(lang_code);
-			}
-		}
+	init({
+		fallbackLocale: 'en',
+		initialLocale: 'en'
 	});
+
+	// onMount(() => {
+	// 	if (browser) {
+	// 		const savedLocale = localStorage.getItem('locale');
+	// 		if (savedLocale) {
+	// 			locale.set(savedLocale);
+	// 		} else {
+	// 			// const navigatorLang = window.navigator.language.split('-')[0]; // Get base language code
+	// 			// FIX THIS BASED ON USER BROWSER LANGUAGE
+	// 			// console.log(navigatorLang);
+	// 			const lang_code = 'en';
+	// 			localStorage.setItem('locale', lang_code);
+	// 			locale.set(lang_code);
+	// 		}
+	// 	}
+	// });
 
 	let { children } = $props();
 </script>
