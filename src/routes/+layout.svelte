@@ -22,6 +22,7 @@
 				locale.set(savedLocale);
 			} else {
 				const navigatorLang = window.navigator.language.split('-')[0]; // Get base language code
+				console.log(navigatorLang);
 				locale.set(navigatorLang);
 			}
 		}
@@ -30,13 +31,11 @@
 	let { children } = $props();
 </script>
 
-{@render children()}
+<svelte:head>
+	<link rel="icon" type="image/svg" href="/favicon.ico" />
+</svelte:head>
 
-<!-- <div style="display:none">
-	{#each locales as locale}
-		<a href={localizeHref(page.url.pathname, { locale })}>{locale}</a>
-	{/each}
-</div> -->
+{@render children()}
 
 <style>
 	:global(body) {
