@@ -3,8 +3,6 @@
 	import '../app.css';
 	import '$lib/i18n';
 	import { onMount } from 'svelte';
-	// import { page } from '$app/state';
-	// import { locales, localizeHref } from '$lib/paraglide/runtime.js';
 	import { locale, waitLocale } from 'svelte-i18n';
 	import type { LayoutLoad } from './$types';
 
@@ -21,9 +19,12 @@
 			if (savedLocale) {
 				locale.set(savedLocale);
 			} else {
-				const navigatorLang = window.navigator.language.split('-')[0]; // Get base language code
-				console.log(navigatorLang);
-				locale.set(navigatorLang);
+				// const navigatorLang = window.navigator.language.split('-')[0]; // Get base language code
+				// FIX THIS BASED ON USER BROWSER LANGUAGE
+				// console.log(navigatorLang);
+				const lang_code = 'en';
+				localStorage.setItem('locale', lang_code);
+				locale.set(lang_code);
 			}
 		}
 	});
