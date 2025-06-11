@@ -21,7 +21,7 @@
 	const API_SUGGESTION_OPTIONS = () => ({
 		API_ENDPOINT: '/suggestion',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { language: getLocaleFullName(), suggestion: story }
+		REQUEST_BODY: { language: getLocaleFullName(), story: story }
 	});
 
 	const API_ADD_STORY_OPTIONS = () => ({
@@ -141,7 +141,7 @@
 	<!-- Buttons Container -->
 	<div class="card-btn-container">
 		<div>
-			<button class="btn" onclick={() => handleSubmit()}>{$_('btn_submit')}</button>
+			<button class="btn" onclick={() => handleGetSuggestions()}>{$_('btn_submit')}</button>
 		</div>
 	</div>
 	<!-- Disclaimer -->
@@ -189,6 +189,7 @@
 	.btn {
 		background-color: black;
 		border-color: white;
+		border-radius: 0px;
 	}
 	.card-disclaimer-container {
 		grid-row-start: 4;

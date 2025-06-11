@@ -6,7 +6,14 @@
 	"btn_explore": "Utforska minnen",
 	"btn_translate_check": "Översätt alla berättelser till det valda språket",
 	"btn_submit": "Skicka",
-	"btn_exit": "Lämna kartan",
 	"input_placeholder": "Ditt minne här...",
-	"disclaimer": "Genom att skicka in bekräftar jag att jag har rätt att publicera denna berättelse och att jag inte delar någon personlig information."
+	"disclaimer": "Genom att skicka in bekräftar jag att jag har rätt att publicera denna berättelse och att jag inte delar någon personlig information.",
+	"btn_exit": "Lämna kartan",
+	"error_db": "Fel: Databasen är inte ansluten. Försök igen senare.",
+	"error_404": "Fel: Sidan hittades inte. Försök igen senare.",
+	"error_general": "Fel: Något gick fel. Försök igen senare.",
+	"rk_link": "https://oulu2026.eu/en/programme/culture-programme/layers-in-the-peace-machine/",
+	"oulu_link": "https://oulu2026.eu/en/",
+	"ekho_link": "https://ekho.fi/",
+	"gdpr_link": "https://oulu2026.eu/en/gdpr/"
 }

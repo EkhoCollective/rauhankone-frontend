@@ -6,7 +6,14 @@
 	"btn_explore": "Geahččal muittuide",
 	"btn_translate_check": "Jorgal buot máidnasat válljejuvvon giellii",
 	"btn_submit": "Sádda",
-	"btn_exit": "Máhppa vuolggat",
 	"input_placeholder": "Dán máidnasa...",
-	"disclaimer": "Čálliin duođaštan ahte muhto lea vuoigatvuohta álggahit dán máidnasa ja in juohkka persovnnalaš dieđuid."
+	"disclaimer": "Čálliin duođaštan ahte muhto lea vuoigatvuohta álggahit dán máidnasa ja in juohkka persovnnalaš dieđuid.",
+	"btn_exit": "Máhppa vuolggat",
+	"error_db": "Vuorá: Máidnasat ođasmahttot ođđa.",
+	"error_404": "Vuorá: Máidnasat ođđa.",
+	"error_general": "Vuorá: Máidnasat ođđa.",
+	"rk_link": "https://oulu2026.eu/en/programme/culture-programme/layers-in-the-peace-machine/",
+	"oulu_link": "https://oulu2026.eu/en/",
+	"ekho_link": "https://ekho.fi/",
+	"gdpr_link": "https://oulu2026.eu/en/gdpr/"
 }

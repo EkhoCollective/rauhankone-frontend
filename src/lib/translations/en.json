@@ -6,7 +6,15 @@
 	"btn_explore": "Explore memories",
 	"btn_translate_check": "Translate all stories to selected language",
 	"btn_submit": "Submit",
-	"btn_exit": "Exit Map",
 	"input_placeholder": "Your memory here...",
-	"disclaimer": "By submitting I confirm that I have the right to publish this story and not sharing any personal information."
+	"disclaimer": "By submitting I confirm that I have the right to publish this story and not sharing any personal information.",
+	"submit_toast": "Thank you. Your memory will be now part of the peace machine.",
+	"btn_exit": "Exit Map",
+	"error_db": "Error: Database is not connected. Please try again later.",
+	"error_404": "Error: Page not found. Please try again later.",
+	"error_general": "Error: Something went wrong. Please try again later.",
+	"rk_link": "https://oulu2026.eu/en/programme/culture-programme/layers-in-the-peace-machine/",
+	"oulu_link": "https://oulu2026.eu/en/",
+	"ekho_link": "https://ekho.fi/",
+	"gdpr_link": "https://oulu2026.eu/en/gdpr/"
 }
