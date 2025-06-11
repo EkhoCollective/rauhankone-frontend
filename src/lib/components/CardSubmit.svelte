@@ -5,6 +5,7 @@
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import DOMPurify from 'dompurify';
+	import Checkmark from '$lib/components/mini-components/Checkmark.svelte';
 
 	let { toExplore } = $props();
 
@@ -146,8 +147,9 @@
 	</div>
 	<!-- Disclaimer -->
 	<div class="card-disclaimer-container">
-		<div class="card-disclaimer-icon">
-			<CircleAlert />
+		<!-- Checkmark -->
+		<div class="card-checkmark-container">
+			<Checkmark />
 		</div>
 		<div class="card-disclaimer-text">
 			<p>{$_('disclaimer')}</p>
@@ -200,9 +202,10 @@
 		justify-items: start;
 	}
 
-	.card-disclaimer-icon {
+	.card-checkmark-container {
 		grid-column-start: 1;
 	}
+
 	.card-disclaimer-text {
 		grid-column-start: 2;
 	}

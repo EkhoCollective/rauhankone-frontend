@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { _, locale, waitLocale } from 'svelte-i18n';
-	import { SquareCheck } from 'lucide-svelte';
 	import { X } from 'lucide-svelte';
+	import Checkmark from '$lib/components/mini-components/Checkmark.svelte';
 
 	let { closeLangCard } = $props();
 
@@ -39,14 +39,10 @@
 	</div>
 	<!-- Extra Selector -->
 	<div class="card-extra-container">
-		<input
-			class="lang-check-style"
-			type="checkbox"
-			id="lang-check"
-			name="lang-check"
-			value="selAllLang"
-		/>
-		<label class="lang-label-style" for="lang-check"> {$_('btn_translate_check')}</label>
+		<div class="card-checkmark-container">
+			<Checkmark />
+		</div>
+		<div>{$_('btn_translate_check')}</div>
 	</div>
 </div>
 
@@ -91,16 +87,12 @@
 		grid-row-start: 3;
 		padding: 0 50px 0 50px;
 		font-size: 0.75em;
-		display: grid;
-		grid-template-columns: 20px 1fr;
+		display: flex;
 		align-items: start;
-		justify-items: start;
+		justify-content: start;
 	}
-	.lang-check-style {
-		grid-column-start: 1;
-	}
-	.lang-label-style {
-		grid-column-start: 2;
+	.card-checkmark-container {
+		margin-right: 10px;
 	}
 	.active-lang {
 		text-decoration: underline;

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import Footer from '$lib/components/Footer.svelte';
-	import Checkmark from '$lib/components/mini-components/Checkmark.svelte';
 
 	let { toSubmit, toExplore } = $props();
 </script>
@@ -24,10 +23,7 @@
 		<button class="btn btn-submit" onclick={() => toSubmit()}>{$_('btn_take_part')}</button>
 		<button class="btn btn-explore" onclick={() => toExplore()}>{$_('btn_explore')}</button>
 	</div>
-	<!-- Checkmark -->
-	<div class="card-checkmark-container">
-		<Checkmark />
-	</div>
+
 	<!-- Footer -->
 	<div class="card-footer-container">
 		<Footer />
@@ -90,13 +86,6 @@
 		text-underline-offset: 2px;
 		border-radius: 0px;
 	}
-	.card-checkmark-container {
-		grid-row-start: 5;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
 	.card-footer-container {
 		grid-row-start: 5;
 		border-top: 1px solid white;
