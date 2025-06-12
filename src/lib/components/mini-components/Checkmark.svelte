@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { Square, SquareCheckBig } from 'lucide-svelte';
 
-	let checked = $state(false);
+	let { checkValue = $bindable(false) } = $props();
 
 	function handleCheckmark() {
-		checked = !checked;
+		checkValue = !checkValue;
 	}
 </script>
 
 <div class="checkmark-container">
 	<button class="checkmark-btn" onclick={() => handleCheckmark()}>
-		{#if checked}
+		{#if checkValue}
 			<SquareCheckBig />
 		{:else}
 			<Square />

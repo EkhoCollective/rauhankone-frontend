@@ -46,7 +46,7 @@
 		handleGetToken();
 	});
 	// Console log to check state changes in svelte
-	$inspect('showSubmit', showSubmit, 'showExplore', showExplore, 'showLang', showLang);
+	// $inspect('showSubmit', showSubmit, 'showExplore', showExplore, 'showLang', showLang);
 </script>
 
 <svelte:head>

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { _, locale } from 'svelte-i18n';
-	import { CircleAlert } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
@@ -12,7 +11,8 @@
 	let question = $state<string | null>(null);
 	let story = $state('');
 	let suggestion = $state('');
-
+	let checked = $state(false);
+	let alertDisclaimer = $state(false);
 	const API_QUESTIONS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_questions',
 		API_METHOD: 'POST',
@@ -37,16 +37,20 @@
 
 	async function handleGetQuestions() {
 		await apiRequest(API_QUESTIONS_OPTIONS()).then((response) => {
-			console.log('Get Questions Response:', response);
+			// console.log('Get Questions Response:', response);
 			getLangFilteredQuestion(response);
 		});
 	}
 
 	async function handleSubmit() {
-		await apiRequest(API_ADD_STORY_OPTIONS()).then((response) => {
-			console.log('Add Story Response:', response);
-		});
-		toExplore();
+		if (checked === true) {
+			await apiRequest(API_ADD_STORY_OPTIONS()).then((response) => {
+				console.log('Add Story Response:', response);
+			});
+			toExplore();
+		} else {
+			alertDisclaimer = true;
+		}
 	}
 
 	async function handleGetSuggestions() {
@@ -108,7 +112,7 @@
 		handleGetQuestions();
 	});
 
-	// $inspect('isLoading', isLoading);
+	// $inspect('checked', checked);
 </script>
 
 <!-- <svelte:window on:keyup={on_key_up} /> -->
@@ -142,14 +146,16 @@
 	<!-- Buttons Container -->
 	<div class="card-btn-container">
 		<div>
-			<button class="btn" onclick={() => handleSubmit()}>{$_('btn_submit')}</button>
+			<button disabled={!checked} class="btn" onclick={() => handleSubmit()}
+				>{$_('btn_submit')}</button
+			>
 		</div>
 	</div>
 	<!-- Disclaimer -->
 	<div class="card-disclaimer-container">
 		<!-- Checkmark -->
 		<div class="card-checkmark-container">
-			<Checkmark />
+			<Checkmark bind:checkValue={checked} />
 		</div>
 		<div class="card-disclaimer-text">
 			<p>{$_('disclaimer')}</p>
@@ -187,12 +193,20 @@
 		justify-self: end;
 		padding-top: 20px;
 		font-size: 0.75em;
+		display: flex;
+		flex-direction: column;
 	}
 	.btn {
 		background-color: black;
 		border-color: white;
 		border-radius: 0px;
 	}
+
+	.btn:disabled {
+		/* background-color: gray; */
+		border-color: gray;
+	}
+
 	.card-disclaimer-container {
 		grid-row-start: 4;
 		font-size: 0.75em;
