@@ -186,7 +186,7 @@
 </script>
 
 <!-- Scene -->
-<T.PerspectiveCamera makeDefault position={[0, 0, 15]}>
+<T.PerspectiveCamera makeDefault position={[0, 0, 50]}>
 	<OrbitControls autoRotate={autoRotateCamera} />
 </T.PerspectiveCamera>
 

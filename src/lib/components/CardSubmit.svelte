@@ -142,7 +142,7 @@
 	<!-- Buttons Container -->
 	<div class="card-btn-container">
 		<div>
-			<button class="btn" onclick={() => handleGetSuggestions()}>{$_('btn_submit')}</button>
+			<button class="btn" onclick={() => handleSubmit()}>{$_('btn_submit')}</button>
 		</div>
 	</div>
 	<!-- Disclaimer -->
