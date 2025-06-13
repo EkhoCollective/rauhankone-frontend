@@ -2,10 +2,10 @@
 	import { _ } from 'svelte-i18n';
 	import { Globe, ArrowLeft } from 'lucide-svelte';
 
-	let { toggleLang, backToHome, showBackBtn } = $props();
+	let { toggleLang, backToHome, showBackBtn, backgroundColor } = $props();
 </script>
 
-<div class="card-header-container">
+<div class="card-header-container" style="background-color: {backgroundColor}">
 	{#if showBackBtn}
 		<div class="back-btn-container">
 			<button class="btn" onclick={() => backToHome()}><ArrowLeft /> {$_('btn_exit')}</button>

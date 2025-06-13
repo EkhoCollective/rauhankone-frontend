@@ -70,6 +70,7 @@
 				toggleLang={handleToggleLang}
 				backToHome={handleBackToHome}
 				showBackBtn={showSubmit || showExplore}
+				backgroundColor={showSubmit || showExplore ? 'rgb(0, 0, 0)' : 'transparent'}
 			/>
 		</div>
 

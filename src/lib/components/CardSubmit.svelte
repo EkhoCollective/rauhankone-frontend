@@ -5,6 +5,7 @@
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import DOMPurify from 'dompurify';
 	import Checkmark from '$lib/components/mini-components/Checkmark.svelte';
+	import Textarea from '$lib/components/mini-components/Textarea.svelte';
 
 	let { toExplore } = $props();
 
@@ -12,7 +13,7 @@
 	let story = $state('');
 	let suggestion = $state('');
 	let checked = $state(false);
-	let alertDisclaimer = $state(false);
+	// let alertDisclaimer = $state(false);
 	const API_QUESTIONS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_questions',
 		API_METHOD: 'POST',
@@ -48,9 +49,10 @@
 				console.log('Add Story Response:', response);
 			});
 			toExplore();
-		} else {
-			alertDisclaimer = true;
 		}
+		// 		else {
+		// 			alertDisclaimer = true;
+		// 		}
 	}
 
 	async function handleGetSuggestions() {
@@ -109,6 +111,7 @@
 	// }
 
 	onMount(() => {
+		window.scrollTo(0, 0);
 		handleGetQuestions();
 	});
 
@@ -135,21 +138,7 @@
 	</div>
 	<!-- Input Area -->
 	<div class="card-input-container">
-		<textarea
-			id="story-input"
-			rows="10"
-			cols="50"
-			placeholder={$_('input_placeholder')}
-			bind:value={story}
-		></textarea>
-	</div>
-	<!-- Buttons Container -->
-	<div class="card-btn-container">
-		<div>
-			<button disabled={!checked} class="btn" onclick={() => handleSubmit()}
-				>{$_('btn_submit')}</button
-			>
-		</div>
+		<Textarea textValue={story} minHeight="100px" />
 	</div>
 	<!-- Disclaimer -->
 	<div class="card-disclaimer-container">
@@ -161,6 +150,14 @@
 			<p>{$_('disclaimer')}</p>
 		</div>
 	</div>
+	<!-- Buttons Container -->
+	<div class="card-btn-container">
+		<div>
+			<button disabled={!checked} class="btn" onclick={() => handleSubmit()}
+				>{$_('btn_submit')}</button
+			>
+		</div>
+	</div>
 </div>
 
 <!-- {/await} -->
@@ -170,26 +167,29 @@
 		width: 100%;
 		height: calc(100vh - 50px);
 		background-color: black;
-		display: grid;
-		grid-template-rows: 1fr 1fr 1fr 1fr;
+		/* display: grid; */
+		/* grid-template-rows: 1fr 1fr 1fr 1fr; */
+		display: flex;
+		flex-direction: column;
 		padding: 0 10% 0 10%;
 	}
 	.card-input-container {
-		grid-row-start: 2;
+		/* grid-row-start: 2; */
 		border: 1px solid white;
 	}
-	textarea {
+	/* #autoresizing {
 		width: 100%;
-		height: 200px;
-		padding: 10px;
-	}
+		display: block;
+		overflow: hidden;
+		resize: none;
+	} */
 	.card-question-container {
 		font-size: 0.75em;
-		grid-row-start: 1;
+		/* grid-row-start: 1; */
 		align-self: center;
 	}
 	.card-btn-container {
-		grid-row-start: 3;
+		/* grid-row-start: 3; */
 		justify-self: end;
 		padding-top: 20px;
 		font-size: 0.75em;
@@ -208,7 +208,7 @@
 	}
 
 	.card-disclaimer-container {
-		grid-row-start: 4;
+		/* grid-row-start: 4; */
 		font-size: 0.75em;
 		display: grid;
 		grid-template-columns: 40px 1fr;
@@ -216,11 +216,11 @@
 		justify-items: start;
 	}
 
-	.card-checkmark-container {
+	/* .card-checkmark-container {
 		grid-column-start: 1;
-	}
+	} */
 
-	.card-disclaimer-text {
+	/* .card-disclaimer-text {
 		grid-column-start: 2;
-	}
+	} */
 </style>
