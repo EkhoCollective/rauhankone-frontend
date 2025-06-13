@@ -33,11 +33,11 @@
 <style>
 	.card-main-container {
 		width: 100%;
-		height: calc(100vh - 50px);
+		height: 100vh;
 		background-color: black;
 		display: grid;
 		grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
-		padding: 0 10% 0 10%;
+		padding: 50px 10% 50px 10%;
 	}
 
 	.card-title-container {

@@ -48,5 +48,6 @@
 		background-color: black;
 		color: white;
 		font-family: 'Roboto', sans-serif;
+		overflow: hidden;
 	}
 </style>

@@ -70,7 +70,6 @@
 				toggleLang={handleToggleLang}
 				backToHome={handleBackToHome}
 				showBackBtn={showSubmit || showExplore}
-				backgroundColor={showSubmit || showExplore ? 'rgb(0, 0, 0)' : 'transparent'}
 			/>
 		</div>
 
@@ -98,26 +97,21 @@
 
 <style>
 	.app-container {
-		/* width: 100vw; */
 		height: 100vh;
-		display: grid;
-		grid-template-rows: 50px 1fr;
-		/* z-index: 1; */
-		/* position: absolute; */
-		/* top: 50%; */
-		/* left: 50%; */
-		/* transform: translate(-50%, -50%); */
 	}
 
 	.header-container {
-		height: 100%;
-		grid-row-start: 1;
+		height: 50px;
+		z-index: 2;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
 	}
 
 	.card-container {
-		/* height: 100%;
-		max-height: calc(100vh - 50px); */
-		grid-row-start: 2;
+		z-index: 1;
+		height: 100%;
 	}
 
 	.lang-container {
@@ -129,16 +123,4 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 	}
-	/* 
-	.submit-container {
-		z-index: 2;
-	}
-
-	.explore-container {
-		z-index: 3;
-	} */
-
-	/* .footer-container {
-		z-index: 4;
-	} */
 </style>

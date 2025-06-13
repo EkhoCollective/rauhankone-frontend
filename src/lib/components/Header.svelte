@@ -2,10 +2,10 @@
 	import { _ } from 'svelte-i18n';
 	import { Globe, ArrowLeft } from 'lucide-svelte';
 
-	let { toggleLang, backToHome, showBackBtn, backgroundColor } = $props();
+	let { toggleLang, backToHome, showBackBtn } = $props();
 </script>
 
-<div class="card-header-container" style="background-color: {backgroundColor}">
+<div class="card-header-container">
 	{#if showBackBtn}
 		<div class="back-btn-container">
 			<button class="btn" onclick={() => backToHome()}><ArrowLeft /> {$_('btn_exit')}</button>
@@ -22,6 +22,7 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		justify-items: end;
+		background-color: transparent;
 	}
 
 	.back-btn-container {

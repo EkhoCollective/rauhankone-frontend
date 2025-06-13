@@ -13,6 +13,7 @@
 	let story = $state('');
 	let suggestion = $state('');
 	let checked = $state(false);
+	let showThankyou = $state(false);
 	// let alertDisclaimer = $state(false);
 	const API_QUESTIONS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_questions',
@@ -49,6 +50,10 @@
 				console.log('Add Story Response:', response);
 			});
 			toExplore();
+			showThankyou = true;
+			setTimeout(() => {
+				showThankyou = false;
+			}, 1000);
 		}
 		// 		else {
 		// 			alertDisclaimer = true;
@@ -111,7 +116,7 @@
 	// }
 
 	onMount(() => {
-		window.scrollTo(0, 0);
+		// window.scrollTo(0, 0);
 		handleGetQuestions();
 	});
 
@@ -165,31 +170,29 @@
 <style>
 	.card-submit-container {
 		width: 100%;
-		height: calc(100vh - 50px);
+		height: 100%;
 		background-color: black;
-		/* display: grid; */
-		/* grid-template-rows: 1fr 1fr 1fr 1fr; */
 		display: flex;
 		flex-direction: column;
 		padding: 0 10% 0 10%;
 	}
-	.card-input-container {
-		/* grid-row-start: 2; */
-		border: 1px solid white;
-	}
-	/* #autoresizing {
-		width: 100%;
-		display: block;
-		overflow: hidden;
-		resize: none;
-	} */
 	.card-question-container {
+		margin-top: 50px; /* fix this */
 		font-size: 0.75em;
-		/* grid-row-start: 1; */
 		align-self: center;
 	}
+	.card-input-container {
+		border: 1px solid white;
+	}
+	.card-disclaimer-container {
+		/* grid-row-start: 4; */
+		font-size: 0.75em;
+		display: grid;
+		grid-template-columns: 40px 1fr;
+		align-items: start;
+		justify-items: start;
+	}
 	.card-btn-container {
-		/* grid-row-start: 3; */
 		justify-self: end;
 		padding-top: 20px;
 		font-size: 0.75em;
@@ -201,26 +204,7 @@
 		border-color: white;
 		border-radius: 0px;
 	}
-
 	.btn:disabled {
-		/* background-color: gray; */
 		border-color: gray;
 	}
-
-	.card-disclaimer-container {
-		/* grid-row-start: 4; */
-		font-size: 0.75em;
-		display: grid;
-		grid-template-columns: 40px 1fr;
-		align-items: start;
-		justify-items: start;
-	}
-
-	/* .card-checkmark-container {
-		grid-column-start: 1;
-	} */
-
-	/* .card-disclaimer-text {
-		grid-column-start: 2;
-	} */
 </style>
