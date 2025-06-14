@@ -87,6 +87,7 @@
 		background-color: black;
 		border: none;
 		box-shadow: none;
+		font-size: 18px;
 	}
 	.card-extra-container {
 		grid-row-start: 3;

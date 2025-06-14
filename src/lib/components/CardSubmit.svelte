@@ -14,6 +14,24 @@
 	let suggestion = $state('');
 	let checked = $state(false);
 	let showThankyou = $state(false);
+	let suggestionLimit = $state(false);
+
+	$effect(() => {
+		if (story.length < 20) {
+			suggestionLimit = true;
+		} else {
+			suggestionLimit = false;
+			// handleGetSuggestions();
+		}
+		// console.log('story.length', story.length);
+	});
+
+	// function test() {
+	// 	// let a = 'dsfjlhasdfjhaldkf';
+	// 	console.log('story.length', story.length);
+	// 	// console.log('story', story);
+	// }
+
 	// let alertDisclaimer = $state(false);
 	const API_QUESTIONS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_questions',
@@ -63,6 +81,8 @@
 	async function handleGetSuggestions() {
 		await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
 			console.log('Get Suggestions Response:', response);
+			suggestion = response.suggestion;
+			// test();
 		});
 	}
 
@@ -143,7 +163,20 @@
 	</div>
 	<!-- Input Area -->
 	<div class="card-input-container">
-		<Textarea textValue={story} minHeight="100px" />
+		<Textarea bind:textValue={story} minHeight="100px" />
+	</div>
+	<!-- Suggestions -->
+	<div class="card-suggestions-container">
+		<button class="btn-suggestions" onclick={() => handleGetSuggestions()}> sugg </button>
+		{#if suggestionLimit}
+			<p>Please enter at least 20 characters to get suggestions</p>
+		{:else}
+			<p>
+				Thanks for sharing your memory. Now it’s time to join it with others by clicking the button
+				below.
+			</p>
+			<p>{suggestion}</p>
+		{/if}
 	</div>
 	<!-- Disclaimer -->
 	<div class="card-disclaimer-container">
@@ -170,32 +203,40 @@
 <style>
 	.card-submit-container {
 		width: 100%;
-		height: 100%;
+		min-height: 100vh;
 		background-color: black;
 		display: flex;
 		flex-direction: column;
 		padding: 0 10% 0 10%;
 	}
 	.card-question-container {
-		margin-top: 50px; /* fix this */
-		font-size: 0.75em;
+		margin-top: calc(50px + 80px); /* fix this */
+		font-size: 16px;
 		align-self: center;
 	}
 	.card-input-container {
-		border: 1px solid white;
+		margin-top: 50px;
+		font-size: 16px;
 	}
+
+	.card-suggestions-container {
+		margin-top: 50px;
+		font-size: 14px;
+	}
+
 	.card-disclaimer-container {
-		/* grid-row-start: 4; */
-		font-size: 0.75em;
+		margin-top: 50px;
+		font-size: 14px;
 		display: grid;
 		grid-template-columns: 40px 1fr;
 		align-items: start;
 		justify-items: start;
 	}
 	.card-btn-container {
+		margin-top: 50px;
 		justify-self: end;
 		padding-top: 20px;
-		font-size: 0.75em;
+		font-size: 16px;
 		display: flex;
 		flex-direction: column;
 	}

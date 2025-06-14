@@ -42,7 +42,7 @@
 
 	.card-title-container {
 		grid-row-start: 1;
-		font-size: 1.25em;
+		font-size: 24px;
 		width: 50%;
 		line-height: 1.25em;
 		align-self: center;
@@ -50,13 +50,13 @@
 
 	.card-sub-title-container {
 		grid-row-start: 2;
-		font-size: 2.25em;
+		font-size: 46px;
 		font-weight: bold;
 		line-height: 1.25em;
 	}
 	.card-text-container {
 		grid-row-start: 3;
-		font-size: 0.75em;
+		font-size: 16px;
 	}
 	.card-btn-container {
 		grid-row-start: 4;
@@ -71,7 +71,7 @@
 		border-color: white;
 		box-shadow: none;
 		width: 100%;
-		font-size: 0.75em;
+		font-size: 16px;
 		border-radius: 0px;
 	}
 
@@ -81,7 +81,7 @@
 		border: none;
 		box-shadow: none;
 		width: 100%;
-		font-size: 0.75em;
+		font-size: 16px;
 		text-decoration: underline;
 		text-underline-offset: 2px;
 		border-radius: 0px;
@@ -90,6 +90,6 @@
 		grid-row-start: 5;
 		border-top: 1px solid white;
 		padding-top: 10px;
-		font-size: 0.75em;
+		font-size: 14px;
 	}
 </style>
