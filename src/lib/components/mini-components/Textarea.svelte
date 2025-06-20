@@ -23,7 +23,7 @@
 		line-height: 1.2;
 		overflow: hidden;
 		color: white;
-		background-color: rgb(10, 10, 10);
+		background-color: rgb(30, 30, 30);
 	}
 	textarea {
 		position: absolute;
@@ -31,11 +31,11 @@
 		height: 100%;
 		top: 0;
 		resize: none;
-		background-color: rgb(10, 10, 10);
+		background-color: rgb(30, 30, 30);
 	}
 	.container:has(textarea:focus) {
 		outline: none;
 		border: 0px solid black;
-		background-color: rgb(30, 30, 30);
+		background-color: rgb(80, 80, 80);
 	}
 </style>

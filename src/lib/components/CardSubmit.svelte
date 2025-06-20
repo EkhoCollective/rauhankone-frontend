@@ -14,11 +14,10 @@
 	let story = $state('');
 	let suggestion = $state('');
 	let checked = $state(false);
-	let showThankyou = $state(false);
 	let suggestionLimit = $state(false);
 	let isTyping = $state(false);
 	let typingTimer: number | null = null;
-	let testcomplete = $state(false);
+	let storyComplete = $state(false);
 
 	const API_QUESTIONS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_questions',
@@ -55,23 +54,12 @@
 				console.log('Add Story Response:', response);
 			});
 			toExplore();
-			showThankyou = true;
-			setTimeout(() => {
-				showThankyou = false;
-			}, 1000);
 		}
-		// 		else {
-		// 			alertDisclaimer = true;
-		// 		}
 	}
 
 	async function handleGetSuggestions() {
 		await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
-			console.log('story', story);
-			console.log('question', question);
-			console.log('suggestion', response.suggestion);
 			suggestion = response.suggestion;
-			// test();
 		});
 	}
 
@@ -115,12 +103,9 @@
 		// Set new timer to detect when user stops typing
 		typingTimer = setTimeout(() => {
 			isTyping = false;
-			console.log('User stopped typing');
-			// You can add any logic here that should run when user stops typing
-			// For example, you could automatically call handleGetSuggestions()
 			if (suggestionLimit === false) {
 				if (suggestion.length > 0) {
-					testcomplete = true;
+					storyComplete = true;
 					return;
 				} else {
 					handleGetSuggestions();
@@ -140,31 +125,23 @@
 		} else {
 			suggestionLimit = false;
 		}
-		if (story && testcomplete === false) {
+		if (story && storyComplete === false) {
 			handleTyping();
+		}
+		if (story.length === 0) {
+			storyComplete = false;
+			suggestion = '';
 		}
 	});
 
-	$inspect('testcomplete', testcomplete, 'isTyping', isTyping, 'suggestionLimit', suggestionLimit);
+	// $inspect('storyComplete', storyComplete, 'isTyping', isTyping, 'suggestionLimit', suggestionLimit);
 </script>
 
-<!-- <svelte:window on:keyup={on_key_up} /> -->
-
-<!-- <div id="test-div">
-	<p>test</p>
-</div> -->
-
-<!-- {#await waitLocale()}
-	<Loader />
-{:then} -->
 <div class="card-submit-container">
 	<!-- Main Text -->
 	<div class="card-question-container">
 		{#if question}
 			<p>{question}</p>
-			<!-- {#key question}
-			<p transition:blur style="position:absolute">{question}</p>
-		{/key} -->
 		{:else}
 			<p>ERROR. Please reload the page.</p>
 		{/if}
@@ -175,27 +152,23 @@
 	</div>
 	<!-- Suggestions -->
 	<div class="card-suggestions-container">
-		<!-- <button class="btn-suggestions" onclick={() => handleGetSuggestions()}> sugg </button> -->
+		<!-- Show warning if story is too short -->
 		{#if suggestionLimit}
 			<p transition:blur class="suggestion-limit-text">
-				You need to share a bit more to participate in building the peace machine.
+				{$_('type_more')}
 			</p>
-		{:else}
-			<!-- <p>
-				Thanks for sharing your memory. Now it’s time to join it with others by clicking the button
-				below.
-			</p> -->
-			{#key suggestion}
-				{#if testcomplete === false && isTyping === false}
-					<p transition:blur style="position:absolute">{suggestion}</p>
-				{/if}
-				<!-- <p>Please extend your story.</p> -->
-			{/key}
 		{/if}
-		{#if testcomplete}
-			<p transition:blur style="position:absolute">
-				Thanks for sharing your memory. Now it’s time to join it with others by clicking the button
-				below.
+		<!-- Show suggestion if user has typed something -->
+		{#if storyComplete === false && isTyping === false && suggestion && story.length > 0}
+			<div transition:blur>
+				<p>{suggestion}</p>
+				<p>{$_('please_extend')}</p>
+			</div>
+		{/if}
+		<!-- Show thank you message if user has finished the story -->
+		{#if storyComplete && story.length > 0}
+			<p transition:blur class="thank-you-text">
+				{$_('submit_toast')}
 			</p>
 		{/if}
 	</div>
@@ -219,8 +192,6 @@
 	</div>
 </div>
 
-<!-- {/await} -->
-
 <style>
 	.card-submit-container {
 		width: 100%;
@@ -237,12 +208,14 @@
 	}
 	.card-input-container {
 		margin-top: 50px;
-		font-size: 16px;
+		font-size: 18px;
+		font-family: 'Roboto Slab', serif;
 	}
 
 	.card-suggestions-container {
 		margin-top: 50px;
 		font-size: 14px;
+		min-height: 100px;
 	}
 
 	.card-disclaimer-container {
@@ -271,7 +244,10 @@
 	}
 
 	.suggestion-limit-text {
-		position: absolute;
 		color: #ff7d7d;
+	}
+
+	.thank-you-text {
+		color: #71f771;
 	}
 </style>
