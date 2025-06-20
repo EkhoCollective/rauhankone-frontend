@@ -55,7 +55,11 @@
 
 <!-- Lnagauge Selector Card -->
 {#if showLang}
-	<div transition:fade={{ duration: transitionDuration }} class="lang-container">
+	<div
+		in:fade={{ duration: transitionDuration }}
+		out:fade={{ duration: transitionDuration }}
+		class="lang-container"
+	>
 		<CardLang closeLangCard={handleToggleLang} />
 	</div>
 {/if}
@@ -64,7 +68,11 @@
 {#await waitLocale()}
 	<Loader />
 {:then}
-	<div transition:fade={{ duration: transitionDuration }} class="app-container">
+	<div
+		in:fade={{ duration: transitionDuration }}
+		out:fade={{ duration: transitionDuration }}
+		class="app-container"
+	>
 		<div class="header-container">
 			<Header
 				toggleLang={handleToggleLang}
@@ -75,19 +83,31 @@
 
 		<div class="card-container">
 			{#if showSubmit}
-				<div transition:fade={{ duration: transitionDuration }} class="submit-container">
+				<div
+					in:fade={{ duration: transitionDuration }}
+					out:fade={{ duration: transitionDuration }}
+					class="submit-container"
+				>
 					<CardSubmit toExplore={handleToggleExplore} />
 				</div>
 			{/if}
 
 			{#if showExplore}
-				<div transition:fade={{ duration: transitionDuration }} class="explore-container">
+				<div
+					in:fade={{ duration: transitionDuration }}
+					out:fade={{ duration: transitionDuration }}
+					class="explore-container"
+				>
 					<CardExplore />
 				</div>
 			{/if}
 
 			{#if !showSubmit && !showExplore}
-				<div transition:fade={{ duration: transitionDuration }} class="main-container">
+				<div
+					in:fade={{ duration: transitionDuration }}
+					out:fade={{ duration: transitionDuration }}
+					class="main-container"
+				>
 					<CardMain toSubmit={handleToggleSubmit} toExplore={handleToggleExplore} />
 				</div>
 			{/if}

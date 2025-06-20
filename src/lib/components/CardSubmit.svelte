@@ -6,6 +6,7 @@
 	import DOMPurify from 'dompurify';
 	import Checkmark from '$lib/components/mini-components/Checkmark.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
+	import { blur } from 'svelte/transition';
 
 	let { toExplore } = $props();
 
@@ -15,24 +16,10 @@
 	let checked = $state(false);
 	let showThankyou = $state(false);
 	let suggestionLimit = $state(false);
+	let isTyping = $state(false);
+	let typingTimer: number | null = null;
+	let testcomplete = $state(false);
 
-	$effect(() => {
-		if (story.length < 20) {
-			suggestionLimit = true;
-		} else {
-			suggestionLimit = false;
-			// handleGetSuggestions();
-		}
-		// console.log('story.length', story.length);
-	});
-
-	// function test() {
-	// 	// let a = 'dsfjlhasdfjhaldkf';
-	// 	console.log('story.length', story.length);
-	// 	// console.log('story', story);
-	// }
-
-	// let alertDisclaimer = $state(false);
 	const API_QUESTIONS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_questions',
 		API_METHOD: 'POST',
@@ -80,7 +67,9 @@
 
 	async function handleGetSuggestions() {
 		await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
-			console.log('Get Suggestions Response:', response);
+			console.log('story', story);
+			console.log('question', question);
+			console.log('suggestion', response.suggestion);
 			suggestion = response.suggestion;
 			// test();
 		});
@@ -114,33 +103,49 @@
 		handleGetQuestions();
 	});
 
-	// function on_key_up(event: KeyboardEvent) {
-	// 	let timer: any;
-	// 	const input = document.querySelector('#story-input');
-	// 	input?.addEventListener('keyup', function () {
-	// 		clearTimeout(timer);
-	// 		timer = setTimeout(() => {
-	// 			// handleGetSuggestions();
-	// 			console.log('timer');
-	// 			// timer.enabled = false;
-	// 		}, 1000);
-	// 	});
+	// Function to handle typing detection
+	function handleTyping() {
+		isTyping = true;
 
-	// 	window.addEventListener('keyup', on_key_up);
+		// Clear existing timer
+		if (typingTimer) {
+			clearTimeout(typingTimer);
+		}
 
-	// 	return {
-	// 		destroy() {
-	// 			window.removeEventListener('keyup', on_key_up);
-	// 		}
-	// 	};
-	// }
+		// Set new timer to detect when user stops typing
+		typingTimer = setTimeout(() => {
+			isTyping = false;
+			console.log('User stopped typing');
+			// You can add any logic here that should run when user stops typing
+			// For example, you could automatically call handleGetSuggestions()
+			if (suggestionLimit === false) {
+				if (suggestion.length > 0) {
+					testcomplete = true;
+					return;
+				} else {
+					handleGetSuggestions();
+				}
+			}
+		}, 1000); // 1 second delay
+	}
 
 	onMount(() => {
-		// window.scrollTo(0, 0);
 		handleGetQuestions();
 	});
 
-	// $inspect('checked', checked);
+	// Watch for changes in the story text
+	$effect(() => {
+		if (story.length < 30 && story.length > 0) {
+			suggestionLimit = true;
+		} else {
+			suggestionLimit = false;
+		}
+		if (story && testcomplete === false) {
+			handleTyping();
+		}
+	});
+
+	$inspect('testcomplete', testcomplete, 'isTyping', isTyping, 'suggestionLimit', suggestionLimit);
 </script>
 
 <!-- <svelte:window on:keyup={on_key_up} /> -->
@@ -157,6 +162,9 @@
 	<div class="card-question-container">
 		{#if question}
 			<p>{question}</p>
+			<!-- {#key question}
+			<p transition:blur style="position:absolute">{question}</p>
+		{/key} -->
 		{:else}
 			<p>ERROR. Please reload the page.</p>
 		{/if}
@@ -167,15 +175,28 @@
 	</div>
 	<!-- Suggestions -->
 	<div class="card-suggestions-container">
-		<button class="btn-suggestions" onclick={() => handleGetSuggestions()}> sugg </button>
+		<!-- <button class="btn-suggestions" onclick={() => handleGetSuggestions()}> sugg </button> -->
 		{#if suggestionLimit}
-			<p>Please enter at least 20 characters to get suggestions</p>
+			<p transition:blur class="suggestion-limit-text">
+				You need to share a bit more to participate in building the peace machine.
+			</p>
 		{:else}
-			<p>
+			<!-- <p>
+				Thanks for sharing your memory. Now it’s time to join it with others by clicking the button
+				below.
+			</p> -->
+			{#key suggestion}
+				{#if testcomplete === false && isTyping === false}
+					<p transition:blur style="position:absolute">{suggestion}</p>
+				{/if}
+				<!-- <p>Please extend your story.</p> -->
+			{/key}
+		{/if}
+		{#if testcomplete}
+			<p transition:blur style="position:absolute">
 				Thanks for sharing your memory. Now it’s time to join it with others by clicking the button
 				below.
 			</p>
-			<p>{suggestion}</p>
 		{/if}
 	</div>
 	<!-- Disclaimer -->
@@ -247,5 +268,10 @@
 	}
 	.btn:disabled {
 		border-color: gray;
+	}
+
+	.suggestion-limit-text {
+		position: absolute;
+		color: #ff7d7d;
 	}
 </style>
