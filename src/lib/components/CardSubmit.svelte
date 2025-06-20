@@ -20,6 +20,8 @@
 	let isLoadingSuggestions = $state(false);
 	let typingTimer: number | null = null;
 	let storyComplete = $state(false);
+	let minStoryLength = $state(30);
+	let waitTimeAfterTyping = $state(2000);
 
 	const API_QUESTIONS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_questions',
@@ -90,10 +92,6 @@
 		}
 	}
 
-	locale.subscribe(() => {
-		handleGetQuestions();
-	});
-
 	// Function to handle typing detection
 	function handleTyping() {
 		isTyping = true;
@@ -121,8 +119,12 @@
 					}, 500);
 				}
 			}
-		}, 1000); // 1 second delay to detect stopping typing
+		}, waitTimeAfterTyping); // 1 second delay to detect stopping typing
 	}
+
+	locale.subscribe(() => {
+		handleGetQuestions();
+	});
 
 	onMount(() => {
 		handleGetQuestions();
@@ -130,7 +132,7 @@
 
 	// Watch for changes in the story text
 	$effect(() => {
-		if (story.length < 30 && story.length > 0) {
+		if (story.length < minStoryLength && story.length > 0) {
 			suggestionLimit = true;
 		} else {
 			suggestionLimit = false;
@@ -139,7 +141,7 @@
 			handleTyping();
 		}
 		// If user deletes all text, reset storyComplete and suggestion
-		if (story.length === 0) {
+		if (story.length < minStoryLength) {
 			storyComplete = false;
 			suggestion = '';
 		}
@@ -168,7 +170,7 @@
 	</div>
 	<!-- Input Area -->
 	<div class="card-input-container">
-		<Textarea bind:textValue={story} minHeight="100px" />
+		<Textarea bind:textValue={story} minHeight="200px" />
 	</div>
 	<!-- Suggestions -->
 	<div class="card-suggestions-container">
