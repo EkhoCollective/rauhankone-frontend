@@ -1,17 +1,15 @@
 <!-- Loading Animation-->
 
-<div class="loader-container">
-	<div class="loader"></div>
-</div>
+<script>
+	let { color, pulseSize, pulseTiming } = $props();
+</script>
+
+<div
+	class="loader"
+	style="--loader-color: {color}; --pulse-size: {pulseSize}; --pulse-timing: {pulseTiming}"
+></div>
 
 <style>
-	:root {
-		--loader-color: white;
-		--loader-background: black;
-		--pulse-size: 80px;
-		--pulse-timing: 1.5s;
-	}
-
 	.loader {
 		width: var(--pulse-size);
 		height: var(--pulse-size);
@@ -30,15 +28,5 @@
 			transform: scale(1);
 			opacity: 0;
 		}
-	}
-
-	.loader-container {
-		background-color: var(--loader-background);
-		text-align: center;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		height: 100vh;
-		margin: 0;
 	}
 </style>

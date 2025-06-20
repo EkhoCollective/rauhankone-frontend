@@ -3,7 +3,7 @@
 	import { getAuthToken } from '$lib/utils/api_token';
 	import { _, waitLocale } from 'svelte-i18n';
 	import Header from '$lib/components/Header.svelte';
-	import Loader from '$lib/components/Loader.svelte';
+	import CardLoader from '$lib/components/CardLoader.svelte';
 	import CardMain from '$lib/components/CardMain.svelte';
 	import CardLang from '$lib/components/CardLang.svelte';
 	import CardSubmit from '$lib/components/CardSubmit.svelte';
@@ -66,7 +66,7 @@
 
 <!-- Loader -->
 {#await waitLocale()}
-	<Loader />
+	<CardLoader />
 {:then}
 	<div
 		in:fade={{ duration: transitionDuration }}

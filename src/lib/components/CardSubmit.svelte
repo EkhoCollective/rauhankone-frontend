@@ -6,6 +6,7 @@
 	import DOMPurify from 'dompurify';
 	import Checkmark from '$lib/components/mini-components/Checkmark.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
+	import Loader from '$lib/components/mini-components/Loader.svelte';
 	import { blur } from 'svelte/transition';
 
 	let { toExplore } = $props();
@@ -16,6 +17,7 @@
 	let checked = $state(false);
 	let suggestionLimit = $state(false);
 	let isTyping = $state(false);
+	let isLoadingSuggestions = $state(false);
 	let typingTimer: number | null = null;
 	let storyComplete = $state(false);
 
@@ -60,6 +62,7 @@
 	async function handleGetSuggestions() {
 		await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
 			suggestion = response.suggestion;
+			isLoadingSuggestions = false;
 		});
 	}
 
@@ -94,6 +97,7 @@
 	// Function to handle typing detection
 	function handleTyping() {
 		isTyping = true;
+		isLoadingSuggestions = false; // Reset loading state when typing starts
 
 		// Clear existing timer
 		if (typingTimer) {
@@ -106,12 +110,18 @@
 			if (suggestionLimit === false) {
 				if (suggestion.length > 0) {
 					storyComplete = true;
+					isLoadingSuggestions = false;
 					return;
 				} else {
-					handleGetSuggestions();
+					// Show loader after 500ms of stopping typing
+					setTimeout(() => {
+						isLoadingSuggestions = true;
+						// Then call the API
+						handleGetSuggestions();
+					}, 500);
 				}
 			}
-		}, 1000); // 1 second delay
+		}, 1000); // 1 second delay to detect stopping typing
 	}
 
 	onMount(() => {
@@ -128,13 +138,23 @@
 		if (story && storyComplete === false) {
 			handleTyping();
 		}
+		// If user deletes all text, reset storyComplete and suggestion
 		if (story.length === 0) {
 			storyComplete = false;
 			suggestion = '';
 		}
 	});
 
-	// $inspect('storyComplete', storyComplete, 'isTyping', isTyping, 'suggestionLimit', suggestionLimit);
+	$inspect(
+		// 'storyComplete',
+		// storyComplete,
+		// 'isTyping',
+		// isTyping,
+		// 'suggestionLimit',
+		// suggestionLimit,
+		'isLoadingSuggestions',
+		isLoadingSuggestions
+	);
 </script>
 
 <div class="card-submit-container">
@@ -158,8 +178,14 @@
 				{$_('type_more')}
 			</p>
 		{/if}
+		<!-- Show loader when waiting for suggestions -->
+		{#if isLoadingSuggestions && story.length > 0 && !suggestionLimit}
+			<div transition:blur class="loader-container">
+				<Loader color="white" pulseSize="30px" pulseTiming="1s" />
+			</div>
+		{/if}
 		<!-- Show suggestion if user has typed something -->
-		{#if storyComplete === false && isTyping === false && suggestion && story.length > 0}
+		{#if storyComplete === false && isTyping === false && suggestion && story.length > 0 && !isLoadingSuggestions}
 			<div transition:blur>
 				<p>{suggestion}</p>
 				<p>{$_('please_extend')}</p>
@@ -216,6 +242,7 @@
 		margin-top: 50px;
 		font-size: 14px;
 		min-height: 100px;
+		text-align: right;
 	}
 
 	.card-disclaimer-container {
@@ -249,5 +276,11 @@
 
 	.thank-you-text {
 		color: #71f771;
+	}
+
+	.loader-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 </style>
