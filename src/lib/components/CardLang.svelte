@@ -2,7 +2,6 @@
 	import { _, locale, waitLocale } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
 	import Checkmark from '$lib/components/mini-components/Checkmark.svelte';
-	import { onMount } from 'svelte';
 
 	let { closeLangCard, translate = $bindable() } = $props();
 
@@ -21,10 +20,6 @@
 			closeLangCard(false);
 		});
 	}
-
-	onMount(() => {
-		// window.scrollTo(0, 0);
-	});
 </script>
 
 <div class="card-lang-container">
