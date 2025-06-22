@@ -61,26 +61,26 @@
 	}
 	.card-header-container {
 		grid-row-start: 1;
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		justify-items: end;
+		display: flex;
+		justify-content: flex-end;
 	}
 
 	.btn {
-		height: 100%;
+		height: 50px;
 	}
 	.btn-close {
-		grid-column-start: 2;
 		background-color: transparent;
 		border-radius: 0;
 		border: none;
 		box-shadow: none;
 	}
 	.card-btn-container {
-		margin: 35% 0 20% 0;
-		display: grid;
-		grid-template-rows: 1fr 1fr 1fr 1fr;
-		align-items: start;
+		grid-row-start: 2;
+		padding-top: 30vh;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		align-items: center;
 		justify-items: center;
 	}
 	.btn-lang {
@@ -91,11 +91,10 @@
 	}
 	.card-extra-container {
 		grid-row-start: 3;
-		padding: 0 50px 0 50px;
-		font-size: 14px;
+		font-size: 18px;
 		display: flex;
 		align-items: start;
-		justify-content: start;
+		justify-content: center;
 	}
 	.card-checkmark-container {
 		margin-right: 10px;
