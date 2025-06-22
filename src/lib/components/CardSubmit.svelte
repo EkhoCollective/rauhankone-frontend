@@ -202,22 +202,25 @@
 			</p>
 		{/if}
 	</div>
-	<!-- Disclaimer -->
-	<div class="card-disclaimer-container">
-		<!-- Checkmark -->
-		<div class="card-checkmark-container">
-			<Checkmark bind:checkValue={userAgreed} />
+	<!-- Actions -->
+	<div class="card-actions-container">
+		<!-- Disclaimer -->
+		<div class="card-disclaimer-container">
+			<!-- Checkmark -->
+			<div class="card-checkmark-container">
+				<Checkmark bind:checkValue={userAgreed} />
+			</div>
+			<div class="card-disclaimer-text">
+				<p>{$_('disclaimer')}</p>
+			</div>
 		</div>
-		<div class="card-disclaimer-text">
-			<p>{$_('disclaimer')}</p>
-		</div>
-	</div>
-	<!-- Buttons Container -->
-	<div class="card-btn-container">
-		<div>
-			<button disabled={!userAgreed} class="btn" onclick={() => handleSubmit()}
-				>{$_('btn_submit')}</button
-			>
+		<!-- Buttons Container -->
+		<div class="card-btn-container">
+			<div>
+				<button disabled={!userAgreed} class="btn" onclick={() => handleSubmit()}
+					>{$_('btn_submit')}</button
+				>
+			</div>
 		</div>
 	</div>
 </div>
@@ -244,7 +247,7 @@
 
 	.card-suggestions-container {
 		margin-top: 50px;
-		font-size: 14px;
+		font-size: 16px;
 		min-height: 50px;
 		text-align: right;
 	}
@@ -286,5 +289,61 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+
+	@media (min-width: 768px) {
+		.card-submit-container {
+			display: grid;
+			grid-template-rows: 1fr 1fr 1fr;
+			grid-template-columns: 1fr 1fr;
+			grid-template-areas:
+				'question .'
+				'input actions'
+				'suggestions .';
+		}
+
+		.card-question-container {
+			grid-area: question;
+		}
+
+		.card-input-container {
+			grid-area: input;
+			margin-top: 0;
+		}
+
+		.card-suggestions-container {
+			grid-area: suggestions;
+			margin-top: 0;
+		}
+
+		.card-actions-container {
+			grid-area: actions;
+			display: flex;
+			flex-direction: column;
+			gap: 100px;
+		}
+
+		.card-disclaimer-container {
+			margin-top: 0;
+			/* display: flex; */
+			/* gap: 10px; */
+			padding: 0 100px 0 100px;
+		}
+
+		.card-btn-container {
+			margin-top: 0;
+			padding-top: 0;
+			/* grid-area: btn-container; */
+			display: flex;
+			/* flex-direction: column; */
+			/* align-items: start;*/
+			align-self: end;
+			justify-self: end;
+			/* justify-self: center; */
+		}
+
+		.btn {
+			width: 170px;
+		}
 	}
 </style>
