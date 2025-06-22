@@ -4,7 +4,7 @@
 	import Checkmark from '$lib/components/mini-components/Checkmark.svelte';
 	import { onMount } from 'svelte';
 
-	let { closeLangCard } = $props();
+	let { closeLangCard, translate = $bindable() } = $props();
 
 	const languages = [
 		{ code: 'en', name: 'English' },
@@ -45,7 +45,7 @@
 	<!-- Extra Selector -->
 	<div class="card-extra-container">
 		<div class="card-checkmark-container">
-			<Checkmark />
+			<Checkmark bind:checkValue={translate} />
 		</div>
 		<div>{$_('btn_translate_check')}</div>
 	</div>

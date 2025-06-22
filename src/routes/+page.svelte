@@ -15,6 +15,7 @@
 	let showSubmit = $state(false);
 	let showExplore = $state(false);
 	let transitionDuration = 500; // milliseconds
+	let translateStories = $state(false);
 
 	let handleToggleLang = () => {
 		showLang = !showLang;
@@ -60,7 +61,7 @@
 		out:fade={{ duration: transitionDuration }}
 		class="lang-container"
 	>
-		<CardLang closeLangCard={handleToggleLang} />
+		<CardLang closeLangCard={handleToggleLang} bind:translate={translateStories} />
 	</div>
 {/if}
 
@@ -98,7 +99,7 @@
 					out:fade={{ duration: transitionDuration }}
 					class="explore-container"
 				>
-					<CardExplore />
+					<CardExplore getOnlyTranslate={translateStories} />
 				</div>
 			{/if}
 

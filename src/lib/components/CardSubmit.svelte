@@ -14,7 +14,7 @@
 	let question = $state<string | null>(null);
 	let story = $state('');
 	let suggestion = $state('');
-	let checked = $state(false);
+	let userAgreed = $state(false);
 	let suggestionLimit = $state(false);
 	let isTyping = $state(false);
 	let isLoadingSuggestions = $state(false);
@@ -53,7 +53,7 @@
 	}
 
 	async function handleSubmit() {
-		if (checked === true) {
+		if (userAgreed === true) {
 			await apiRequest(API_ADD_STORY_OPTIONS()).then((response) => {
 				console.log('Add Story Response:', response);
 			});
@@ -162,10 +162,12 @@
 <div class="card-submit-container">
 	<!-- Main Text -->
 	<div class="card-question-container">
-		{#if question}
+		{#if question && question.length > 0}
 			<p>{question}</p>
 		{:else}
-			<p>ERROR. Please reload the page.</p>
+			<div transition:blur class="loader-container">
+				<Loader color="white" pulseSize="30px" pulseTiming="1s" />
+			</div>
 		{/if}
 	</div>
 	<!-- Input Area -->
@@ -176,9 +178,9 @@
 	<div class="card-suggestions-container">
 		<!-- Show warning if story is too short -->
 		{#if suggestionLimit}
-			<p transition:blur class="suggestion-limit-text">
+			<div transition:blur class="suggestion-limit-text">
 				{$_('type_more')}
-			</p>
+			</div>
 		{/if}
 		<!-- Show loader when waiting for suggestions -->
 		{#if isLoadingSuggestions && story.length > 0 && !suggestionLimit}
@@ -204,7 +206,7 @@
 	<div class="card-disclaimer-container">
 		<!-- Checkmark -->
 		<div class="card-checkmark-container">
-			<Checkmark bind:checkValue={checked} />
+			<Checkmark bind:checkValue={userAgreed} />
 		</div>
 		<div class="card-disclaimer-text">
 			<p>{$_('disclaimer')}</p>
@@ -213,7 +215,7 @@
 	<!-- Buttons Container -->
 	<div class="card-btn-container">
 		<div>
-			<button disabled={!checked} class="btn" onclick={() => handleSubmit()}
+			<button disabled={!userAgreed} class="btn" onclick={() => handleSubmit()}
 				>{$_('btn_submit')}</button
 			>
 		</div>
@@ -243,7 +245,7 @@
 	.card-suggestions-container {
 		margin-top: 50px;
 		font-size: 14px;
-		min-height: 100px;
+		min-height: 50px;
 		text-align: right;
 	}
 
