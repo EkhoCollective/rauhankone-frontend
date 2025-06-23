@@ -28,10 +28,6 @@
 		await getAuthToken();
 	}
 
-	// function setShowLang(state: boolean) {
-	// 	showLang = state;
-	// }
-
 	onMount(() => {
 		handleGetToken();
 	});
@@ -76,7 +72,7 @@
 			<!-- Submit Card -->
 			{#if currentCard === 'submit'}
 				<div
-					in:fade={{ delay: 1000, duration: transitionDuration }}
+					in:fade={{ delay: 0, duration: transitionDuration }}
 					out:fade={{ duration: transitionDuration }}
 					class="submit-container"
 				>

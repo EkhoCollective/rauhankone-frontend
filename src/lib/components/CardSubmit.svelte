@@ -47,7 +47,7 @@
 
 	async function handleGetQuestions() {
 		await apiRequest(API_QUESTIONS_OPTIONS()).then((response) => {
-			// console.log('Get Questions Response:', response);
+			console.log('Get Questions Response:', response);
 			getLangFilteredQuestion(response);
 		});
 	}

@@ -31,7 +31,7 @@
 		height: 100%;
 		top: 0;
 		resize: none;
-		background-color: rgb(30, 30, 30);
+		background: linear-gradient(to bottom, rgb(10, 10, 10), rgb(0, 0, 0));
 	}
 	.container:has(textarea:focus) {
 		outline: none;
