@@ -12,8 +12,7 @@
 
 	// UI Toggle states
 	let showLang = $state(false);
-	let showSubmit = $state(false);
-	let showExplore = $state(false);
+	let currentCard = $state('main');
 	let transitionDuration = 500; // milliseconds
 	let translateStories = $state(false);
 
@@ -21,33 +20,23 @@
 		showLang = !showLang;
 	};
 
-	function handleToggleSubmit() {
-		showSubmit = !showSubmit;
-	}
-
-	function handleToggleExplore() {
-		showExplore = !showExplore;
-		showSubmit = false;
-	}
-
-	function handleBackToHome() {
-		showSubmit = false;
-		showExplore = false;
+	function handleCardView(card: string) {
+		currentCard = card;
 	}
 
 	async function handleGetToken() {
 		await getAuthToken();
 	}
 
-	function setShowLang(state: boolean) {
-		showLang = state;
-	}
+	// function setShowLang(state: boolean) {
+	// 	showLang = state;
+	// }
 
 	onMount(() => {
 		handleGetToken();
 	});
 	// Console log to check state changes in svelte
-	// $inspect('showSubmit', showSubmit, 'showExplore', showExplore, 'showLang', showLang);
+	$inspect('currentCard', currentCard);
 </script>
 
 <svelte:head>
@@ -74,42 +63,47 @@
 		out:fade={{ duration: transitionDuration }}
 		class="app-container"
 	>
+		<!-- Header -->
 		<div class="header-container">
 			<Header
 				toggleLang={handleToggleLang}
-				backToHome={handleBackToHome}
-				showBackBtn={showSubmit || showExplore}
+				backToHome={() => handleCardView('main')}
+				showBackBtn={currentCard !== 'main'}
 			/>
 		</div>
 
 		<div class="card-container">
-			{#if showSubmit}
+			<!-- Submit Card -->
+			{#if currentCard === 'submit'}
 				<div
-					in:fade={{ duration: transitionDuration }}
+					in:fade={{ delay: 1000, duration: transitionDuration }}
 					out:fade={{ duration: transitionDuration }}
 					class="submit-container"
 				>
-					<CardSubmit toExplore={handleToggleExplore} />
+					<CardSubmit toExplore={() => handleCardView('explore')} />
 				</div>
 			{/if}
-
-			{#if showExplore}
+			<!-- Explore Card -->
+			{#if currentCard === 'explore'}
 				<div
 					in:fade={{ duration: transitionDuration }}
 					out:fade={{ duration: transitionDuration }}
 					class="explore-container"
 				>
-					<CardExplore getOnlyTranslate={translateStories} />
+					<CardExplore getOnlyTranslated={translateStories} />
 				</div>
 			{/if}
-
-			{#if !showSubmit && !showExplore}
+			<!-- Main Card -->
+			{#if currentCard === 'main'}
 				<div
-					in:fade={{ duration: transitionDuration }}
-					out:fade={{ duration: transitionDuration }}
+					in:fade={{ delay: 500, duration: transitionDuration }}
+					out:fade={{ delay: 0, duration: transitionDuration }}
 					class="main-container"
 				>
-					<CardMain toSubmit={handleToggleSubmit} toExplore={handleToggleExplore} />
+					<CardMain
+						toSubmit={() => handleCardView('submit')}
+						toExplore={() => handleCardView('explore')}
+					/>
 				</div>
 			{/if}
 		</div>

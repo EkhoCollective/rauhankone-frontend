@@ -6,7 +6,7 @@
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 
-	let { getOnlyTranslate = $bindable() } = $props();
+	let { getOnlyTranslated = $bindable() } = $props();
 
 	let response_clusters = $state(null);
 	let requestLanguage = $state('Any');
@@ -26,7 +26,7 @@
 	}
 
 	function handleGetTranslate() {
-		if (getOnlyTranslate === true) {
+		if (getOnlyTranslated === true) {
 			requestLanguage = getLocaleFullName();
 		} else {
 			requestLanguage = 'Any';
@@ -38,7 +38,7 @@
 		fetchClusters();
 	});
 
-	$inspect(response_clusters, getOnlyTranslate);
+	$inspect(response_clusters, getOnlyTranslated);
 </script>
 
 <div class="scene-container">

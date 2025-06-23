@@ -147,16 +147,16 @@
 		}
 	});
 
-	$inspect(
-		// 'storyComplete',
-		// storyComplete,
-		// 'isTyping',
-		// isTyping,
-		// 'suggestionLimit',
-		// suggestionLimit,
-		'isLoadingSuggestions',
-		isLoadingSuggestions
-	);
+	// $inspect(
+	// 	// 'storyComplete',
+	// 	// storyComplete,
+	// 	// 'isTyping',
+	// 	// isTyping,
+	// 	// 'suggestionLimit',
+	// 	// suggestionLimit,
+	// 	'isLoadingSuggestions',
+	// 	isLoadingSuggestions
+	// );
 </script>
 
 <div class="card-submit-container">
@@ -267,6 +267,7 @@
 		font-size: 16px;
 		display: flex;
 		flex-direction: column;
+		align-items: end;
 	}
 	.btn {
 		background-color: black;
@@ -325,21 +326,15 @@
 
 		.card-disclaimer-container {
 			margin-top: 0;
-			/* display: flex; */
-			/* gap: 10px; */
 			padding: 0 100px 0 100px;
 		}
 
 		.card-btn-container {
 			margin-top: 0;
 			padding-top: 0;
-			/* grid-area: btn-container; */
 			display: flex;
-			/* flex-direction: column; */
-			/* align-items: start;*/
 			align-self: end;
 			justify-self: end;
-			/* justify-self: center; */
 		}
 
 		.btn {

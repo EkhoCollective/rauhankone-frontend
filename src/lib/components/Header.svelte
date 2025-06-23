@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import { Globe, ArrowLeft } from 'lucide-svelte';
+	import { blur } from 'svelte/transition';
 
 	let { toggleLang, backToHome, showBackBtn } = $props();
 </script>
 
 <div class="card-header-container">
 	{#if showBackBtn}
-		<div class="back-btn-container">
+		<div transition:blur class="back-btn-container">
 			<button class="btn" onclick={() => backToHome()}><ArrowLeft /> {$_('btn_exit')}</button>
 		</div>
 	{/if}
