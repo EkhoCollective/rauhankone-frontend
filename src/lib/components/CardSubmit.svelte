@@ -278,6 +278,7 @@
 		background-color: black;
 		border-color: white;
 		border-radius: 0px;
+		color: white;
 	}
 	.btn:disabled {
 		border-color: gray;

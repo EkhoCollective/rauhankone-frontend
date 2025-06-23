@@ -11,9 +11,9 @@
 <div class="checkmark-container">
 	<button class="checkmark-btn" onclick={() => handleCheckmark()}>
 		{#if checkValue}
-			<SquareCheckBig />
+			<SquareCheckBig color="#ffffff" />
 		{:else}
-			<Square />
+			<Square color="#ffffff" />
 		{/if}
 	</button>
 </div>

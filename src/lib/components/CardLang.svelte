@@ -25,7 +25,7 @@
 <div class="card-lang-container">
 	<!-- Header/Language Selector -->
 	<div class="card-header-container">
-		<button class="btn btn-close" onclick={() => closeLangCard()}><X /></button>
+		<button class="btn btn-close" onclick={() => closeLangCard()}><X color="#ffffff" /></button>
 	</div>
 	<!-- Buttons Container -->
 	<div class="card-btn-container">
@@ -62,6 +62,7 @@
 
 	.btn {
 		height: 50px;
+		color: white;
 	}
 	.btn-close {
 		background-color: transparent;
@@ -83,6 +84,7 @@
 		border: none;
 		box-shadow: none;
 		font-size: 18px;
+		color: white;
 	}
 	.card-extra-container {
 		grid-row-start: 3;

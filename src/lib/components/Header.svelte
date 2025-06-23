@@ -9,11 +9,13 @@
 <div class="card-header-container">
 	{#if showBackBtn}
 		<div transition:blur class="back-btn-container">
-			<button class="btn" onclick={() => backToHome()}><ArrowLeft /> {$_('btn_exit')}</button>
+			<button class="btn" onclick={() => backToHome()}
+				><ArrowLeft color="#ffffff" /> {$_('btn_exit')}</button
+			>
 		</div>
 	{/if}
 	<div class="lang-btn-container">
-		<button class="btn" onclick={() => toggleLang()}><Globe /></button>
+		<button class="btn" onclick={() => toggleLang()}><Globe color="#ffffff" /></button>
 	</div>
 </div>
 

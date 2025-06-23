@@ -73,6 +73,7 @@
 		width: 100%;
 		font-size: 16px;
 		border-radius: 0px;
+		color: white;
 	}
 
 	.btn-explore {
@@ -85,6 +86,7 @@
 		text-decoration: underline;
 		text-underline-offset: 2px;
 		border-radius: 0px;
+		color: white;
 	}
 	.card-footer-container {
 		grid-row-start: 5;
