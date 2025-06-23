@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { getAuthToken } from '$lib/utils/api_token';
+	import { apiRequest } from '$lib/utils/api_request';
 	import { _, waitLocale } from 'svelte-i18n';
 	import Header from '$lib/components/Header.svelte';
 	import CardLoader from '$lib/components/CardLoader.svelte';
@@ -15,6 +16,7 @@
 	let currentCard = $state('main');
 	let transitionDuration = 500; // milliseconds
 	let translateStories = $state(false);
+	let questions = $state(null);
 
 	let handleToggleLang = () => {
 		showLang = !showLang;
@@ -25,7 +27,23 @@
 	}
 
 	async function handleGetToken() {
-		await getAuthToken();
+		await getAuthToken().then(() => {
+			handleGetQuestions();
+		});
+	}
+
+	const API_QUESTIONS_OPTIONS = () => ({
+		API_ENDPOINT: '/get_questions',
+		API_METHOD: 'POST',
+		REQUEST_BODY: { language: 'Any', question_type: 'starter' }
+	});
+
+	async function handleGetQuestions() {
+		await apiRequest(API_QUESTIONS_OPTIONS()).then((response) => {
+			console.log('Get Questions Response:', response);
+			// getLangFilteredQuestion(response);
+			questions = response;
+		});
 	}
 
 	onMount(() => {
@@ -69,26 +87,6 @@
 		</div>
 
 		<div class="card-container">
-			<!-- Submit Card -->
-			{#if currentCard === 'submit'}
-				<div
-					in:fade={{ delay: 0, duration: transitionDuration }}
-					out:fade={{ duration: transitionDuration }}
-					class="submit-container"
-				>
-					<CardSubmit toExplore={() => handleCardView('explore')} />
-				</div>
-			{/if}
-			<!-- Explore Card -->
-			{#if currentCard === 'explore'}
-				<div
-					in:fade={{ duration: transitionDuration }}
-					out:fade={{ duration: transitionDuration }}
-					class="explore-container"
-				>
-					<CardExplore getOnlyTranslated={translateStories} />
-				</div>
-			{/if}
 			<!-- Main Card -->
 			{#if currentCard === 'main'}
 				<div
@@ -100,6 +98,26 @@
 						toSubmit={() => handleCardView('submit')}
 						toExplore={() => handleCardView('explore')}
 					/>
+				</div>
+			{/if}
+			<!-- Submit Card -->
+			{#if currentCard === 'submit'}
+				<div
+					in:fade={{ delay: 500, duration: transitionDuration }}
+					out:fade={{ duration: transitionDuration }}
+					class="submit-container"
+				>
+					<CardSubmit toExplore={() => handleCardView('explore')} questionsData={questions} />
+				</div>
+			{/if}
+			<!-- Explore Card -->
+			{#if currentCard === 'explore'}
+				<div
+					in:fade={{ delay: 500, duration: transitionDuration }}
+					out:fade={{ duration: transitionDuration }}
+					class="explore-container"
+				>
+					<CardExplore getOnlyTranslated={translateStories} />
 				</div>
 			{/if}
 		</div>
@@ -121,14 +139,14 @@
 	}
 
 	.card-container {
-		z-index: 1;
+		/* z-index: 1; */
 		height: 100%;
 	}
 
 	.lang-container {
 		width: 100vw;
 		height: 100vh;
-		z-index: 9999;
+		z-index: 1000;
 		position: absolute;
 		top: 50%;
 		left: 50%;

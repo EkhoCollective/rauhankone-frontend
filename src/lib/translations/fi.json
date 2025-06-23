@@ -11,7 +11,7 @@
 	"please_extend": "Ole hyvä ja laajenna tarinaasi",
 	"disclaimer": "Lähettämällä vahvistan, että minulla on oikeus julkaista tämä tarina enkä jaa mitään henkilökohtaisia tietoja.",
 	"submit_toast": "Kiitos, että jaoit muistosi. Nyt on aika yhdistää se muiden kanssa klikkaamalla alla olevaa painiketta.",
-	"btn_exit": "Poistu kartasta",
+	"btn_exit": "Aloita alusta",
 	"error_db": "Virhe: Tietokanta ei ole yhdistetty. Yritä myöhemmin uudelleen.",
 	"error_404": "Virhe: Sivua ei löydy. Yritä myöhemmin uudelleen.",
 	"error_general": "Virhe: Jotain meni pieleen. Yritä myöhemmin uudelleen.",

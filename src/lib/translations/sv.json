@@ -11,7 +11,7 @@
 	"please_extend": "Vänligen utveckla din berättelse.",
 	"disclaimer": "Genom att skicka in bekräftar jag att jag har rätt att publicera denna berättelse och att jag inte delar någon personlig information.",
 	"submit_toast": "Tack för att du delade ditt minne. Nu är det dags att förena det med andras genom att klicka på knappen nedan.",
-	"btn_exit": "Lämna kartan",
+	"btn_exit": "Starta om",
 	"error_db": "Fel: Databasen är inte ansluten. Försök igen senare.",
 	"error_404": "Fel: Sidan hittades inte. Försök igen senare.",
 	"error_general": "Fel: Något gick fel. Försök igen senare.",

@@ -11,7 +11,7 @@
 	"please_extend": "Please extend your story.",
 	"disclaimer": "By submitting I confirm that I have the right to publish this story and not sharing any personal information.",
 	"submit_toast": "Thanks for sharing your memory. Now it’s time to join it with others by clicking the button below.",
-	"btn_exit": "Exit Map",
+	"btn_exit": "Start Over",
 	"error_db": "Error: Database is not connected. Please try again later.",
 	"error_404": "Error: Page not found. Please try again later.",
 	"error_general": "Error: Something went wrong. Please try again later.",

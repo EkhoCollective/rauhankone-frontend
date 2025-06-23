@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { _, locale } from 'svelte-i18n';
+	import { _ } from 'svelte-i18n';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
@@ -9,7 +9,7 @@
 	import Loader from '$lib/components/mini-components/Loader.svelte';
 	import { blur } from 'svelte/transition';
 
-	let { toExplore } = $props();
+	let { toExplore, questionsData } = $props();
 
 	let question = $state<string | null>(null);
 	let story = $state('');
@@ -22,12 +22,6 @@
 	let storyComplete = $state(false);
 	let minStoryLength = $state(30);
 	let waitTimeAfterTyping = $state(2000);
-
-	const API_QUESTIONS_OPTIONS = () => ({
-		API_ENDPOINT: '/get_questions',
-		API_METHOD: 'POST',
-		REQUEST_BODY: { language: 'Any', question_type: 'starter' }
-	});
 
 	const API_SUGGESTION_OPTIONS = () => ({
 		API_ENDPOINT: '/suggestion',
@@ -44,13 +38,6 @@
 			language: getLocaleFullName()
 		}
 	});
-
-	async function handleGetQuestions() {
-		await apiRequest(API_QUESTIONS_OPTIONS()).then((response) => {
-			console.log('Get Questions Response:', response);
-			getLangFilteredQuestion(response);
-		});
-	}
 
 	async function handleSubmit() {
 		if (userAgreed === true) {
@@ -122,12 +109,12 @@
 		}, waitTimeAfterTyping); // 1 second delay to detect stopping typing
 	}
 
-	locale.subscribe(() => {
-		handleGetQuestions();
-	});
+	// locale.subscribe(() => {
+	// 	handleGetQuestions();
+	// });
 
 	onMount(() => {
-		handleGetQuestions();
+		getLangFilteredQuestion(questionsData);
 	});
 
 	// Watch for changes in the story text
