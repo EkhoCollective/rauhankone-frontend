@@ -246,10 +246,15 @@
 	}
 
 	.card-suggestions-container {
+		align-self: end;
 		margin-top: 50px;
+		max-width: 80%;
 		font-size: 16px;
 		min-height: 50px;
-		text-align: right;
+		text-align: left;
+		background-color: rgb(15, 15, 15);
+		border-radius: 10px;
+		padding: 10px;
 	}
 
 	.card-disclaimer-container {
