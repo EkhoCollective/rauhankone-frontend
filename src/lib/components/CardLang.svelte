@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { _, locale, waitLocale } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
-	import Checkmark from '$lib/components/mini-components/Checkmark.svelte';
+	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 
 	let { closeLangCard, translate = $bindable() } = $props();
 

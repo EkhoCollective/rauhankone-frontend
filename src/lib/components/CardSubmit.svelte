@@ -1,17 +1,20 @@
 <script lang="ts">
+	// Imports
 	import { _ } from 'svelte-i18n';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import { getLangFilteredQuestion } from '$lib/utils/questions_handler';
 	import DOMPurify from 'dompurify';
-	import Checkmark from '$lib/components/mini-components/Checkmark.svelte';
+	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
 	import Loader from '$lib/components/mini-components/Loader.svelte';
 	import { blur } from 'svelte/transition';
 
+	// Props
 	let { toExplore, questionsData } = $props();
 
+	// States
 	let question = $state<string | null>(null);
 	let story = $state('');
 	let suggestion = $state('');
@@ -23,6 +26,7 @@
 	let suggestionState = $state('off');
 	let suggestionFadeTimer = $state(3000);
 
+	// API Options
 	const API_SUGGESTION_OPTIONS = () => ({
 		API_ENDPOINT: '/suggestion',
 		API_METHOD: 'POST',
@@ -39,6 +43,7 @@
 		}
 	});
 
+	// Functions
 	async function handleSubmit() {
 		if (userAgreed === true) {
 			await apiRequest(API_ADD_STORY_OPTIONS()).then((response) => {
@@ -49,14 +54,13 @@
 	}
 
 	async function handleGetSuggestions() {
-		await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
-			suggestion = response.suggestion;
-			console.log('Suggestion request complete');
-			// isLoadingSuggestions = false;
-			suggestionState = 'ok';
-			// Start timer to hide suggestion after 3 seconds
-			// startSuggestionTimer();
-		});
+		await apiRequest(API_SUGGESTION_OPTIONS())
+			.then((response) => {
+				suggestion = response.suggestion;
+			})
+			.then(() => {
+				suggestionState = 'ok';
+			});
 	}
 
 	// Function to handle typing detection
@@ -65,19 +69,14 @@
 		if (story.length <= 0) {
 			suggestionState = 'off';
 			storyComplete = false;
-			// clearSuggestionTimer();
 			return;
 		}
-
 		// If story is already complete (done state), don't change anything
 		if (suggestionState === 'done') {
 			return;
 		}
-
 		// When user is actively typing
 		if (isTyping === true) {
-			// Clear any suggestion timer when user starts typing
-			// clearSuggestionTimer();
 			// If user was in 'ok' state (had received suggestion) and starts typing again,
 			// set to 'off' first, then will transition to 'done' when they stop typing
 			if (suggestionState === 'ok') {
@@ -101,7 +100,6 @@
 				// Only set to loading if we haven't already received a suggestion or completed the story
 				suggestionState = 'loading';
 				// Trigger API call to get suggestions
-				// isLoadingSuggestions = true;
 				handleGetSuggestions();
 			} else if (
 				suggestionState === 'off' &&
@@ -114,18 +112,13 @@
 			}
 		}
 	}
-	// Suggestion State:
-	// off: no suggestion because is not typing and there is no text
-	// warning: story is too short and user has stopped typing
-	// loading: loading suggestion hen the text is longer than the minStoryLength and the user has stopped typing
-	// ok: suggestion received
-	// done: thank you message when the user has edited the story and the story is complete
 
 	// Watch for changes in the story text
 	$effect(() => {
 		handleTyping();
 	});
 
+	// On Mount
 	onMount(() => {
 		question = getLangFilteredQuestion(questionsData, getLocaleFullName());
 	});
@@ -161,42 +154,40 @@
 	<!-- Suggestions -->
 	<div class="suggestions-container">
 		{#if suggestionState !== 'off'}
-			<!-- <div transition:blur class="card-suggestions-bubble"> -->
-			<!-- refactor this bubles per sugg state, check the in blur states for delay and duration -->
-
-			<!-- Show warning if story is too short -->
-			{#if suggestionState === 'warning'}
-				<div transition:blur class="warning-bubble bubble">
-					{$_('type_more')}
-				</div>
-			{/if}
-			<!-- Show loader when waiting for suggestions -->
-			{#if suggestionState === 'loading'}
-				<div transition:blur class="loader-bubble bubble">
-					<Loader color="white" pulseSize="30px" pulseTiming="1s" />
-				</div>
-			{/if}
-			<!-- Show suggestion if user has typed something -->
-			{#if suggestionState === 'ok'}
-				<div transition:blur class="suggestions-bubble bubble">
-					<p>{suggestion}</p>
-					<p>{$_('please_extend')}</p>
-				</div>
-			{/if}
-			<!-- Show thank you message if user has finished the story -->
-			{#if suggestionState === 'done'}
-				<p transition:blur class="thank-you-bubble bubble">
-					{$_('submit_toast')}
-				</p>
-			{/if}
-			<!-- </div> -->
+			<div></div>
+		{/if}
+		<!-- Show warning if story is too short -->
+		{#if suggestionState === 'warning'}
+			<div transition:blur class="warning-bubble bubble">
+				{$_('type_more')}
+			</div>
+		{/if}
+		<!-- Show loader when waiting for suggestions -->
+		{#if suggestionState === 'loading'}
+			<div transition:blur class="loader-bubble bubble">
+				<Loader color="white" pulseSize="30px" pulseTiming="1s" />
+			</div>
+		{/if}
+		<!-- Show suggestion if user has typed something -->
+		{#if suggestionState === 'ok'}
+			<div transition:blur class="suggestions-bubble bubble">
+				<p>{suggestion}</p>
+				<p>{$_('please_extend')}</p>
+			</div>
+		{/if}
+		<!-- Show thank you message if user has finished the story -->
+		{#if suggestionState === 'done'}
+			<p transition:blur class="thank-you-bubble bubble">
+				{$_('submit_toast')}
+			</p>
 		{/if}
 	</div>
 	<!-- Actions -->
-	{#if (suggestionState === 'done' || suggestionState === 'ok' || storyComplete === true) && story.length > minStoryLength}
-		<div class="actions-container">
+
+	<div class="actions-container">
+		{#if (suggestionState === 'done' || suggestionState === 'ok' || storyComplete === true) && story.length > minStoryLength}
 			<!-- Disclaimer -->
-			<div class="disclaimer-container">
+			<div transition:blur class="disclaimer-container">
 				<!-- Checkmark -->
 				<div class="checkmark-container">
 					<Checkmark bind:checkValue={userAgreed} />
@@ -206,15 +197,15 @@
 				</div>
 			</div>
 			<!-- Buttons Container -->
-			<div class="disclaimer-btn-container">
+			<div transition:blur class="disclaimer-btn-container">
 				<div>
 					<button disabled={!userAgreed} class="btn" onclick={handleSubmit}
 						>{$_('btn_submit')}</button
 					>
 				</div>
 			</div>
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>
 
 <style>
@@ -241,6 +232,7 @@
 	.suggestions-container {
 		margin-top: 40px;
 		min-height: 150px;
+		position: relative;
 		display: flex;
 		justify-content: end;
 		align-items: flex-start;
@@ -274,6 +266,9 @@
 	}
 
 	.bubble {
+		position: absolute;
+		top: 0;
+		right: 0;
 		max-width: 80%;
 		font-size: 16px;
 		text-align: left;
@@ -300,6 +295,7 @@
 		background-color: #cfffcf1a;
 	}
 
+	/* Media Queries */
 	@media (min-width: 768px) {
 		.card-submit-container {
 			display: grid;
