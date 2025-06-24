@@ -22,6 +22,7 @@
 	let storyComplete = $state(false);
 	let minStoryLength = $state(30);
 	let waitTimeAfterTyping = $state(2000);
+	let suggestionState = $state('off');
 
 	const API_SUGGESTION_OPTIONS = () => ({
 		API_ENDPOINT: '/suggestion',
@@ -52,6 +53,7 @@
 		await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
 			suggestion = response.suggestion;
 			isLoadingSuggestions = false;
+			suggestionState = 'requested';
 		});
 	}
 
@@ -80,70 +82,75 @@
 	}
 
 	// Function to handle typing detection
-	function handleTyping() {
-		isTyping = true;
-		isLoadingSuggestions = false; // Reset loading state when typing starts
+	// function handleTyping() {
+	// 	isTyping = true;
+	// 	isLoadingSuggestions = false; // Reset loading state when typing starts
 
-		// Clear existing timer
-		if (typingTimer) {
-			clearTimeout(typingTimer);
-		}
+	// 	// Clear existing timer
+	// 	if (typingTimer) {
+	// 		clearTimeout(typingTimer);
+	// 	}
 
-		// Set new timer to detect when user stops typing
-		typingTimer = setTimeout(() => {
-			isTyping = false;
-			if (suggestionLimit === false) {
-				if (suggestion.length > 0) {
-					storyComplete = true;
-					isLoadingSuggestions = false;
-					return;
-				} else {
-					// Show loader after 500ms of stopping typing
-					setTimeout(() => {
-						isLoadingSuggestions = true;
-						// Then call the API
-						handleGetSuggestions();
-					}, 500);
-				}
-			}
-		}, waitTimeAfterTyping); // 1 second delay to detect stopping typing
-	}
+	// 	// Set new timer to detect when user stops typing
+	// 	typingTimer = setTimeout(() => {
+	// 		isTyping = false;
+	// 		if (suggestionLimit === false) {
+	// 			if (suggestion.length > 0) {
+	// 				storyComplete = true;
+	// 				isLoadingSuggestions = false;
+	// 				return;
+	// 			} else {
+	// 				// Show loader after 500ms of stopping typing
+	// 				setTimeout(() => {
+	// 					isLoadingSuggestions = true;
+	// 					suggestionState = 'loading';
+	// 					// Then call the API
+	// 					handleGetSuggestions();
+	// 				}, 500);
+	// 			}
+	// 		}
+	// 	}, waitTimeAfterTyping); // 1 second delay to detect stopping typing
+	// }
 
-	// locale.subscribe(() => {
-	// 	handleGetQuestions();
-	// });
+	// function handleTypingActive(active: boolean) {
+	// 	console.log('Typing active:', active);
+	// }
+
+	// Watch for changes in the story text
+	$effect(() => {
+		// handleTyping();
+		// if (isTyping === false && (story.length < minStoryLength || story.length > 0)) {
+		// 	suggestionState = 'warning';
+		// }
+		// if (story.length > minStoryLength) {
+		// 	suggestionState = 'loading';
+		// }
+		// // else {
+		// // 	suggestionState = 'off';
+		// // }
+		// // if (story && storyComplete === false) {
+		// // 	handleTyping();
+		// // }
+		// // // If user deletes all text, reset storyComplete and suggestion
+		// if (story.length === 0) {
+		// 	storyComplete = false;
+		// 	suggestionState = 'off';
+		// 	suggestion = '';
+		// }
+	});
+
+	// Suggestion State:
+	// off: no suggestion
+	// warning: story is too short
+	// requested: suggestion requested
+	// loading: loading suggestion
+	// done: thank you message
 
 	onMount(() => {
 		getLangFilteredQuestion(questionsData);
 	});
 
-	// Watch for changes in the story text
-	$effect(() => {
-		if (story.length < minStoryLength && story.length > 0) {
-			suggestionLimit = true;
-		} else {
-			suggestionLimit = false;
-		}
-		if (story && storyComplete === false) {
-			handleTyping();
-		}
-		// If user deletes all text, reset storyComplete and suggestion
-		if (story.length < minStoryLength) {
-			storyComplete = false;
-			suggestion = '';
-		}
-	});
-
-	// $inspect(
-	// 	// 'storyComplete',
-	// 	// storyComplete,
-	// 	// 'isTyping',
-	// 	// isTyping,
-	// 	// 'suggestionLimit',
-	// 	// suggestionLimit,
-	// 	'isLoadingSuggestions',
-	// 	isLoadingSuggestions
-	// );
+	$inspect('isTyping', isTyping);
 </script>
 
 <div class="card-submit-container">
@@ -152,43 +159,48 @@
 		{#if question && question.length > 0}
 			<p>{question}</p>
 		{:else}
-			<div transition:blur class="loader-container">
-				<Loader color="white" pulseSize="30px" pulseTiming="1s" />
-			</div>
+			<p>{$_('error_db')}</p>
 		{/if}
 	</div>
 	<!-- Input Area -->
 	<div class="card-input-container">
-		<Textarea bind:textValue={story} minHeight="200px" />
+		<Textarea
+			bind:textValue={story}
+			minHeight="200px"
+			debounceTime={750}
+			bind:typingActive={isTyping}
+		/>
 	</div>
 	<!-- Suggestions -->
-	<div class="card-suggestions-container">
-		<!-- Show warning if story is too short -->
-		{#if suggestionLimit}
-			<div transition:blur class="suggestion-limit-text">
-				{$_('type_more')}
-			</div>
-		{/if}
-		<!-- Show loader when waiting for suggestions -->
-		{#if isLoadingSuggestions && story.length > 0 && !suggestionLimit}
-			<div transition:blur class="loader-container">
-				<Loader color="white" pulseSize="30px" pulseTiming="1s" />
-			</div>
-		{/if}
-		<!-- Show suggestion if user has typed something -->
-		{#if storyComplete === false && isTyping === false && suggestion && story.length > 0 && !isLoadingSuggestions}
-			<div transition:blur>
-				<p>{suggestion}</p>
-				<p>{$_('please_extend')}</p>
-			</div>
-		{/if}
-		<!-- Show thank you message if user has finished the story -->
-		{#if storyComplete && story.length > 0}
-			<p transition:blur class="thank-you-text">
-				{$_('submit_toast')}
-			</p>
-		{/if}
-	</div>
+	{#if suggestionState !== 'off'}
+		<div transition:blur class="card-suggestions-container">
+			<!-- Show warning if story is too short -->
+			{#if suggestionState === 'warning'}
+				<div transition:blur class="suggestion-limit-text">
+					{$_('type_more')}
+				</div>
+			{/if}
+			<!-- Show loader when waiting for suggestions -->
+			{#if suggestionState === 'loading'}
+				<div transition:blur class="loader-container">
+					<Loader color="white" pulseSize="30px" pulseTiming="1s" />
+				</div>
+			{/if}
+			<!-- Show suggestion if user has typed something -->
+			{#if suggestionState === 'requested'}
+				<div transition:blur>
+					<p>{suggestion}</p>
+					<p>{$_('please_extend')}</p>
+				</div>
+			{/if}
+			<!-- Show thank you message if user has finished the story -->
+			{#if suggestionState === 'done'}
+				<p transition:blur class="thank-you-text">
+					{$_('submit_toast')}
+				</p>
+			{/if}
+		</div>
+	{/if}
 	<!-- Actions -->
 	<div class="card-actions-container">
 		<!-- Disclaimer -->
@@ -204,8 +216,7 @@
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<div>
-				<button disabled={!userAgreed} class="btn" onclick={() => handleSubmit()}
-					>{$_('btn_submit')}</button
+				<button disabled={!userAgreed} class="btn" onclick={handleSubmit}>{$_('btn_submit')}</button
 				>
 			</div>
 		</div>
@@ -222,19 +233,21 @@
 		padding: 0 10% 0 10%;
 	}
 	.card-question-container {
-		margin-top: calc(50px + 80px); /* fix this */
+		margin-top: 80px;
 		font-size: 16px;
 		align-self: center;
+		padding-bottom: 40px;
+		border-bottom: 1px solid white;
 	}
 	.card-input-container {
-		margin-top: 50px;
+		margin-top: 40px;
 		font-size: 18px;
 		font-family: 'Roboto Slab', serif;
 	}
 
 	.card-suggestions-container {
 		align-self: end;
-		margin-top: 50px;
+		margin-top: 40px;
 		max-width: 80%;
 		font-size: 16px;
 		min-height: 50px;
@@ -245,7 +258,7 @@
 	}
 
 	.card-disclaimer-container {
-		margin-top: 50px;
+		margin-top: 40px;
 		font-size: 14px;
 		display: grid;
 		grid-template-columns: 40px 1fr;
@@ -253,9 +266,8 @@
 		justify-items: start;
 	}
 	.card-btn-container {
-		margin-top: 50px;
+		margin-top: 20px;
 		justify-self: end;
-		padding-top: 20px;
 		font-size: 16px;
 		display: flex;
 		flex-direction: column;

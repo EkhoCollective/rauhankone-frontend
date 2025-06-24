@@ -40,8 +40,7 @@
 
 	async function handleGetQuestions() {
 		await apiRequest(API_QUESTIONS_OPTIONS()).then((response) => {
-			console.log('Get Questions Response:', response);
-			// getLangFilteredQuestion(response);
+			// console.log('Get Questions Response:', response);
 			questions = response;
 		});
 	}
@@ -50,7 +49,7 @@
 		handleGetToken();
 	});
 	// Console log to check state changes in svelte
-	$inspect('currentCard', currentCard);
+	// $inspect('currentCard', currentCard);
 </script>
 
 <svelte:head>
@@ -139,7 +138,6 @@
 	}
 
 	.card-container {
-		/* z-index: 1; */
 		height: 100%;
 	}
 
