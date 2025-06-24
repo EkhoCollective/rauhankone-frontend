@@ -15,13 +15,10 @@
 	let story = $state('');
 	let suggestion = $state('');
 	let userAgreed = $state(false);
-	let suggestionLimit = $state(false);
 	let isTyping = $state(false);
-	let isLoadingSuggestions = $state(false);
-	let typingTimer: number | null = null;
+	let typingTimer = $state(750);
 	let storyComplete = $state(false);
 	let minStoryLength = $state(30);
-	let waitTimeAfterTyping = $state(2000);
 	let suggestionState = $state('off');
 
 	const API_SUGGESTION_OPTIONS = () => ({
@@ -52,8 +49,9 @@
 	async function handleGetSuggestions() {
 		await apiRequest(API_SUGGESTION_OPTIONS()).then((response) => {
 			suggestion = response.suggestion;
-			isLoadingSuggestions = false;
-			suggestionState = 'requested';
+			console.log('Suggestion request complete');
+			// isLoadingSuggestions = false;
+			suggestionState = 'ok';
 		});
 	}
 
@@ -82,75 +80,81 @@
 	}
 
 	// Function to handle typing detection
-	// function handleTyping() {
-	// 	isTyping = true;
-	// 	isLoadingSuggestions = false; // Reset loading state when typing starts
+	function handleTyping() {
+		// Check if story is empty - always set to "off" regardless of typing state or current state
+		if (story.length <= 0) {
+			suggestionState = 'off';
+			storyComplete = false;
+			return;
+		}
 
-	// 	// Clear existing timer
-	// 	if (typingTimer) {
-	// 		clearTimeout(typingTimer);
-	// 	}
+		// If story is already complete (done state), don't change anything
+		if (suggestionState === 'done') {
+			return;
+		}
 
-	// 	// Set new timer to detect when user stops typing
-	// 	typingTimer = setTimeout(() => {
-	// 		isTyping = false;
-	// 		if (suggestionLimit === false) {
-	// 			if (suggestion.length > 0) {
-	// 				storyComplete = true;
-	// 				isLoadingSuggestions = false;
-	// 				return;
-	// 			} else {
-	// 				// Show loader after 500ms of stopping typing
-	// 				setTimeout(() => {
-	// 					isLoadingSuggestions = true;
-	// 					suggestionState = 'loading';
-	// 					// Then call the API
-	// 					handleGetSuggestions();
-	// 				}, 500);
-	// 			}
-	// 		}
-	// 	}, waitTimeAfterTyping); // 1 second delay to detect stopping typing
-	// }
-
-	// function handleTypingActive(active: boolean) {
-	// 	console.log('Typing active:', active);
-	// }
+		// When user is actively typing
+		if (isTyping === true) {
+			// If user was in 'ok' state (had received suggestion) and starts typing again,
+			// set to 'off' first, then will transition to 'done' when they stop typing
+			if (suggestionState === 'ok') {
+				suggestionState = 'off';
+				storyComplete = true;
+			} else {
+				// Reset to off state while typing for other states
+				suggestionState = 'off';
+			}
+		} else {
+			// When user has stopped typing
+			if (story.length < minStoryLength) {
+				suggestionState = 'warning';
+			} else if (
+				story.length >= minStoryLength &&
+				suggestionState !== 'ok' &&
+				suggestionState !== 'done' &&
+				suggestionState !== 'loading' &&
+				storyComplete === false
+			) {
+				// Only set to loading if we haven't already received a suggestion or completed the story
+				suggestionState = 'loading';
+				// Trigger API call to get suggestions
+				// isLoadingSuggestions = true;
+				handleGetSuggestions();
+			} else if (
+				suggestionState === 'off' &&
+				story.length >= minStoryLength &&
+				storyComplete === true
+			) {
+				// If user was in 'ok' state, started typing (set to 'off'), and now stopped typing
+				// with sufficient story length, set to 'done'
+				suggestionState = 'done';
+			}
+		}
+	}
+	// Suggestion State:
+	// off: no suggestion because is not typing and there is no text
+	// warning: story is too short and user has stopped typing
+	// loading: loading suggestion hen the text is longer than the minStoryLength and the user has stopped typing
+	// ok: suggestion received
+	// done: thank you message when the user has edited the story and the story is complete
 
 	// Watch for changes in the story text
 	$effect(() => {
-		// handleTyping();
-		// if (isTyping === false && (story.length < minStoryLength || story.length > 0)) {
-		// 	suggestionState = 'warning';
-		// }
-		// if (story.length > minStoryLength) {
-		// 	suggestionState = 'loading';
-		// }
-		// // else {
-		// // 	suggestionState = 'off';
-		// // }
-		// // if (story && storyComplete === false) {
-		// // 	handleTyping();
-		// // }
-		// // // If user deletes all text, reset storyComplete and suggestion
-		// if (story.length === 0) {
-		// 	storyComplete = false;
-		// 	suggestionState = 'off';
-		// 	suggestion = '';
-		// }
+		handleTyping();
 	});
-
-	// Suggestion State:
-	// off: no suggestion
-	// warning: story is too short
-	// requested: suggestion requested
-	// loading: loading suggestion
-	// done: thank you message
 
 	onMount(() => {
 		getLangFilteredQuestion(questionsData);
 	});
 
-	$inspect('isTyping', isTyping);
+	$inspect(
+		'isTyping',
+		isTyping,
+		'suggestionState',
+		suggestionState,
+		'storyComplete',
+		storyComplete
+	);
 </script>
 
 <div class="card-submit-container">
@@ -167,7 +171,7 @@
 		<Textarea
 			bind:textValue={story}
 			minHeight="200px"
-			debounceTime={750}
+			debounceTime={typingTimer}
 			bind:typingActive={isTyping}
 		/>
 	</div>
@@ -187,7 +191,7 @@
 				</div>
 			{/if}
 			<!-- Show suggestion if user has typed something -->
-			{#if suggestionState === 'requested'}
+			{#if suggestionState === 'ok'}
 				<div transition:blur>
 					<p>{suggestion}</p>
 					<p>{$_('please_extend')}</p>
@@ -202,25 +206,28 @@
 		</div>
 	{/if}
 	<!-- Actions -->
-	<div class="card-actions-container">
-		<!-- Disclaimer -->
-		<div class="card-disclaimer-container">
-			<!-- Checkmark -->
-			<div class="card-checkmark-container">
-				<Checkmark bind:checkValue={userAgreed} />
+	{#if (suggestionState === 'done' || suggestionState === 'ok' || storyComplete === true) && story.length > minStoryLength}
+		<div class="card-actions-container">
+			<!-- Disclaimer -->
+			<div class="card-disclaimer-container">
+				<!-- Checkmark -->
+				<div class="card-checkmark-container">
+					<Checkmark bind:checkValue={userAgreed} />
+				</div>
+				<div class="card-disclaimer-text">
+					<p>{$_('disclaimer')}</p>
+				</div>
 			</div>
-			<div class="card-disclaimer-text">
-				<p>{$_('disclaimer')}</p>
+			<!-- Buttons Container -->
+			<div class="card-btn-container">
+				<div>
+					<button disabled={!userAgreed} class="btn" onclick={handleSubmit}
+						>{$_('btn_submit')}</button
+					>
+				</div>
 			</div>
 		</div>
-		<!-- Buttons Container -->
-		<div class="card-btn-container">
-			<div>
-				<button disabled={!userAgreed} class="btn" onclick={handleSubmit}>{$_('btn_submit')}</button
-				>
-			</div>
-		</div>
-	</div>
+	{/if}
 </div>
 
 <style>
@@ -278,9 +285,11 @@
 		border-color: white;
 		border-radius: 0px;
 		color: white;
+		min-width: 130px;
 	}
 	.btn:disabled {
-		border-color: gray;
+		border-color: rgb(90, 90, 90);
+		color: rgb(90, 90, 90);
 	}
 
 	.suggestion-limit-text {

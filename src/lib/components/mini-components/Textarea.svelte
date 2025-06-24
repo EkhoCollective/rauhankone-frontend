@@ -9,23 +9,18 @@
 
 	let timer: number | null = null;
 
-	const debounce = (v: any) => {
+	const debounce = () => {
 		typingActive = true;
 		if (timer) clearTimeout(timer);
 		timer = setTimeout(() => {
-			textValue = v;
 			typingActive = false;
-			console.log(textValue);
 		}, debounceTime);
 	};
 </script>
 
 <div class="container">
 	<pre aria-hidden="true" style="min-height: {minHeight}">{textValue + '\n'}</pre>
-	<textarea
-		onkeydown={({ target }) => debounce((target as HTMLTextAreaElement).value)}
-		bind:value={textValue}
-		placeholder={$_('input_placeholder')}
+	<textarea onkeydown={debounce} bind:value={textValue} placeholder={$_('input_placeholder')}
 	></textarea>
 </div>
 
