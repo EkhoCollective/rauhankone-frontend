@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
+	import { getLangFilteredQuestion } from '$lib/utils/questions_handler';
 	import DOMPurify from 'dompurify';
 	import Checkmark from '$lib/components/mini-components/Checkmark.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
@@ -20,6 +21,7 @@
 	let storyComplete = $state(false);
 	let minStoryLength = $state(30);
 	let suggestionState = $state('off');
+	let suggestionTimer = $state<number | null>(null);
 
 	const API_SUGGESTION_OPTIONS = () => ({
 		API_ENDPOINT: '/suggestion',
@@ -52,31 +54,9 @@
 			console.log('Suggestion request complete');
 			// isLoadingSuggestions = false;
 			suggestionState = 'ok';
+			// Start timer to hide suggestion after 3 seconds
+			// startSuggestionTimer();
 		});
-	}
-
-	function getLangFilteredQuestion(obj: any) {
-		const questionsArray = obj.questions;
-
-		if (Array.isArray(questionsArray) && questionsArray.length > 0) {
-			const currentLocale = getLocaleFullName();
-			const filteredQuestions = questionsArray.filter((q) => q.language === currentLocale);
-
-			if (filteredQuestions.length > 0) {
-				const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
-				question = filteredQuestions[randomIndex].text;
-			} else {
-				// Fallback: if no questions for the current locale, pick a random one from all questions
-				console.warn(
-					`No questions found for locale: ${currentLocale}. Displaying a random question from all available.`
-				);
-				const randomIndex = Math.floor(Math.random() * questionsArray.length);
-				question = questionsArray[randomIndex].text;
-			}
-		} else {
-			console.error('Questions array is missing or empty in the response:', obj);
-			question = 'No questions available at the moment.'; // Default message
-		}
 	}
 
 	// Function to handle typing detection
@@ -85,6 +65,7 @@
 		if (story.length <= 0) {
 			suggestionState = 'off';
 			storyComplete = false;
+			// clearSuggestionTimer();
 			return;
 		}
 
@@ -95,11 +76,19 @@
 
 		// When user is actively typing
 		if (isTyping === true) {
+			// Clear any suggestion timer when user starts typing
+			// clearSuggestionTimer();
 			// If user was in 'ok' state (had received suggestion) and starts typing again,
 			// set to 'off' first, then will transition to 'done' when they stop typing
 			if (suggestionState === 'ok') {
-				suggestionState = 'off';
-				storyComplete = true;
+				if (suggestionTimer) clearTimeout(suggestionTimer);
+				suggestionTimer = setTimeout(() => {
+					if (suggestionState === 'ok') {
+						suggestionState = 'off';
+						storyComplete = true;
+					}
+					suggestionTimer = null;
+				}, 3000);
 			} else {
 				// Reset to off state while typing for other states
 				suggestionState = 'off';
@@ -144,7 +133,7 @@
 	});
 
 	onMount(() => {
-		getLangFilteredQuestion(questionsData);
+		question = getLangFilteredQuestion(questionsData, getLocaleFullName());
 	});
 
 	$inspect(
@@ -176,35 +165,37 @@
 		/>
 	</div>
 	<!-- Suggestions -->
-	{#if suggestionState !== 'off'}
-		<div transition:blur class="card-suggestions-container">
-			<!-- Show warning if story is too short -->
-			{#if suggestionState === 'warning'}
-				<div transition:blur class="suggestion-limit-text">
-					{$_('type_more')}
-				</div>
-			{/if}
-			<!-- Show loader when waiting for suggestions -->
-			{#if suggestionState === 'loading'}
-				<div transition:blur class="loader-container">
-					<Loader color="white" pulseSize="30px" pulseTiming="1s" />
-				</div>
-			{/if}
-			<!-- Show suggestion if user has typed something -->
-			{#if suggestionState === 'ok'}
-				<div transition:blur>
-					<p>{suggestion}</p>
-					<p>{$_('please_extend')}</p>
-				</div>
-			{/if}
-			<!-- Show thank you message if user has finished the story -->
-			{#if suggestionState === 'done'}
-				<p transition:blur class="thank-you-text">
-					{$_('submit_toast')}
-				</p>
-			{/if}
-		</div>
-	{/if}
+	<div class="card-suggestions-container">
+		{#if suggestionState !== 'off'}
+			<div transition:blur class="card-suggestions-bubble">
+				<!-- Show warning if story is too short -->
+				{#if suggestionState === 'warning'}
+					<div transition:blur class="suggestion-warning-text">
+						{$_('type_more')}
+					</div>
+				{/if}
+				<!-- Show loader when waiting for suggestions -->
+				{#if suggestionState === 'loading'}
+					<div transition:blur class="loader-container">
+						<Loader color="white" pulseSize="30px" pulseTiming="1s" />
+					</div>
+				{/if}
+				<!-- Show suggestion if user has typed something -->
+				{#if suggestionState === 'ok'}
+					<div transition:blur>
+						<p>{suggestion}</p>
+						<p>{$_('please_extend')}</p>
+					</div>
+				{/if}
+				<!-- Show thank you message if user has finished the story -->
+				{#if suggestionState === 'done'}
+					<p transition:blur class="thank-you-text">
+						{$_('submit_toast')}
+					</p>
+				{/if}
+			</div>
+		{/if}
+	</div>
 	<!-- Actions -->
 	{#if (suggestionState === 'done' || suggestionState === 'ok' || storyComplete === true) && story.length > minStoryLength}
 		<div class="card-actions-container">
@@ -242,7 +233,6 @@
 	.card-question-container {
 		margin-top: 80px;
 		font-size: 16px;
-		align-self: center;
 		padding-bottom: 40px;
 		border-bottom: 1px solid white;
 	}
@@ -253,11 +243,16 @@
 	}
 
 	.card-suggestions-container {
-		align-self: end;
 		margin-top: 40px;
+		min-height: 150px;
+		display: flex;
+		justify-content: end;
+		align-items: flex-start;
+	}
+
+	.card-suggestions-bubble {
 		max-width: 80%;
 		font-size: 16px;
-		min-height: 50px;
 		text-align: left;
 		background-color: rgb(15, 15, 15);
 		border-radius: 10px;
@@ -292,7 +287,7 @@
 		color: rgb(90, 90, 90);
 	}
 
-	.suggestion-limit-text {
+	.suggestion-warning-text {
 		color: #ff7d7d;
 	}
 
