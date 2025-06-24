@@ -21,7 +21,7 @@
 	let storyComplete = $state(false);
 	let minStoryLength = $state(30);
 	let suggestionState = $state('off');
-	let suggestionTimer = $state<number | null>(null);
+	let suggestionFadeTimer = $state(3000);
 
 	const API_SUGGESTION_OPTIONS = () => ({
 		API_ENDPOINT: '/suggestion',
@@ -81,14 +81,8 @@
 			// If user was in 'ok' state (had received suggestion) and starts typing again,
 			// set to 'off' first, then will transition to 'done' when they stop typing
 			if (suggestionState === 'ok') {
-				if (suggestionTimer) clearTimeout(suggestionTimer);
-				suggestionTimer = setTimeout(() => {
-					if (suggestionState === 'ok') {
-						suggestionState = 'off';
-						storyComplete = true;
-					}
-					suggestionTimer = null;
-				}, 3000);
+				suggestionState = 'off';
+				storyComplete = true;
 			} else {
 				// Reset to off state while typing for other states
 				suggestionState = 'off';
@@ -148,7 +142,7 @@
 
 <div class="card-submit-container">
 	<!-- Main Text -->
-	<div class="card-question-container">
+	<div class="question-container">
 		{#if question && question.length > 0}
 			<p>{question}</p>
 		{:else}
@@ -156,7 +150,7 @@
 		{/if}
 	</div>
 	<!-- Input Area -->
-	<div class="card-input-container">
+	<div class="input-container">
 		<Textarea
 			bind:textValue={story}
 			minHeight="200px"
@@ -165,52 +159,54 @@
 		/>
 	</div>
 	<!-- Suggestions -->
-	<div class="card-suggestions-container">
+	<div class="suggestions-container">
 		{#if suggestionState !== 'off'}
-			<div transition:blur class="card-suggestions-bubble">
-				<!-- Show warning if story is too short -->
-				{#if suggestionState === 'warning'}
-					<div transition:blur class="suggestion-warning-text">
-						{$_('type_more')}
-					</div>
-				{/if}
-				<!-- Show loader when waiting for suggestions -->
-				{#if suggestionState === 'loading'}
-					<div transition:blur class="loader-container">
-						<Loader color="white" pulseSize="30px" pulseTiming="1s" />
-					</div>
-				{/if}
-				<!-- Show suggestion if user has typed something -->
-				{#if suggestionState === 'ok'}
-					<div transition:blur>
-						<p>{suggestion}</p>
-						<p>{$_('please_extend')}</p>
-					</div>
-				{/if}
-				<!-- Show thank you message if user has finished the story -->
-				{#if suggestionState === 'done'}
-					<p transition:blur class="thank-you-text">
-						{$_('submit_toast')}
-					</p>
-				{/if}
-			</div>
+			<!-- <div transition:blur class="card-suggestions-bubble"> -->
+			<!-- refactor this bubles per sugg state, check the in blur states for delay and duration -->
+
+			<!-- Show warning if story is too short -->
+			{#if suggestionState === 'warning'}
+				<div transition:blur class="warning-bubble bubble">
+					{$_('type_more')}
+				</div>
+			{/if}
+			<!-- Show loader when waiting for suggestions -->
+			{#if suggestionState === 'loading'}
+				<div transition:blur class="loader-bubble bubble">
+					<Loader color="white" pulseSize="30px" pulseTiming="1s" />
+				</div>
+			{/if}
+			<!-- Show suggestion if user has typed something -->
+			{#if suggestionState === 'ok'}
+				<div transition:blur class="suggestions-bubble bubble">
+					<p>{suggestion}</p>
+					<p>{$_('please_extend')}</p>
+				</div>
+			{/if}
+			<!-- Show thank you message if user has finished the story -->
+			{#if suggestionState === 'done'}
+				<p transition:blur class="thank-you-bubble bubble">
+					{$_('submit_toast')}
+				</p>
+			{/if}
+			<!-- </div> -->
 		{/if}
 	</div>
 	<!-- Actions -->
 	{#if (suggestionState === 'done' || suggestionState === 'ok' || storyComplete === true) && story.length > minStoryLength}
-		<div class="card-actions-container">
+		<div class="actions-container">
 			<!-- Disclaimer -->
-			<div class="card-disclaimer-container">
+			<div class="disclaimer-container">
 				<!-- Checkmark -->
-				<div class="card-checkmark-container">
+				<div class="checkmark-container">
 					<Checkmark bind:checkValue={userAgreed} />
 				</div>
-				<div class="card-disclaimer-text">
+				<div class="disclaimer-text">
 					<p>{$_('disclaimer')}</p>
 				</div>
 			</div>
 			<!-- Buttons Container -->
-			<div class="card-btn-container">
+			<div class="disclaimer-btn-container">
 				<div>
 					<button disabled={!userAgreed} class="btn" onclick={handleSubmit}
 						>{$_('btn_submit')}</button
@@ -230,36 +226,26 @@
 		flex-direction: column;
 		padding: 0 10% 0 10%;
 	}
-	.card-question-container {
+	.question-container {
 		margin-top: 80px;
 		font-size: 16px;
 		padding-bottom: 40px;
 		border-bottom: 1px solid white;
 	}
-	.card-input-container {
+	.input-container {
 		margin-top: 40px;
 		font-size: 18px;
 		font-family: 'Roboto Slab', serif;
 	}
 
-	.card-suggestions-container {
+	.suggestions-container {
 		margin-top: 40px;
 		min-height: 150px;
 		display: flex;
 		justify-content: end;
 		align-items: flex-start;
 	}
-
-	.card-suggestions-bubble {
-		max-width: 80%;
-		font-size: 16px;
-		text-align: left;
-		background-color: rgb(15, 15, 15);
-		border-radius: 10px;
-		padding: 10px;
-	}
-
-	.card-disclaimer-container {
+	.disclaimer-container {
 		margin-top: 40px;
 		font-size: 14px;
 		display: grid;
@@ -267,7 +253,7 @@
 		align-items: start;
 		justify-items: start;
 	}
-	.card-btn-container {
+	.disclaimer-btn-container {
 		margin-top: 20px;
 		justify-self: end;
 		font-size: 16px;
@@ -287,18 +273,31 @@
 		color: rgb(90, 90, 90);
 	}
 
-	.suggestion-warning-text {
-		color: #ff7d7d;
+	.bubble {
+		max-width: 80%;
+		font-size: 16px;
+		text-align: left;
+		border-radius: 10px;
+		padding: 10px;
 	}
 
-	.thank-you-text {
-		color: #71f771;
+	.warning-bubble {
+		color: #ffbcbc;
+		background-color: #ffbcbc1a;
 	}
 
-	.loader-container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
+	.loader-bubble {
+		background-color: transparent;
+	}
+
+	.suggestions-bubble {
+		color: #ffe7c3;
+		background-color: #ffe7c31a;
+	}
+
+	.thank-you-bubble {
+		color: #cfffcf;
+		background-color: #cfffcf1a;
 	}
 
 	@media (min-width: 768px) {
@@ -312,33 +311,33 @@
 				'suggestions .';
 		}
 
-		.card-question-container {
+		.question-container {
 			grid-area: question;
 		}
 
-		.card-input-container {
+		.input-container {
 			grid-area: input;
 			margin-top: 0;
 		}
 
-		.card-suggestions-container {
+		.suggestions-container {
 			grid-area: suggestions;
 			margin-top: 0;
 		}
 
-		.card-actions-container {
+		.actions-container {
 			grid-area: actions;
 			display: flex;
 			flex-direction: column;
 			gap: 100px;
 		}
 
-		.card-disclaimer-container {
+		.disclaimer-container {
 			margin-top: 0;
 			padding: 0 100px 0 100px;
 		}
 
-		.card-btn-container {
+		.disclaimer-btn-container {
 			margin-top: 0;
 			padding-top: 0;
 			display: flex;
