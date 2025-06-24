@@ -8,8 +8,8 @@
 	}
 </script>
 
-<div class="checkmark-container">
-	<button class="checkmark-btn" onclick={() => handleAudioIcon()}>
+<div class="audio-icon-container">
+	<button class="audio-icon-btn" onclick={() => handleAudioIcon()}>
 		{#if audioValue}
 			<Volume2 color="#ffffff" />
 		{:else}
@@ -17,5 +17,3 @@
 		{/if}
 	</button>
 </div>
-
-<style></style>

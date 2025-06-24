@@ -5,11 +5,14 @@
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
+	import AudioIcon from '$lib/components/mini-components/AudioIcon.svelte';
 
 	let { getOnlyTranslated = $bindable() } = $props();
 
 	let response_clusters = $state(null);
 	let requestLanguage = $state('Any');
+
+	let toggleAudio = $state(false);
 
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
@@ -38,7 +41,7 @@
 		fetchClusters();
 	});
 
-	$inspect(response_clusters, getOnlyTranslated);
+	$inspect(response_clusters, getOnlyTranslated, toggleAudio);
 </script>
 
 <div class="scene-container">
@@ -48,6 +51,9 @@
 	<Canvas>
 		<Scene />
 	</Canvas>
+	<div class="audio-icon-container">
+		<AudioIcon bind:audioValue={toggleAudio} />
+	</div>
 </div>
 
 <style>
@@ -55,5 +61,12 @@
 		width: 100%;
 		height: 100vh;
 		background-color: black;
+	}
+
+	.audio-icon-container {
+		position: absolute;
+		z-index: 100;
+		bottom: 20px;
+		left: 20px;
 	}
 </style>
