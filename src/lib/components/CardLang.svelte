@@ -13,12 +13,9 @@
 	];
 
 	async function handleLocaleChange(lang_code: string) {
-		locale.set(lang_code);
+		await locale.set(lang_code);
 		localStorage.setItem('locale', lang_code);
-		await waitLocale().then(() => {
-			console.log('Locale loaded');
-			closeLangCard(false);
-		});
+		closeLangCard(false);
 	}
 </script>
 
@@ -90,8 +87,10 @@
 		grid-row-start: 3;
 		font-size: 18px;
 		display: flex;
+		justify-self: center;
 		align-items: start;
 		justify-content: center;
+		max-width: 75%;
 	}
 	.card-checkmark-container {
 		margin-right: 10px;

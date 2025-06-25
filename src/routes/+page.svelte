@@ -67,6 +67,8 @@
 	</div>
 {/if}
 
+<!-- Put the error cards here -->
+
 <!-- Loader -->
 {#await waitLocale()}
 	<CardLoader />

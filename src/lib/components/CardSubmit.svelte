@@ -9,6 +9,7 @@
 	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
 	import Loader from '$lib/components/mini-components/Loader.svelte';
+	import CardError from '$lib/components/CardError.svelte';
 	import { blur } from 'svelte/transition';
 
 	// Props
@@ -25,6 +26,8 @@
 	let minStoryLength = $state(30);
 	let suggestionState = $state('off');
 	let suggestionFadeTimer = $state(3000);
+	let thankYouFadeTimer = $state(2000);
+	let raiseError = $state(false);
 
 	// API Options
 	const API_SUGGESTION_OPTIONS = () => ({
@@ -54,13 +57,15 @@
 	}
 
 	async function handleGetSuggestions() {
-		await apiRequest(API_SUGGESTION_OPTIONS())
-			.then((response) => {
-				suggestion = response.suggestion;
-			})
-			.then(() => {
-				suggestionState = 'ok';
-			});
+		try {
+			const response = await apiRequest(API_SUGGESTION_OPTIONS());
+			suggestion = response.suggestion;
+			suggestionState = 'ok';
+		} catch (error) {
+			// If suggestion request fails, raise error
+			console.error('Failed to get suggestions:', error);
+			raiseError = true;
+		}
 	}
 
 	function handleGetQuestion() {
@@ -122,105 +127,114 @@
 		handleTyping();
 	});
 
-	locale.subscribe(handleGetQuestion);
+	// Watch for locale changes and update question
+	$effect(() => {
+		$locale;
+		if (questionsData) {
+			handleGetQuestion();
+		}
+	});
+	// Watch for question changes and raise error if question is 'error_db'
+	$effect(() => {
+		if (question === 'error_db') {
+			raiseError = true;
+		} else if (question && question !== 'error_db') {
+			raiseError = false;
+		}
+	});
 
 	// On Mount
 	onMount(() => {
 		handleGetQuestion();
 	});
 
-	$inspect(
-		'isTyping',
-		isTyping,
-		'suggestionState',
-		suggestionState,
-		'storyComplete',
-		storyComplete
-	);
+	// $inspect('raiseError', raiseError, 'question', question, 'suggestion', suggestion);
 </script>
 
-<div class="card-submit-container">
-	<!-- Main Text -->
-	<div class="question-container">
-		{#if question && question.length > 0}
+{#if raiseError}
+	<div transition:blur>
+		<CardError errorMessage={$_('error_map')} />
+	</div>
+{:else}
+	<div class="card-submit-container">
+		<!-- Main Text -->
+		<div class="question-container">
 			<p>{question}</p>
-		{:else}
-			<p>{$_('error_db')}</p>
-		{/if}
-	</div>
-	<!-- Input Area -->
-	<div class="input-container">
-		<Textarea
-			bind:textValue={story}
-			minHeight="200px"
-			debounceTime={typingTimer}
-			bind:typingActive={isTyping}
-		/>
-	</div>
-	<!-- Suggestions -->
-	<div class="suggestions-container">
-		{#if suggestionState !== 'off'}
-			<div></div>
-		{/if}
-		<!-- Show warning if story is too short -->
-		{#if suggestionState === 'warning'}
-			<div transition:blur class="warning-bubble bubble">
-				{$_('type_more')}
-			</div>
-		{/if}
-		<!-- Show loader when waiting for suggestions -->
-		{#if suggestionState === 'loading'}
-			<div transition:blur class="loader-bubble bubble">
-				<Loader color="white" pulseSize="30px" pulseTiming="1s" />
-			</div>
-		{/if}
-		<!-- Show suggestion if user has typed something -->
-		{#if suggestionState === 'ok'}
-			<div
-				in:blur
-				out:blur={{ delay: suggestionFadeTimer, duration: 500 }}
-				class="suggestions-bubble bubble"
-			>
-				<p>{suggestion}</p>
-				<p>{$_('please_extend')}</p>
-			</div>
-		{/if}
-		<!-- Show thank you message if user has finished the story -->
-		{#if suggestionState === 'done'}
-			<p
-				in:blur={{ delay: suggestionFadeTimer, duration: 500 }}
-				out:blur
-				class="thank-you-bubble bubble"
-			>
-				{$_('submit_toast')}
-			</p>
-		{/if}
-	</div>
-	<!-- Actions -->
+		</div>
+		<!-- Input Area -->
+		<div class="input-container">
+			<Textarea
+				bind:textValue={story}
+				minHeight="200px"
+				debounceTime={typingTimer}
+				bind:typingActive={isTyping}
+			/>
+		</div>
+		<!-- Suggestions -->
+		<div class="suggestions-container">
+			{#if suggestionState !== 'off'}
+				<div></div>
+			{/if}
+			<!-- Show warning if story is too short -->
+			{#if suggestionState === 'warning'}
+				<div transition:blur class="warning-bubble bubble">
+					{$_('type_more')}
+				</div>
+			{/if}
+			<!-- Show loader when waiting for suggestions -->
+			{#if suggestionState === 'loading'}
+				<div transition:blur class="loader-bubble bubble">
+					<Loader color="white" pulseSize="30px" pulseTiming="1s" />
+				</div>
+			{/if}
+			<!-- Show suggestion if user has typed something -->
+			{#if suggestionState === 'ok'}
+				<div
+					in:blur
+					out:blur={{ delay: suggestionFadeTimer, duration: 500 }}
+					class="suggestions-bubble bubble"
+				>
+					<p>{suggestion}</p>
+					<p>{$_('please_extend')}</p>
+				</div>
+			{/if}
+			<!-- Show thank you message if user has finished the story -->
+			{#if suggestionState === 'done'}
+				<p
+					in:blur={{ delay: thankYouFadeTimer, duration: 500 }}
+					out:blur
+					class="thank-you-bubble bubble"
+				>
+					{$_('submit_toast')}
+				</p>
+			{/if}
+		</div>
+		<!-- Actions -->
 
-	<div class="actions-container">
-		{#if (suggestionState === 'done' || suggestionState === 'ok' || storyComplete === true) && story.length > minStoryLength}
-			<!-- Disclaimer -->
-			<div transition:blur class="disclaimer-container">
-				<!-- Checkmark -->
-				<div class="checkmark-container">
-					<Checkmark bind:checkValue={userAgreed} />
+		<div class="actions-container">
+			{#if (suggestionState === 'done' || suggestionState === 'ok' || storyComplete === true) && story.length > minStoryLength}
+				<!-- Disclaimer -->
+				<div transition:blur class="disclaimer-container">
+					<!-- Checkmark -->
+					<div class="checkmark-container">
+						<Checkmark bind:checkValue={userAgreed} />
+					</div>
+					<div class="disclaimer-text">
+						<p>{$_('disclaimer')}</p>
+					</div>
 				</div>
-				<div class="disclaimer-text">
-					<p>{$_('disclaimer')}</p>
+				<!-- Buttons Container -->
+				<div transition:blur class="disclaimer-btn-container">
+					<div>
+						<button disabled={!userAgreed} class="btn" onclick={handleSubmit}
+							>{$_('btn_submit')}</button
+						>
+					</div>
 				</div>
-			</div>
-			<!-- Buttons Container -->
-			<div transition:blur class="disclaimer-btn-container">
-				<div>
-					<button disabled={!userAgreed} class="btn" onclick={handleSubmit}
-						>{$_('btn_submit')}</button
-					>
-				</div>
-			</div>
-		{/if}
+			{/if}
+		</div>
 	</div>
-</div>
+{/if}
 
 <style>
 	.card-submit-container {

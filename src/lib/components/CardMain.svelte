@@ -1,34 +1,40 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { _, waitLocale } from 'svelte-i18n';
 	import Footer from '$lib/components/Footer.svelte';
+	import CardLoader from '$lib/components/CardLoader.svelte';
 
 	let { toSubmit, toExplore } = $props();
 </script>
 
-<div class="card-main-container">
-	<!-- Title -->
-	<div class="card-title-container">
-		<div>{$_('rk_title')}</div>
-	</div>
-	<!-- Subtitle -->
-	<div class="card-sub-title-container">
-		<div>{$_('rk_layer')}</div>
-	</div>
-	<!-- Main Text -->
-	<div class="card-text-container">
-		<div>{$_('description')}</div>
-	</div>
-	<!-- Buttons Container -->
-	<div class="card-btn-container">
-		<button class="btn btn-submit" onclick={() => toSubmit()}>{$_('btn_take_part')}</button>
-		<button class="btn btn-explore" onclick={() => toExplore()}>{$_('btn_explore')}</button>
-	</div>
+<!-- Loader -->
+{#await waitLocale()}
+	<CardLoader />
+{:then}
+	<div class="card-main-container">
+		<!-- Title -->
+		<div class="card-title-container">
+			<div>{$_('rk_title')}</div>
+		</div>
+		<!-- Subtitle -->
+		<div class="card-sub-title-container">
+			<div>{$_('rk_layer')}</div>
+		</div>
+		<!-- Main Text -->
+		<div class="card-text-container">
+			<div>{$_('description')}</div>
+		</div>
+		<!-- Buttons Container -->
+		<div class="card-btn-container">
+			<button class="btn btn-submit" onclick={() => toSubmit()}>{$_('btn_take_part')}</button>
+			<button class="btn btn-explore" onclick={() => toExplore()}>{$_('btn_explore')}</button>
+		</div>
 
-	<!-- Footer -->
-	<div class="card-footer-container">
-		<Footer />
+		<!-- Footer -->
+		<div class="card-footer-container">
+			<Footer />
+		</div>
 	</div>
-</div>
+{/await}
 
 <style>
 	.card-main-container {
