@@ -181,7 +181,11 @@
 		{/if}
 		<!-- Show thank you message if user has finished the story -->
 		{#if suggestionState === 'done'}
-			<p transition:blur class="thank-you-bubble bubble">
+			<p
+				in:blur={{ delay: suggestionFadeTimer, duration: 500 }}
+				out:blur
+				class="thank-you-bubble bubble"
+			>
 				{$_('submit_toast')}
 			</p>
 		{/if}
