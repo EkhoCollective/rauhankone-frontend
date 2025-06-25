@@ -170,7 +170,11 @@
 		{/if}
 		<!-- Show suggestion if user has typed something -->
 		{#if suggestionState === 'ok'}
-			<div transition:blur class="suggestions-bubble bubble">
+			<div
+				in:blur
+				out:blur={{ delay: suggestionFadeTimer, duration: 500 }}
+				class="suggestions-bubble bubble"
+			>
 				<p>{suggestion}</p>
 				<p>{$_('please_extend')}</p>
 			</div>

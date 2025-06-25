@@ -35,12 +35,12 @@
 	const API_QUESTIONS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_questions',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { language: 'Any', question_type: 'starter' }
+		REQUEST_BODY: { question_type: 'starter' }
 	});
 
 	async function handleGetQuestions() {
 		await apiRequest(API_QUESTIONS_OPTIONS()).then((response) => {
-			// console.log('Get Questions Response:', response);
+			console.log('Get Questions Response:', response);
 			questions = response;
 		});
 	}
@@ -81,7 +81,7 @@
 			<Header
 				toggleLang={handleToggleLang}
 				backToHome={() => handleCardView('main')}
-				showBackBtn={currentCard !== 'main'}
+				showBackBtn={currentCard === 'explore'}
 			/>
 		</div>
 
