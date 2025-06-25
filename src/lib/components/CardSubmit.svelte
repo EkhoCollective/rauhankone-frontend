@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Imports
-	import { _ } from 'svelte-i18n';
+	import { _, locale } from 'svelte-i18n';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
@@ -63,6 +63,10 @@
 			});
 	}
 
+	function handleGetQuestion() {
+		question = getLangFilteredQuestion(questionsData, getLocaleFullName());
+	}
+
 	// Function to handle typing detection
 	function handleTyping() {
 		// Check if story is empty - always set to "off" regardless of typing state or current state
@@ -118,9 +122,11 @@
 		handleTyping();
 	});
 
+	locale.subscribe(handleGetQuestion);
+
 	// On Mount
 	onMount(() => {
-		question = getLangFilteredQuestion(questionsData, getLocaleFullName());
+		handleGetQuestion();
 	});
 
 	$inspect(
