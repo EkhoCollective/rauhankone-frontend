@@ -3,7 +3,7 @@
 	import { getAuthToken } from '$lib/utils/api_token';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { _, waitLocale } from 'svelte-i18n';
-	import Header from '$lib/components/Header.svelte';
+	import Header from '$lib/components/mini-components/Header.svelte';
 	import CardLoader from '$lib/components/CardLoader.svelte';
 	import CardMain from '$lib/components/CardMain.svelte';
 	import CardLang from '$lib/components/CardLang.svelte';

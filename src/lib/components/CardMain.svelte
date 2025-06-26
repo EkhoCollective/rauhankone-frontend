@@ -1,16 +1,27 @@
 <script lang="ts">
 	import { _, waitLocale } from 'svelte-i18n';
-	import Footer from '$lib/components/Footer.svelte';
+	import Footer from '$lib/components/mini-components/Footer.svelte';
 	import CardLoader from '$lib/components/CardLoader.svelte';
+	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
 
 	let { toSubmit, toExplore } = $props();
+	let backgroundRef: BackgroundMouse | undefined = $state();
+
+	function handleMouseMove(e: MouseEvent) {
+		if (backgroundRef) {
+			backgroundRef.updateCoords(e);
+		}
+	}
 </script>
 
 <!-- Loader -->
 {#await waitLocale()}
 	<CardLoader />
 {:then}
-	<div class="card-main-container">
+	<div class="card-bg-container">
+		<BackgroundMouse bind:this={backgroundRef} maxMovement={75} stiffness={0.05} damping={0.95} />
+	</div>
+	<div class="card-main-container" onmousemove={handleMouseMove} role="presentation">
 		<!-- Title -->
 		<div class="card-title-container">
 			<div>{$_('rk_title')}</div>
@@ -37,10 +48,14 @@
 {/await}
 
 <style>
+	.card-bg-container {
+		display: none;
+	}
+
 	.card-main-container {
-		width: 100%;
+		width: 100vw;
 		height: 100vh;
-		background-color: black;
+		/* background-color: black; */
 		display: grid;
 		grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
 		padding: 50px 10% 50px 10%;
@@ -102,8 +117,19 @@
 	}
 
 	@media (min-width: 768px) {
+		.card-bg-container {
+			display: block;
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 0;
+		}
+
 		.card-main-container {
-			background-image: url('extras/EKHO_Sketch_bg.webp');
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 100;
 			grid-template-rows: 1fr 1fr 1fr 1fr;
 			grid-template-columns: 1fr 1fr;
 			grid-template-areas:
