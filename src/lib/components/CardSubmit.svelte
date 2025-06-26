@@ -4,7 +4,7 @@
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
-	import { getLangFilteredQuestion } from '$lib/utils/questions_handler';
+	// import { getLangFilteredQuestion } from '$lib/utils/questions_handler';
 	import DOMPurify from 'dompurify';
 	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
@@ -17,6 +17,7 @@
 
 	// States
 	let question = $state<string | null>(null);
+	let questionContainer = $state<any[] | null>(null);
 	let story = $state('');
 	let suggestion = $state('');
 	let userAgreed = $state(false);
@@ -68,8 +69,32 @@
 		}
 	}
 
+	function handleGetQuestionContainer() {
+		if (!questionsData) {
+			raiseError = true;
+			return;
+		}
+		const randomGroupIndex = Math.floor(Math.random() * questionsData.questions.length);
+		questionContainer = questionsData.questions[randomGroupIndex];
+		handleGetQuestion();
+	}
+
 	function handleGetQuestion() {
-		question = getLangFilteredQuestion(questionsData, getLocaleFullName());
+		if (!questionContainer) {
+			return;
+		}
+		let filteredQuestion = questionContainer.find((q: any) => q.language === getLocaleFullName());
+
+		// If North Sami not found, fallback to English
+		if (!filteredQuestion && getLocaleFullName() === 'North Sámi') {
+			filteredQuestion = questionContainer.find((q: any) => q.language === 'English');
+		}
+
+		if (!filteredQuestion) {
+			raiseError = true;
+			return;
+		}
+		question = filteredQuestion.text;
 	}
 
 	// Function to handle typing detection
@@ -130,22 +155,15 @@
 	// Watch for locale changes and update question
 	$effect(() => {
 		$locale;
+		// console.log('locale changed', localStorage.getItem('locale'));
 		if (questionsData) {
 			handleGetQuestion();
-		}
-	});
-	// Watch for question changes and raise error if question is 'error_db'
-	$effect(() => {
-		if (question === 'error_db') {
-			raiseError = true;
-		} else if (question && question !== 'error_db') {
-			raiseError = false;
 		}
 	});
 
 	// On Mount
 	onMount(() => {
-		handleGetQuestion();
+		handleGetQuestionContainer();
 	});
 
 	// $inspect('raiseError', raiseError, 'question', question, 'suggestion', suggestion);

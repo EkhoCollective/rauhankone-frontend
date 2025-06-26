@@ -13,9 +13,11 @@
 	];
 
 	async function handleLocaleChange(lang_code: string) {
-		await locale.set(lang_code);
+		locale.set(lang_code);
 		localStorage.setItem('locale', lang_code);
-		closeLangCard(false);
+		await waitLocale().then(() => {
+			closeLangCard(false);
+		});
 	}
 </script>
 
@@ -45,8 +47,8 @@
 
 <style>
 	.card-lang-container {
-		width: 100%;
-		height: 100%;
+		width: 100vw;
+		height: 100vh;
 		background-color: black;
 		display: grid;
 		grid-template-rows: 50px 1fr 25%;

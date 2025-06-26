@@ -103,6 +103,7 @@
 
 	@media (min-width: 768px) {
 		.card-main-container {
+			background-image: url('extras/EKHO_Sketch_bg.webp');
 			grid-template-rows: 1fr 1fr 1fr 1fr;
 			grid-template-columns: 1fr 1fr;
 			grid-template-areas:
