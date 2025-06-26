@@ -1,18 +1,20 @@
 <script lang="ts">
-	import { Canvas } from '@threlte/core';
-	import Scene from '$lib/components/visual-module/ScenePoints.svelte';
-	// import Thankyou from '$lib/components/mini-components/Thankyou.svelte';
+	import { _ } from 'svelte-i18n';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
+	import { blur } from 'svelte/transition';
 	import AudioIcon from '$lib/components/mini-components/AudioIcon.svelte';
+	import CardError from '$lib/components/CardError.svelte';
+	import { Canvas } from '@threlte/core';
+	import Scene from '$lib/components/visual-module/ScenePoints.svelte';
 
 	let { getOnlyTranslated = $bindable() } = $props();
 
 	let response_clusters = $state(null);
 	let requestLanguage = $state('Any');
-
 	let toggleAudio = $state(false);
+	let raiseError = $state(false);
 
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
@@ -21,11 +23,14 @@
 	};
 
 	async function fetchClusters() {
-		const result = await apiRequest(API_CLUSTERS_OPTIONS);
-		if (result) {
-			response_clusters = result;
-			console.log(response_clusters);
-		}
+		await apiRequest(API_CLUSTERS_OPTIONS)
+			.then((response) => {
+				response_clusters = response;
+			})
+			.catch((error) => {
+				console.log('Error getting clusters', error);
+				raiseError = true;
+			});
 	}
 
 	function handleGetTranslate() {
@@ -44,10 +49,14 @@
 	$inspect(response_clusters, getOnlyTranslated, toggleAudio);
 </script>
 
+<!-- Error Card -->
+{#if raiseError}
+	<div transition:blur>
+		<CardError errorMessage={$_('error_map')} />
+	</div>
+{/if}
+
 <div class="scene-container">
-	<!-- {#if showThankyou}
-		<Thankyou />
-	{/if} -->
 	<Canvas>
 		<Scene />
 	</Canvas>

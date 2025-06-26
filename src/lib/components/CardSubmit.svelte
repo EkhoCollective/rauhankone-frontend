@@ -163,7 +163,8 @@
 
 	// On Mount
 	onMount(() => {
-		handleGetQuestionContainer();
+		// handleGetQuestionContainer();
+		raiseError = true;
 	});
 
 	// $inspect('raiseError', raiseError, 'question', question, 'suggestion', suggestion);

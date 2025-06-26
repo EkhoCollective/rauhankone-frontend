@@ -9,14 +9,22 @@
 	import CardLang from '$lib/components/CardLang.svelte';
 	import CardSubmit from '$lib/components/CardSubmit.svelte';
 	import CardExplore from '$lib/components/CardExplore.svelte';
-	import { fade } from 'svelte/transition';
+	import CardError from '$lib/components/CardError.svelte';
+	import { fade, blur } from 'svelte/transition';
 
 	// UI Toggle states
 	let showLang = $state(false);
 	let currentCard = $state('main');
-	let transitionDuration = 500; // milliseconds
+	let transitionDuration = 500;
 	let translateStories = $state(false);
 	let questions = $state(null);
+	let raiseError = $state(false);
+
+	const API_QUESTIONS_OPTIONS = () => ({
+		API_ENDPOINT: '/get_questions',
+		API_METHOD: 'POST',
+		REQUEST_BODY: { question_type: 'starter' }
+	});
 
 	let handleToggleLang = () => {
 		showLang = !showLang;
@@ -27,22 +35,25 @@
 	}
 
 	async function handleGetToken() {
-		await getAuthToken().then(() => {
-			handleGetQuestions();
-		});
+		await getAuthToken()
+			.then(() => {
+				handleGetQuestions();
+			})
+			.catch((error) => {
+				console.log('Error getting token', error);
+				raiseError = true;
+			});
 	}
 
-	const API_QUESTIONS_OPTIONS = () => ({
-		API_ENDPOINT: '/get_questions',
-		API_METHOD: 'POST',
-		REQUEST_BODY: { question_type: 'starter' }
-	});
-
 	async function handleGetQuestions() {
-		await apiRequest(API_QUESTIONS_OPTIONS()).then((response) => {
-			// console.log('Get Questions Response:', response);
-			questions = response;
-		});
+		await apiRequest(API_QUESTIONS_OPTIONS())
+			.then((response) => {
+				questions = response;
+			})
+			.catch((error) => {
+				console.log('Error getting questions', error);
+				raiseError = true;
+			});
 	}
 
 	onMount(() => {
@@ -56,7 +67,14 @@
 	<title>{$_('rk_title')} | {$_('rk_layer')} | Oulu 2026</title>
 </svelte:head>
 
-<!-- Lnagauge Selector Card -->
+<!-- Error Card -->
+{#if raiseError}
+	<div transition:blur>
+		<CardError errorMessage={$_('error_map')} />
+	</div>
+{/if}
+
+<!-- Langauge Selector Card -->
 {#if showLang}
 	<div
 		in:fade={{ duration: transitionDuration }}
@@ -66,8 +84,6 @@
 		<CardLang closeLangCard={handleToggleLang} bind:translate={translateStories} />
 	</div>
 {/if}
-
-<!-- Put the error cards here -->
 
 <!-- Loader -->
 {#await waitLocale()}
