@@ -9,12 +9,13 @@
 	import { Canvas } from '@threlte/core';
 	import Scene from '$lib/components/visual-module/ScenePoints.svelte';
 
-	let { getOnlyTranslated = $bindable() } = $props();
+	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
 	let response_clusters = $state(null);
 	let requestLanguage = $state('Any');
 	let toggleAudio = $state(false);
 	let raiseError = $state(false);
+	let toastEnabled = $state(true);
 
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
@@ -44,15 +45,34 @@
 
 	onMount(() => {
 		fetchClusters();
+
+		// Set timeout to hide toast after 3 seconds
+		if (triggeredFrom) {
+			setTimeout(() => {
+				toastEnabled = false;
+			}, 3000);
+		}
 	});
 
-	$inspect(response_clusters, getOnlyTranslated, toggleAudio);
+	$inspect(response_clusters, getOnlyTranslated, toggleAudio, triggeredFrom, toastEnabled);
 </script>
 
 <!-- Error Card -->
 {#if raiseError}
 	<div transition:blur>
 		<CardError errorMessage={$_('error_map')} />
+	</div>
+{/if}
+
+{#if triggeredFrom === 'submit' && toastEnabled}
+	<div transition:blur class="toast-container">
+		<p>{$_('toast_from_submit')}</p>
+	</div>
+{/if}
+
+{#if triggeredFrom === 'main' && toastEnabled}
+	<div transition:blur class="toast-container">
+		<p>{$_('toast_from_home')}</p>
 	</div>
 {/if}
 
@@ -77,5 +97,13 @@
 		z-index: 100;
 		bottom: 20px;
 		left: 20px;
+	}
+
+	.toast-container {
+		position: absolute;
+		z-index: 100;
+		top: 100px;
+		left: 50%;
+		transform: translateX(-50%);
 	}
 </style>

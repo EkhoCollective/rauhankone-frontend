@@ -4,7 +4,6 @@
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
-	// import { getLangFilteredQuestion } from '$lib/utils/questions_handler';
 	import DOMPurify from 'dompurify';
 	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
@@ -163,8 +162,8 @@
 
 	// On Mount
 	onMount(() => {
-		// handleGetQuestionContainer();
-		raiseError = true;
+		handleGetQuestionContainer();
+		// raiseError = true;
 	});
 
 	// $inspect('raiseError', raiseError, 'question', question, 'suggestion', suggestion);
@@ -224,7 +223,7 @@
 					out:blur
 					class="thank-you-bubble bubble"
 				>
-					{$_('submit_toast')}
+					{$_('submit_ack')}
 				</p>
 			{/if}
 		</div>

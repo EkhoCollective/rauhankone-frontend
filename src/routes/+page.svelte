@@ -15,6 +15,7 @@
 	// UI Toggle states
 	let showLang = $state(false);
 	let currentCard = $state('main');
+	let triggerCard = $state('');
 	let transitionDuration = 500;
 	let translateStories = $state(false);
 	let questions = $state(null);
@@ -30,8 +31,9 @@
 		showLang = !showLang;
 	};
 
-	function handleCardView(card: string) {
+	function handleCardView(card: string, cardTrigger: string) {
 		currentCard = card;
+		triggerCard = cardTrigger;
 	}
 
 	async function handleGetToken() {
@@ -98,7 +100,7 @@
 		<div class="header-container">
 			<Header
 				toggleLang={handleToggleLang}
-				backToHome={() => handleCardView('main')}
+				backToHome={() => handleCardView('main', 'lang')}
 				showBackBtn={currentCard === 'explore'}
 			/>
 		</div>
@@ -112,8 +114,8 @@
 					class="main-container"
 				>
 					<CardMain
-						toSubmit={() => handleCardView('submit')}
-						toExplore={() => handleCardView('explore')}
+						toSubmit={() => handleCardView('submit', 'main')}
+						toExplore={() => handleCardView('explore', 'main')}
 					/>
 				</div>
 			{/if}
@@ -124,7 +126,10 @@
 					out:fade={{ duration: transitionDuration }}
 					class="submit-container"
 				>
-					<CardSubmit toExplore={() => handleCardView('explore')} questionsData={questions} />
+					<CardSubmit
+						toExplore={() => handleCardView('explore', 'submit')}
+						questionsData={questions}
+					/>
 				</div>
 			{/if}
 			<!-- Explore Card -->
@@ -134,7 +139,7 @@
 					out:fade={{ duration: transitionDuration }}
 					class="explore-container"
 				>
-					<CardExplore getOnlyTranslated={translateStories} />
+					<CardExplore getOnlyTranslated={translateStories} triggeredFrom={triggerCard} />
 				</div>
 			{/if}
 		</div>

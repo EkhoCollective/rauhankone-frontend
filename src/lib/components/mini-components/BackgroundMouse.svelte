@@ -55,6 +55,5 @@
 		background-size: cover;
 		background-repeat: no-repeat;
 		overflow: hidden;
-		/* transform: translate(-10%, -10%); */
 	}
 </style>
