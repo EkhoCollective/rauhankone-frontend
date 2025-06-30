@@ -18,6 +18,7 @@
 	"error_map": "Ops, memories have lost in the unreachable. Refresh the page or return later to explore the map of memories.",
 	"error_404": "You ended up somewhere that doesn’t exist. Click the link below to move into the beginning and participate in building the peace machine.",
 	"error_general": "Even when building a peace machine, something can go wrong. Refresh the page or start over by clicking the link below.",
+	"error_internet": "503 Service Unavailable. Please check your internet connections and refresh the page.",
 	"rk_link": "https://oulu2026.eu/en/programme/culture-programme/layers-in-the-peace-machine/",
 	"oulu_link": "https://oulu2026.eu/en/",
 	"ekho_link": "https://ekho.fi/",

@@ -61,8 +61,16 @@
 	onMount(() => {
 		handleGetToken();
 	});
-	// Console log to check state changes in svelte
-	// $inspect('currentCard', currentCard);
+
+	$effect(() => {
+		window.addEventListener('offline', () => {
+			raiseError = true;
+		});
+	});
+
+	// Check for internet connection
+
+	$inspect('raiseError', raiseError);
 </script>
 
 <svelte:head>
@@ -71,7 +79,7 @@
 
 <!-- Error Card -->
 {#if raiseError}
-	<div transition:blur>
+	<div transition:blur class="error-container">
 		<CardError errorMessage={$_('error_map')} />
 	</div>
 {/if}
@@ -168,6 +176,16 @@
 		width: 100vw;
 		height: 100vh;
 		z-index: 1000;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	.error-container {
+		width: 100vw;
+		height: 100vh;
+		z-index: 2000;
 		position: absolute;
 		top: 50%;
 		left: 50%;
