@@ -26,7 +26,7 @@
 	let minStoryLength = $state(30);
 	let suggestionState = $state('off');
 	let suggestionFadeTimer = $state(3000);
-	let thankYouFadeTimer = $state(2000);
+	let thankYouFadeTimer = $state(3000);
 	let raiseError = $state(false);
 
 	// API Options
@@ -346,7 +346,7 @@
 		.card-submit-container {
 			display: grid;
 			grid-template-rows: 1fr 1fr 1fr;
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: minmax(0, 1fr) 1fr;
 			grid-template-areas:
 				'question .'
 				'input actions'
@@ -359,7 +359,7 @@
 
 		.input-container {
 			grid-area: input;
-			margin-top: 0;
+			margin-top: 40px;
 		}
 
 		.suggestions-container {

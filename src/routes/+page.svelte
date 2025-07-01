@@ -85,7 +85,7 @@
 <!-- Error Card -->
 {#if raiseError}
 	<div transition:blur class="error-container">
-		<CardError errorMessage={$_('error_map')} />
+		<CardError errorMessage={$_('error_general')} />
 	</div>
 {/if}
 
@@ -166,7 +166,7 @@
 
 	.header-container {
 		height: 50px;
-		z-index: 2;
+		z-index: 1000;
 		position: absolute;
 		top: 0;
 		left: 0;

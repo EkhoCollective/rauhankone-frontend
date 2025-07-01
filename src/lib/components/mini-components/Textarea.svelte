@@ -38,7 +38,7 @@
 		border: 0px solid black;
 		line-height: 1.2;
 		overflow: hidden;
-		color: white;
+		color: #a0a0a0;
 		background-color: black;
 	}
 	textarea {

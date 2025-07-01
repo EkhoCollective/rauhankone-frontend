@@ -12,6 +12,14 @@
 			backgroundRef.updateCoords(e);
 		}
 	}
+
+	function splitA(text: string): string {
+		return text.slice(0, text.indexOf('.') + 1);
+	}
+
+	function splitB(text: string): string {
+		return text.slice(text.indexOf('.') + 1);
+	}
 </script>
 
 <!-- Loader -->
@@ -31,8 +39,8 @@
 			<div>{$_('rk_layer')}</div>
 		</div>
 		<!-- Main Text -->
-		<div class="card-text-container">
-			<div>{$_('description')}</div>
+		<div class="card-description-container">
+			<div>{splitA($_('description'))}<br /><br />{splitB($_('description'))}</div>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
@@ -75,7 +83,7 @@
 		font-weight: bold;
 		line-height: 1.25em;
 	}
-	.card-text-container {
+	.card-description-container {
 		grid-row-start: 3;
 		font-size: 16px;
 	}
@@ -147,7 +155,7 @@
 			grid-area: subtitle;
 		}
 
-		.card-text-container {
+		.card-description-container {
 			grid-area: text;
 		}
 
