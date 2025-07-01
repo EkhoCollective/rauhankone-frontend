@@ -4,7 +4,7 @@
 	let { errorMessage } = $props();
 
 	const toHome = () => {
-		window.location.href = '/';
+		window.location.reload();
 	};
 </script>
 

@@ -58,19 +58,22 @@
 			});
 	}
 
+	// Get token and questions
 	onMount(() => {
 		handleGetToken();
 	});
 
+	// Reload page on back button
+	addEventListener('popstate', () => {
+		location.reload();
+	});
+
+	// Check for internet connection
 	$effect(() => {
 		window.addEventListener('offline', () => {
 			raiseError = true;
 		});
 	});
-
-	// Check for internet connection
-
-	$inspect('raiseError', raiseError);
 </script>
 
 <svelte:head>
