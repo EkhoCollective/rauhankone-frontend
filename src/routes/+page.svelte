@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
 	import { getAuthToken } from '$lib/utils/api_token';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { _, waitLocale } from 'svelte-i18n';
@@ -63,11 +64,10 @@
 		handleGetToken();
 	});
 
-	// Reload page on back button
-	$effect(() => {
-		window.addEventListener('popstate', () => {
+	beforeNavigate(({ type }) => {
+		if (type === 'popstate') {
 			location.reload();
-		});
+		}
 	});
 
 	// Check for internet connection
