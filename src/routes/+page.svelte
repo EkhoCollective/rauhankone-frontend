@@ -180,17 +180,17 @@
 	.lang-container {
 		width: 100vw;
 		height: 100vh;
-		z-index: 1000;
+		z-index: 2000;
 		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
+		top: 0;
+		left: 0;
+		/* transform: translate(-50%, -50%); */
 	}
 
 	.error-container {
 		width: 100vw;
 		height: 100vh;
-		z-index: 2000;
+		z-index: 3000;
 		position: absolute;
 		top: 50%;
 		left: 50%;
