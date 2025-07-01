@@ -16,12 +16,6 @@
 		REQUEST_BODY: { language: getLocaleFullName(), max_stories: 100, story: null }
 	};
 
-	// const API_GET_STORIES_OPTIONS = {
-	// 	API_ENDPOINT: '/get_stories',
-	// 	API_METHOD: 'GET',
-	// 	REQUEST_BODY: { language: 'Any', max_stories: 100 }
-	// };
-
 	async function fetchClusters() {
 		const result = await apiRequest(API_CLUSTERS_OPTIONS);
 		if (result) {

@@ -5,6 +5,7 @@
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import { blur } from 'svelte/transition';
 	import AudioIcon from '$lib/components/mini-components/AudioIcon.svelte';
+	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import CardError from '$lib/components/CardError.svelte';
 	import { Canvas } from '@threlte/core';
 	import Scene from '$lib/components/visual-module/ScenePoints.svelte';
@@ -16,6 +17,7 @@
 	let toggleAudio = $state(false);
 	let raiseError = $state(false);
 	let toastEnabled = $state(true);
+	let navButtonValue = $state('');
 
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
@@ -54,7 +56,8 @@
 		}
 	});
 
-	$inspect(response_clusters, getOnlyTranslated, toggleAudio, triggeredFrom, toastEnabled);
+	// $inspect(response_clusters, getOnlyTranslated, toggleAudio, triggeredFrom, toastEnabled);
+	$inspect(navButtonValue);
 </script>
 
 <!-- Error Card -->
@@ -83,6 +86,9 @@
 	<div class="audio-icon-container">
 		<AudioIcon bind:audioValue={toggleAudio} />
 	</div>
+	<div class="navigation-icons-container">
+		<NavIcons bind:value={navButtonValue} />
+	</div>
 </div>
 
 <style>
@@ -97,6 +103,13 @@
 		z-index: 100;
 		bottom: 20px;
 		left: 20px;
+	}
+
+	.navigation-icons-container {
+		position: absolute;
+		z-index: 200;
+		bottom: 20px;
+		right: 20px;
 	}
 
 	.toast-container {
