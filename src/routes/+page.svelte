@@ -64,8 +64,10 @@
 	});
 
 	// Reload page on back button
-	addEventListener('popstate', () => {
-		location.reload();
+	$effect(() => {
+		window.addEventListener('popstate', () => {
+			location.reload();
+		});
 	});
 
 	// Check for internet connection
