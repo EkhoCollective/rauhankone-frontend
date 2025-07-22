@@ -61,6 +61,7 @@
 
 	// Get token and questions
 	onMount(() => {
+		window.scrollTo(0, 0);
 		handleGetToken();
 	});
 

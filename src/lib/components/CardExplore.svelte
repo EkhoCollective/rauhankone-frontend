@@ -8,7 +8,7 @@
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import CardError from '$lib/components/CardError.svelte';
 	import { Canvas } from '@threlte/core';
-	import Scene from '$lib/components/visual-module/ScenePoints.svelte';
+	import Scene from '$lib/components/visual-module/Scene_test_1.svelte';
 
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
