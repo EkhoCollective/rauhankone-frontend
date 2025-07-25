@@ -8,7 +8,9 @@
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import CardError from '$lib/components/CardError.svelte';
 	import { Canvas } from '@threlte/core';
+	import type { CameraControlsRef } from '@threlte/extras';
 	import Scene from '$lib/components/visual-module/Scene_test_1_sphere.svelte';
+	import { MathUtils } from 'three';
 
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
@@ -18,6 +20,8 @@
 	let raiseError = $state(false);
 	let toastEnabled = $state(true);
 	let navButtonValue = $state('');
+
+	let controls = $state.raw<CameraControlsRef>();
 
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
@@ -46,6 +50,26 @@
 		return requestLanguage;
 	}
 
+	function handleNavButton(buttonValue: string) {
+		if (buttonValue === 'left') {
+			controls?.rotate(-45 * MathUtils.DEG2RAD, 0, true);
+			navButtonValue = 'idle';
+		} else if (buttonValue === 'right') {
+			controls?.rotate(45 * MathUtils.DEG2RAD, 0, true);
+			navButtonValue = 'idle';
+		} else if (buttonValue === 'plus') {
+			controls?.dolly(-1, true);
+			navButtonValue = 'idle';
+		} else if (buttonValue === 'minus') {
+			controls?.dolly(1, true);
+			navButtonValue = 'idle';
+		}
+	}
+
+	$effect(() => {
+		handleNavButton(navButtonValue);
+	});
+
 	onMount(() => {
 		fetchClusters();
 
@@ -58,7 +82,7 @@
 	});
 
 	// $inspect(response_clusters, getOnlyTranslated, toggleAudio, triggeredFrom, toastEnabled);
-	$inspect(navButtonValue);
+	// $inspect(navButtonValue);
 </script>
 
 <!-- Error Card -->
@@ -82,7 +106,7 @@
 
 <div class="scene-container">
 	<Canvas>
-		<Scene />
+		<Scene bind:controls />
 	</Canvas>
 	<div class="audio-icon-container">
 		<AudioIcon bind:audioValue={toggleAudio} />

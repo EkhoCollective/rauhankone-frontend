@@ -1,10 +1,22 @@
 <script lang="ts">
 	import { T, useTask, useThrelte } from '@threlte/core';
-	import { interactivity, useCursor } from '@threlte/extras';
 	// import { Spring } from 'svelte/motion';
-	import { Environment, OrbitControls } from '@threlte/extras';
+	import {
+		interactivity,
+		useCursor,
+		Environment,
+		OrbitControls,
+		CameraControls,
+		type CameraControlsRef
+	} from '@threlte/extras';
 	import * as THREE from 'three';
 	import { onMount } from 'svelte';
+
+	let {
+		controls = $bindable()
+	}: {
+		controls?: CameraControlsRef;
+	} = $props();
 
 	interactivity();
 
@@ -279,7 +291,7 @@
 	}
 
 	// Reactive color based on hovering state
-	$: currentColor = $hovering ? hoverColor : pointColor;
+	// $: currentColor = $hovering ? hoverColor : pointColor;
 
 	// Regenerate points when count changes
 	function updatePoints(): void {
@@ -294,11 +306,14 @@
 			geometryRef.attributes.size.needsUpdate = true;
 		}
 	}
+
+	// $inspect(controls);
 </script>
 
 <!-- Scene -->
 <T.PerspectiveCamera makeDefault position={[0, 0, 50]}>
 	<OrbitControls autoRotate autoRotateSpeed={0.1} />
+	<CameraControls bind:ref={controls} />
 </T.PerspectiveCamera>
 
 <T.AmbientLight intensity={0.5} />

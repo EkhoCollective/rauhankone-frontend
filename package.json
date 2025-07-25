@@ -75,7 +75,7 @@
 		"@theatre/core": "^0.7.2",
 		"@theatre/studio": "^0.7.2",
 		"@threlte/core": "^8.0.2",
-		"@threlte/extras": "^9.1.4",
+		"@threlte/extras": "^9.4.2",
 		"@threlte/studio": "^0.1.4",
 		"@threlte/theatre": "^3.0.1",
 		"dompurify": "^3.2.6",
