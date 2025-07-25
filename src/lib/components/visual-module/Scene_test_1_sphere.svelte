@@ -16,6 +16,7 @@
 	let hoverColor: string = '#FF0000'; // Red color for hover
 	let hoverSizeMultiplier: number = 2.5; // Multiplier for hovered point size
 	let autoRotateCamera: boolean = false;
+	let radius: number = 10;
 
 	// Flocking parameters
 	let maxSpeed = 0.05;
@@ -46,10 +47,19 @@
 		const baseColor = new THREE.Color(pointColor);
 
 		for (let i = 0; i < count; i++) {
-			const x = (Math.random() - 0.5) * width * 2;
-			const y = (Math.random() - 0.5) * width * 2;
-			const z = (Math.random() - 0.5) * width * 2;
-			positions.push(x, y, z);
+			let r = Math.random() * radius;
+			let vx = Math.random() * 2 - 1;
+			let vy = Math.random() * 2 - 1;
+			let vz = Math.random() * 2 - 1;
+			const magnitude = Math.sqrt(vx * vx + vy * vy + vz * vz);
+
+			vx = vx / magnitude;
+			vy = vy / magnitude;
+			vz = vz / magnitude;
+
+			var c = Math.cbrt(r);
+
+			positions.push(c * vx * radius, c * vy * radius, c * vz * radius);
 			colors.push(baseColor.r, baseColor.g, baseColor.b);
 			sizes.push(1.0); // Use 1.0 as the base multiplier
 

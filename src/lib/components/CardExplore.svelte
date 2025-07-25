@@ -8,7 +8,7 @@
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import CardError from '$lib/components/CardError.svelte';
 	import { Canvas } from '@threlte/core';
-	import Scene from '$lib/components/visual-module/Scene_test_1.svelte';
+	import Scene from '$lib/components/visual-module/Scene_test_1_sphere.svelte';
 
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
@@ -29,6 +29,7 @@
 		await apiRequest(API_CLUSTERS_OPTIONS)
 			.then((response) => {
 				response_clusters = response;
+				console.log('response_clusters', response_clusters);
 			})
 			.catch((error) => {
 				console.log('Error getting clusters', error);
