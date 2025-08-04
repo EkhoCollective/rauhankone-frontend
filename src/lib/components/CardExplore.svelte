@@ -2,6 +2,7 @@
 	import { _ } from 'svelte-i18n';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
+	import { apiRequestGET } from '$lib/utils/api_request_GET';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import { blur } from 'svelte/transition';
 	import AudioIcon from '$lib/components/mini-components/AudioIcon.svelte';
@@ -9,12 +10,13 @@
 	import CardError from '$lib/components/CardError.svelte';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
-	import Scene from '$lib/components/visual-module/Scene_test_1_sphere.svelte';
+	import Scene from '$lib/components/visual-module/Scene_basic_hover.svelte';
 	import { MathUtils } from 'three';
 
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
-	let response_clusters = $state(null);
+	let response_clusters: any = $state(null);
+	let response_stories: any = $state(null);
 	let requestLanguage = $state('Any');
 	let toggleAudio = $state(false);
 	let raiseError = $state(false);
@@ -26,7 +28,13 @@
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { language: handleGetTranslate(), max_stories: 100, story: null }
+		REQUEST_BODY: { language: handleGetTranslate(), max_stories: 400, story: null }
+	};
+
+	const API_STORIES_OPTIONS = {
+		API_ENDPOINT: '/get_stories',
+		API_METHOD: 'GET',
+		REQUEST_PARAMS: { language: 'Any', max_stories: 1000 }
 	};
 
 	async function fetchClusters() {
@@ -37,6 +45,18 @@
 			})
 			.catch((error) => {
 				console.log('Error getting clusters', error);
+				raiseError = true;
+			});
+	}
+
+	async function fetchStories() {
+		await apiRequestGET(API_STORIES_OPTIONS)
+			.then((response) => {
+				response_stories = response;
+				console.log('response_stories', response_stories);
+			})
+			.catch((error) => {
+				console.log('Error getting stories', error);
 				raiseError = true;
 			});
 	}
@@ -58,10 +78,10 @@
 			controls?.rotate(45 * MathUtils.DEG2RAD, 0, true);
 			navButtonValue = 'idle';
 		} else if (buttonValue === 'plus') {
-			controls?.dolly(-1, true);
+			controls?.dolly(10, true);
 			navButtonValue = 'idle';
 		} else if (buttonValue === 'minus') {
-			controls?.dolly(1, true);
+			controls?.dolly(-10, true);
 			navButtonValue = 'idle';
 		}
 	}
@@ -72,6 +92,7 @@
 
 	onMount(() => {
 		fetchClusters();
+		fetchStories();
 
 		// Set timeout to hide toast after 3 seconds
 		if (triggeredFrom) {

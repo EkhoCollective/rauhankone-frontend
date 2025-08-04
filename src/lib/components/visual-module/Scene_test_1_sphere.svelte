@@ -95,9 +95,9 @@
 	let pointData: PointData = generatePoints(pointCount, distributionWidth);
 
 	// Create refs for points and geometry
-	let pointsRef: THREE.Points | undefined;
-	let geometryRef: THREE.BufferGeometry | undefined;
-	let hoverSphereRef: THREE.Mesh | undefined;
+	let pointsRef: THREE.Points | undefined = $state();
+	let geometryRef: THREE.BufferGeometry | undefined = $state();
+	let hoverSphereRef: THREE.Mesh | undefined = $state();
 
 	onMount(() => {
 		if (!geometryRef) return;
