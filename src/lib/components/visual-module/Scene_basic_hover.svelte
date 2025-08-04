@@ -6,7 +6,7 @@
 	import { T, useTask } from '@threlte/core';
 
 	import type { Vector2Tuple } from 'three';
-	import { Grid, interactivity, OrbitControls } from '@threlte/extras';
+	import { Grid, interactivity, OrbitControls, type CameraControlsRef } from '@threlte/extras';
 	import { Spring } from 'svelte/motion';
 
 	import { useCursor } from '@threlte/extras';
@@ -24,6 +24,12 @@
 	const notHoveringColor = '#ffffff';
 	const hoveringColor = '#fe3d00';
 	let color = $state(notHoveringColor);
+
+	let {
+		controls = $bindable()
+	}: {
+		controls?: CameraControlsRef;
+	} = $props();
 </script>
 
 <T.OrthographicCamera zoom={80} position={10} makeDefault>
