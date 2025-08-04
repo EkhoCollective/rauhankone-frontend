@@ -9,8 +9,9 @@
 	import CardError from '$lib/components/CardError.svelte';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
-	import Scene from '$lib/components/visual-module/Scene_basic_instance.svelte';
+	import Scene from '$lib/components/visual-module/Instance_Flocking.svelte';
 	import { MathUtils } from 'three';
+	import testData from '$lib/utils/testData.json';
 
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
@@ -107,7 +108,7 @@
 
 <div class="scene-container">
 	<Canvas>
-		<Scene bind:controls />
+		<Scene bind:controls data={testData} />
 	</Canvas>
 	<div class="audio-icon-container">
 		<AudioIcon bind:audioValue={toggleAudio} />
