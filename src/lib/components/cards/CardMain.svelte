@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { _, waitLocale } from 'svelte-i18n';
 	import Footer from '$lib/components/mini-components/Footer.svelte';
-	import CardLoader from '$lib/components/CardLoader.svelte';
+	import CardLoader from '$lib/components/cards/CardLoader.svelte';
 	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
 
 	let { toSubmit, toExplore } = $props();

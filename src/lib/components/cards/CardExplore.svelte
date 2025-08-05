@@ -8,7 +8,7 @@
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
 	import Scene from '$lib/components/visual-module/Instance_Click.svelte';
-	import CardError from '$lib/components/CardError.svelte';
+	import CardError from '$lib/components/cards/CardError.svelte';
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
@@ -36,10 +36,10 @@
 		await apiRequest(API_CLUSTERS_OPTIONS)
 			.then((response) => {
 				response_clusters = response;
-				console.log('response_clusters', response_clusters);
+				// console.log('response_clusters', response_clusters);
 			})
 			.catch((error) => {
-				console.log('Error getting clusters', error);
+				// console.log('Error getting clusters', error);
 				raiseError = true;
 			});
 	}
@@ -86,6 +86,7 @@
 
 	// $inspect(response_clusters, getOnlyTranslated, toggleAudio, triggeredFrom, toastEnabled);
 	// $inspect(selectedStory);
+	$inspect('response_clusters', response_clusters);
 </script>
 
 <!-- Error Card -->

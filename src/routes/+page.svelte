@@ -5,12 +5,12 @@
 	import { apiRequest } from '$lib/utils/api_request';
 	import { _, waitLocale } from 'svelte-i18n';
 	import Header from '$lib/components/mini-components/Header.svelte';
-	import CardLoader from '$lib/components/CardLoader.svelte';
-	import CardMain from '$lib/components/CardMain.svelte';
-	import CardLang from '$lib/components/CardLang.svelte';
-	import CardSubmit from '$lib/components/CardSubmit.svelte';
-	import CardExplore from '$lib/components/CardExplore.svelte';
-	import CardError from '$lib/components/CardError.svelte';
+	import CardLoader from '$lib/components/cards/CardLoader.svelte';
+	import CardMain from '$lib/components/cards/CardMain.svelte';
+	import CardLang from '$lib/components/cards/CardLang.svelte';
+	import CardSubmit from '$lib/components/cards/CardSubmit.svelte';
+	import CardExplore from '$lib/components/cards/CardExplore.svelte';
+	import CardError from '$lib/components/cards/CardError.svelte';
 	import { fade, blur } from 'svelte/transition';
 
 	// UI Toggle states

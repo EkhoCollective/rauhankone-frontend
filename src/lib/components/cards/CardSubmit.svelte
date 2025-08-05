@@ -8,7 +8,7 @@
 	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
 	import Loader from '$lib/components/mini-components/Loader.svelte';
-	import CardError from '$lib/components/CardError.svelte';
+	import CardError from '$lib/components/cards/CardError.svelte';
 	import { blur } from 'svelte/transition';
 
 	// Props
@@ -16,6 +16,7 @@
 
 	// States
 	let question = $state<string | null>(null);
+	let questionOriginalId = $state<string | null>(null);
 	let questionContainer = $state<any[] | null>(null);
 	let story = $state('');
 	let suggestion = $state('');
@@ -41,7 +42,7 @@
 		API_METHOD: 'POST',
 		REQUEST_BODY: {
 			text: DOMPurify.sanitize(story),
-			question: question,
+			question: questionOriginalId,
 			language: getLocaleFullName()
 		}
 	});
@@ -94,6 +95,7 @@
 			return;
 		}
 		question = filteredQuestion.text;
+		questionOriginalId = filteredQuestion.original_id;
 	}
 
 	// Function to handle typing detection
@@ -165,6 +167,8 @@
 		handleGetQuestionContainer();
 		// raiseError = true;
 	});
+
+	// $inspect('questionData', questionsData);
 
 	// $inspect('raiseError', raiseError, 'question', question, 'suggestion', suggestion);
 </script>
