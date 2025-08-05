@@ -6,11 +6,12 @@
 	import { blur } from 'svelte/transition';
 	import AudioIcon from '$lib/components/mini-components/AudioIcon.svelte';
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
+	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
+	import Scene from '$lib/components/visual-module/Instance_Click.svelte';
 	import CardError from '$lib/components/CardError.svelte';
+	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
-	import Scene from '$lib/components/visual-module/Instance_Flocking.svelte';
-	import { MathUtils } from 'three';
 	import testData from '$lib/utils/testData.json';
 
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
@@ -22,7 +23,7 @@
 	let raiseError = $state(false);
 	let toastEnabled = $state(true);
 	let navButtonValue = $state('');
-
+	let selectedStory = $state(null);
 	let controls = $state.raw<CameraControlsRef>();
 
 	const API_CLUSTERS_OPTIONS = {
@@ -84,7 +85,7 @@
 	});
 
 	// $inspect(response_clusters, getOnlyTranslated, toggleAudio, triggeredFrom, toastEnabled);
-	// $inspect(navButtonValue);
+	// $inspect(selectedStory);
 </script>
 
 <!-- Error Card -->
@@ -107,8 +108,13 @@
 {/if}
 
 <div class="scene-container">
+	<div class="modal-story-container">
+		{#if selectedStory}
+			<ModalStory story={selectedStory} closeModal={() => (selectedStory = null)} />
+		{/if}
+	</div>
 	<Canvas>
-		<Scene bind:controls data={testData} />
+		<Scene bind:controls data={testData} bind:selectedStory />
 	</Canvas>
 	<div class="audio-icon-container">
 		<AudioIcon bind:audioValue={toggleAudio} />
@@ -123,6 +129,13 @@
 		width: 100%;
 		height: 100vh;
 		background-color: black;
+	}
+
+	.modal-story-container {
+		position: absolute;
+		z-index: 100;
+		top: 0;
+		left: 0;
 	}
 
 	.audio-icon-container {

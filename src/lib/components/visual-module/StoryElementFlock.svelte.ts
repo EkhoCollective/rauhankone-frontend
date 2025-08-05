@@ -24,6 +24,8 @@ export default class {
     startColor: Color,
     endColor: Color,
     public scale_init: number,
+    public cluster_id: string,
+    public text: string,
     x: number,
     y: number,
     z: number,
