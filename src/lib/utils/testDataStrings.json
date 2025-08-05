@@ -1,0 +1,414 @@
+{
+	"clusters": [
+		{
+			"label": "crimson",
+			"id": "clstr_9a8f3",
+			"coord": {
+				"x": -0.34,
+				"y": 0.67,
+				"z": -0.82
+			},
+			"stories": [
+				{
+					"text": "The ancient lighthouse stood weathered against countless storms, its beacon guiding lost sailors through treacherous waters during the darkest nights.",
+					"x": 0.45,
+					"y": -0.23,
+					"z": 0.78
+				},
+				{
+					"text": "In the bustling marketplace, vendors called out their wares while colorful fabrics danced in the warm afternoon breeze, creating a symphony of commerce.",
+					"x": -0.67,
+					"y": 0.89,
+					"z": -0.12
+				},
+				{
+					"text": "Mountain peaks pierced through clouds like cathedral spires, while eagles soared majestically overhead in the crisp morning air.",
+					"x": 0.34,
+					"y": 0.56,
+					"z": -0.91
+				},
+				{
+					"text": "Desert sands whispered ancient secrets as nomads traversed endless dunes under a canopy of brilliant stars that illuminated their journey.",
+					"x": -0.88,
+					"y": -0.45,
+					"z": 0.23
+				},
+				{
+					"text": "Forest pathways meandered through towering pines where sunlight filtered through emerald canopies, creating patterns of light and shadow on moss-covered ground.",
+					"x": 0.12,
+					"y": 0.77,
+					"z": 0.43
+				}
+			]
+		},
+		{
+			"label": "emerald",
+			"id": "clstr_2b4e7",
+			"coord": {
+				"x": 0.78,
+				"y": -0.45,
+				"z": 0.23
+			},
+			"stories": [
+				{
+					"text": "Waves crashed rhythmically against red cliffs while seabirds danced on ocean currents, their calls echoing across the vast expanse of azure waters.",
+					"x": -0.34,
+					"y": 0.21,
+					"z": -0.78
+				},
+				{
+					"text": "Spice merchants arranged aromatic treasures in rainbow formations, filling the air with cardamom, cinnamon, and other exotic fragrances from distant lands.",
+					"x": 0.89,
+					"y": -0.67,
+					"z": 0.45
+				},
+				{
+					"text": "Crystal lakes reflected autumn colors while gentle breezes carried the scent of pine needles and wildflowers across pristine wilderness landscapes.",
+					"x": -0.12,
+					"y": -0.89,
+					"z": -0.34
+				},
+				{
+					"text": "Cobblestone streets wound through ancient villages where church bells rang at sunset, calling families home for evening meals filled with laughter and tradition.",
+					"x": 0.76,
+					"y": 0.23,
+					"z": 0.65
+				},
+				{
+					"text": "Cherry blossoms painted the hillsides in delicate pink hues while traditional drums echoed through valleys, celebrating the arrival of spring.",
+					"x": -0.45,
+					"y": 0.67,
+					"z": -0.23
+				}
+			]
+		},
+		{
+			"label": "azure",
+			"id": "clstr_5c9d1",
+			"coord": {
+				"x": -0.67,
+				"y": 0.89,
+				"z": -0.56
+			},
+			"stories": [
+				{
+					"text": "Vineyard terraces cascaded down rolling hills where morning mist clung to grape clusters, promising another exceptional harvest season.",
+					"x": 0.23,
+					"y": -0.56,
+					"z": 0.87
+				},
+				{
+					"text": "Volcanic peaks dominated the horizon while thermal springs bubbled with mineral-rich water, creating natural pools of steaming warmth.",
+					"x": -0.78,
+					"y": 0.34,
+					"z": -0.67
+				},
+				{
+					"text": "Golden temples gleamed in tropical sunlight as monks in saffron robes walked silently through courtyards filled with fragrant lotus blossoms.",
+					"x": 0.56,
+					"y": 0.91,
+					"z": 0.12
+				},
+				{
+					"text": "Castle towers rose from misty valleys where medieval legends whispered through stone corridors, echoing tales of knights and ancient mysteries.",
+					"x": -0.23,
+					"y": -0.78,
+					"z": 0.45
+				},
+				{
+					"text": "Savanna grasslands stretched endlessly under African skies while acacia trees provided shade for wildlife gathering near watering holes at dusk.",
+					"x": 0.67,
+					"y": -0.12,
+					"z": -0.89
+				}
+			]
+		},
+		{
+			"label": "amber",
+			"id": "clstr_8f2a6",
+			"coord": {
+				"x": 0.45,
+				"y": -0.78,
+				"z": 0.91
+			},
+			"stories": [
+				{
+					"text": "Snow-covered steppes glittered like diamonds under winter moonlight as arctic winds carried the haunting songs of distant wolves across frozen landscapes.",
+					"x": -0.56,
+					"y": 0.78,
+					"z": 0.34
+				},
+				{
+					"text": "Tango music drifted from candlelit cafes where passionate dancers moved in perfect harmony, their silhouettes painting stories against warm evening light.",
+					"x": 0.89,
+					"y": -0.23,
+					"z": -0.67
+				},
+				{
+					"text": "Renaissance architecture framed bustling piazzas where fountains splashed melodically, creating an eternal symphony of water and stone harmonizing together.",
+					"x": -0.34,
+					"y": -0.45,
+					"z": 0.78
+				},
+				{
+					"text": "Tropical islands dotted turquoise seas like emerald jewels, while palm fronds swayed gently in trade winds carrying salt and adventure.",
+					"x": 0.12,
+					"y": 0.89,
+					"z": -0.56
+				},
+				{
+					"text": "Labyrinthine souks buzzed with activity as artisans crafted intricate patterns on leather goods, their tools creating rhythmic percussion against ancient stones.",
+					"x": -0.78,
+					"y": 0.45,
+					"z": 0.23
+				}
+			]
+		},
+		{
+			"label": "violet",
+			"id": "clstr_3e7b9",
+			"coord": {
+				"x": -0.89,
+				"y": 0.34,
+				"z": -0.12
+			},
+			"stories": [
+				{
+					"text": "Bamboo forests whispered ancient wisdom while pandas meandered peacefully through misty groves, embodying tranquility in their unhurried movements.",
+					"x": 0.78,
+					"y": 0.34,
+					"z": -0.45
+				},
+				{
+					"text": "Andean condors soared above sacred valleys where terraced gardens climbed impossible slopes, testament to human ingenuity and perseverance through centuries.",
+					"x": -0.23,
+					"y": -0.89,
+					"z": 0.67
+				},
+				{
+					"text": "Aurora borealis painted the night sky in ethereal greens and purples while reindeer bells chimed softly across snow-blanketed tundra landscapes.",
+					"x": 0.45,
+					"y": 0.67,
+					"z": 0.89
+				},
+				{
+					"text": "Hot air balloons drifted over fairy chimneys at dawn, their colorful canopies creating a dreamlike tapestry against the ancient Cappadocian landscape.",
+					"x": -0.67,
+					"y": -0.34,
+					"z": -0.12
+				},
+				{
+					"text": "Fjords carved by glaciers reflected snow-capped peaks while waterfalls thundered into pristine lakes, creating natural amphitheaters of breathtaking beauty.",
+					"x": 0.34,
+					"y": -0.78,
+					"z": 0.56
+				}
+			]
+		},
+		{
+			"label": "coral",
+			"id": "clstr_6d1c4",
+			"coord": {
+				"x": 0.56,
+				"y": 0.78,
+				"z": -0.67
+			},
+			"stories": [
+				{
+					"text": "Flamenco guitars echoed through narrow alleyways where orange trees perfumed the air, their melodies weaving tales of passion and cultural heritage.",
+					"x": -0.45,
+					"y": 0.89,
+					"z": -0.78
+				},
+				{
+					"text": "Rice paddies created emerald mirrors reflecting cloudy skies while water buffalo grazed peacefully in fields blessed by monsoon rains.",
+					"x": 0.67,
+					"y": -0.34,
+					"z": 0.23
+				},
+				{
+					"text": "Medieval town squares hosted vibrant markets where amber jewelry caught sunlight like trapped fragments of ancient forests and forgotten time.",
+					"x": -0.89,
+					"y": 0.12,
+					"z": -0.45
+				},
+				{
+					"text": "Coffee plantations adorned mountain slopes in neat rows while hummingbirds darted between exotic flowers, their wings beating like tiny thunderclaps.",
+					"x": 0.23,
+					"y": 0.78,
+					"z": 0.67
+				},
+				{
+					"text": "Rhythmic drumbeats echoed across villages where storytellers gathered children under baobab trees, sharing wisdom passed down through countless generations.",
+					"x": -0.12,
+					"y": -0.67,
+					"z": 0.89
+				}
+			]
+		},
+		{
+			"label": "teal",
+			"id": "clstr_4a8e2",
+			"coord": {
+				"x": -0.23,
+				"y": -0.56,
+				"z": 0.89
+			},
+			"stories": [
+				{
+					"text": "Mist rolled across moors dotted with ancient stone circles while sheep grazed contentedly among wildflowers that painted the countryside in vibrant hues.",
+					"x": 0.89,
+					"y": 0.45,
+					"z": -0.23
+				},
+				{
+					"text": "Volcanic islands rose from cerulean waters where traditional fishing boats sailed between coral reefs teeming with tropical marine life.",
+					"x": -0.34,
+					"y": -0.78,
+					"z": 0.56
+				},
+				{
+					"text": "Coastal winds carried the scent of salt and seaweed while fishing villages nestled against harbors filled with colorful boats bobbing gently.",
+					"x": 0.12,
+					"y": 0.67,
+					"z": -0.89
+				},
+				{
+					"text": "Waterfalls plunged from tepuis into mist-shrouded valleys where exotic birds displayed brilliant plumage among orchids and bromeliads.",
+					"x": -0.67,
+					"y": 0.23,
+					"z": 0.78
+				},
+				{
+					"text": "Sunset painted the savanna in golden hues while lions roared in the distance, their calls echoing across grasslands where life thrives.",
+					"x": 0.78,
+					"y": -0.56,
+					"z": -0.34
+				}
+			]
+		},
+		{
+			"label": "gold",
+			"id": "clstr_7f3b5",
+			"coord": {
+				"x": 0.89,
+				"y": 0.45,
+				"z": -0.34
+			},
+			"stories": [
+				{
+					"text": "Windmills turned lazily above tulip fields creating geometric patterns of vibrant colors that stretched toward horizons lined with canal systems.",
+					"x": -0.23,
+					"y": 0.56,
+					"z": 0.45
+				},
+				{
+					"text": "Rainforest canopies sheltered diverse wildlife while exotic fruits hung heavy on branches, their sweet aromas mixing with humid jungle air.",
+					"x": 0.45,
+					"y": -0.89,
+					"z": -0.67
+				},
+				{
+					"text": "Coastal cliffs overlooked fishing boats returning with daily catches while seagulls circled overhead, their cries mixing with ocean waves.",
+					"x": -0.78,
+					"y": 0.34,
+					"z": 0.89
+				},
+				{
+					"text": "Equatorial jungles hummed with life as colorful parrots flew between ancient trees whose roots have witnessed centuries of natural evolution.",
+					"x": 0.67,
+					"y": 0.78,
+					"z": -0.12
+				},
+				{
+					"text": "Highland plateaus hosted coffee ceremonies where aromatic beans roasted over open fires, filling the air with rich, earthy fragrances.",
+					"x": -0.45,
+					"y": -0.23,
+					"z": 0.34
+				}
+			]
+		},
+		{
+			"label": "indigo",
+			"id": "clstr_1c6d8",
+			"coord": {
+				"x": -0.45,
+				"y": -0.89,
+				"z": 0.67
+			},
+			"stories": [
+				{
+					"text": "Alpine meadows bloomed with wildflowers while church bells echoed across valleys where traditional chalets dotted emerald mountainsides.",
+					"x": 0.34,
+					"y": 0.89,
+					"z": -0.56
+				},
+				{
+					"text": "River deltas wove intricate patterns through fertile lands where fishermen cast nets from wooden boats painted in traditional bright colors.",
+					"x": -0.89,
+					"y": -0.45,
+					"z": 0.67
+				},
+				{
+					"text": "Ancient olive groves cascaded down hillsides where whitewashed villages perched above azure seas that sparkled like scattered diamonds.",
+					"x": 0.56,
+					"y": 0.23,
+					"z": 0.78
+				},
+				{
+					"text": "Rolling pampas stretched endlessly under expansive skies where gauchos herded cattle across grasslands that whispered with prairie winds.",
+					"x": -0.67,
+					"y": 0.78,
+					"z": -0.34
+				},
+				{
+					"text": "Market vendors arranged colorful textiles under shade trees while traditional drums provided rhythmic accompaniment to daily commerce and community.",
+					"x": 0.23,
+					"y": -0.67,
+					"z": 0.45
+				}
+			]
+		},
+		{
+			"label": "magenta",
+			"id": "clstr_9b5f2",
+			"coord": {
+				"x": 0.67,
+				"y": 0.23,
+				"z": -0.78
+			},
+			"stories": [
+				{
+					"text": "Mountain lakes reflected snow-capped peaks while classical music seemed to emanate from ancient concert halls nestled in picturesque valleys.",
+					"x": -0.56,
+					"y": 0.45,
+					"z": -0.78
+				},
+				{
+					"text": "Tea plantations painted hillsides in emerald terraces while monsoon clouds gathered above ancient temples carved from living rock.",
+					"x": 0.78,
+					"y": -0.23,
+					"z": 0.89
+				},
+				{
+					"text": "Emerald fields divided by stone walls stretched toward cliffs where Celtic music drifted from cozy pubs filled with warmth and storytelling.",
+					"x": -0.34,
+					"y": 0.67,
+					"z": -0.45
+				},
+				{
+					"text": "Salt flats created mirror-like surfaces reflecting sky and clouds while llamas grazed peacefully across high-altitude plains kissed by mountain air.",
+					"x": 0.45,
+					"y": -0.78,
+					"z": 0.12
+				},
+				{
+					"text": "Baobab trees stood like ancient sentinels across savannas where wildebeest migrations created dust clouds visible from distant horizons.",
+					"x": -0.12,
+					"y": 0.34,
+					"z": 0.67
+				}
+			]
+		}
+	]
+}

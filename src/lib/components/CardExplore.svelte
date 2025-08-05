@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
-	import { blur } from 'svelte/transition';
+	import { blur, fade } from 'svelte/transition';
 	import AudioIcon from '$lib/components/mini-components/AudioIcon.svelte';
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
@@ -12,7 +12,7 @@
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
-	import testData from '$lib/utils/testData.json';
+	import testData from '$lib/utils/testDataStrings.json';
 
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
@@ -108,9 +108,14 @@
 {/if}
 
 <div class="scene-container">
-	<div class="modal-story-container">
-		{#if selectedStory}
-			<ModalStory story={selectedStory} closeModal={() => (selectedStory = null)} />
+	<div>
+		{#if selectedStory}<div
+				class="modal-story-container"
+				in:fade={{ duration: 500 }}
+				out:fade={{ duration: 500 }}
+			>
+				<ModalStory story={selectedStory} closeModal={() => (selectedStory = null)} />
+			</div>
 		{/if}
 	</div>
 	<Canvas>
@@ -132,6 +137,7 @@
 	}
 
 	.modal-story-container {
+		backdrop-filter: blur(10px);
 		position: absolute;
 		z-index: 100;
 		top: 0;

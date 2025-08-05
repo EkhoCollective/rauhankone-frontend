@@ -1,24 +1,25 @@
 <script lang="ts">
+	import { X } from 'lucide-svelte';
 	let { story = $bindable(), closeModal } = $props();
 </script>
 
 <div class="modal-story-container">
 	<div class="modal-story-content">
-		<h1>{story.text}</h1>
-		<button
-			onclick={() => {
-				closeModal();
-				console.log('close');
-			}}>Close</button
-		>
+		<div class="modal-story-header">
+			<h1>{story.cluster_id}</h1>
+			<button class="btn btn-close" onclick={() => closeModal()}><X color="#ffffff" /></button>
+		</div>
+		<div class="modal-story-body">
+			<h1>{story.text}</h1>
+		</div>
 	</div>
 </div>
 
 <style>
 	.modal-story-container {
 		/* background-color: black; */
-		backdrop-filter: blur(10px);
-		text-align: center;
+		/* backdrop-filter: blur(10px); */
+		/* text-align: center; */
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -29,5 +30,38 @@
 		/* background-color: black; */
 		/* display: grid; */
 		/* grid-template-rows: 50px 1fr 25%; */
+	}
+
+	.modal-story-content {
+		background-color: red;
+		display: flex;
+		flex-direction: column;
+		min-height: 200px;
+		/* min-width: 90%; */
+		max-width: 90%;
+	}
+
+	.modal-story-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 20px;
+	}
+
+	.modal-story-body {
+		padding: 0;
+	}
+
+	.btn-close {
+		background-color: transparent;
+		border-radius: 0;
+		border: none;
+		box-shadow: none;
+	}
+
+	@media (min-width: 768px) {
+		.modal-story-content {
+			max-width: 40%;
+		}
 	}
 </style>

@@ -23,13 +23,13 @@
 	const endColor = new Color('white');
 
 	// Flocking parameters
-	let maxSpeed = 0.05; // Increased for more visible movement
-	let maxForce = 0.02; // Increased for more visible movement
-	let cohesionWeight = 1.0;
-	let alignmentWeight = 1.0;
-	let separationWeight = 1.5;
-	let perceptionRadius = 3;
-	let separationDistance = 1;
+	// let maxSpeed = 0.05; // Increased for more visible movement
+	// let maxForce = 0.02; // Increased for more visible movement
+	// let cohesionWeight = 1.0;
+	// let alignmentWeight = 1.0;
+	// let separationWeight = 1.5;
+	// let perceptionRadius = 3;
+	// let separationDistance = 1;
 
 	let {
 		data,
@@ -211,11 +211,7 @@
 			scale={instance.scale}
 			color={instance.color}
 			onclick={() => {
-				selectedStory = {
-					text: instance.text,
-					cluster_id: instance.cluster_id
-				};
-				// console.log(instance.x, instance.y, instance.z, instance.text, instance.cluster_id);
+				selectedStory = instance;
 			}}
 			onpointerenter={() => {
 				instance.tw.set(1);
