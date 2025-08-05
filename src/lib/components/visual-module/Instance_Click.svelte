@@ -19,7 +19,7 @@
 	const worldRadius: number = 20;
 	const worldScale: number = 10;
 	let instances: StoryElement[] = $state([]);
-	const startColor = new Color('blue');
+	const startColor = new Color('dimgray');
 	const endColor = new Color('white');
 
 	// Flocking parameters

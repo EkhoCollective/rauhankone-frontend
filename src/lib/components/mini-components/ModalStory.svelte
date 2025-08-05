@@ -33,7 +33,7 @@
 	}
 
 	.modal-story-content {
-		background-color: red;
+		/* background-color: red; */
 		display: flex;
 		flex-direction: column;
 		min-height: 200px;
@@ -45,11 +45,11 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0 20px;
+		padding: 10px 0 0 20px;
 	}
 
 	.modal-story-body {
-		padding: 0;
+		padding: 20px;
 	}
 
 	.btn-close {

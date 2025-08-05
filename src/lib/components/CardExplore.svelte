@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
-	import { blur, fade } from 'svelte/transition';
+	import { blur } from 'svelte/transition';
 	import AudioIcon from '$lib/components/mini-components/AudioIcon.svelte';
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
@@ -111,8 +111,8 @@
 	<div>
 		{#if selectedStory}<div
 				class="modal-story-container"
-				in:fade={{ duration: 500 }}
-				out:fade={{ duration: 500 }}
+				in:blur={{ duration: 500 }}
+				out:blur={{ duration: 500 }}
 			>
 				<ModalStory story={selectedStory} closeModal={() => (selectedStory = null)} />
 			</div>
