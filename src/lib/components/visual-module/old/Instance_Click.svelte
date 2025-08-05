@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	// import { getLocaleFullName } from '$lib/utils/locale_handler';
-	import StoryElement from './StoryElementFlock.svelte';
+	import ClusterInstance from '$lib/components/visual-module/instances/ClusterInstance.svelte';
+	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
 	import * as THREE from 'three';
 	import { Color } from 'three';
 	import { T, useTask, useThrelte } from '@threlte/core';
@@ -18,7 +19,7 @@
 	// let storiesNumber = $state(null);
 	const worldRadius: number = 20;
 	const worldScale: number = 10;
-	let instances: StoryElement[] = $state([]);
+	let instances: StoryInstance[] = $state([]);
 	const startColor = new Color('dimgray');
 	const endColor = new Color('white');
 
@@ -62,7 +63,7 @@
 				const scale = Math.random() + 0.1;
 
 				instances.push(
-					new StoryElement(
+					new StoryInstance(
 						startColor,
 						endColor,
 						scale,

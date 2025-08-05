@@ -7,7 +7,7 @@
 	import AudioIcon from '$lib/components/mini-components/AudioIcon.svelte';
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
-	import Scene from '$lib/components/visual-module/Instance_Click.svelte';
+	import Scene from '$lib/components/visual-module/Instance_Nesting.svelte';
 	import CardError from '$lib/components/cards/CardError.svelte';
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
