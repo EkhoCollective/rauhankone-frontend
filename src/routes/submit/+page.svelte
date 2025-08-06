@@ -13,9 +13,7 @@
 	import { blur } from 'svelte/transition';
 	import { getContext } from 'svelte';
 
-	// Props
-	let { toExplore } = $props();
-
+	// Get Questions Data from Parent Layout
 	const getQuestionsData = getContext('questions') as () => any;
 
 	// States
@@ -172,21 +170,12 @@
 		handleGetQuestionContainer();
 		// raiseError = true;
 	});
-
-	// $inspect('questionData', questionsData);
-
-	// $inspect('raiseError', raiseError, 'question', question, 'suggestion', suggestion);
 </script>
 
 <svelte:head>
 	<title>{$_('rk_title')} | {$_('rk_layer')} | Oulu 2026 | Submit</title>
 </svelte:head>
 
-<!-- {#if raiseError}
-	<div transition:blur>
-		<CardError errorMessage={$_('error_map')} />
-	</div>
-{:else} -->
 <div class="card-submit-container">
 	<!-- Main Text -->
 	<div class="question-container">
@@ -265,8 +254,6 @@
 		{/if}
 	</div>
 </div>
-
-<!-- {/if} -->
 
 <style>
 	.card-submit-container {

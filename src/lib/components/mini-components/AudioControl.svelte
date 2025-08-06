@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { Volume2, VolumeX } from 'lucide-svelte';
 	import { tracklist } from '$lib/components/media/audio/tracklist';
+	import { page } from '$app/state';
 
-	let { songIdx = $bindable() } = $props();
+	let songIdx = $state(0);
 
 	let playingState = $state('paused');
 	let song = $state<HTMLAudioElement | null>(null);
@@ -31,10 +32,18 @@
 		playingState = 'paused';
 		song?.pause();
 	}
+
+	$effect(() => {
+		if (page.url.pathname === '/explore') {
+			songIdx = 1;
+		} else {
+			songIdx = 0;
+		}
+	});
 </script>
 
 <div class="audio-icon-container">
-	<button class="audio-icon-btn" onclick={() => togglePlaying()}>
+	<button class="btn" onclick={() => togglePlaying()}>
 		{#if playingState === 'playing'}
 			<Volume2 color="#ffffff" />
 		{:else}
@@ -42,3 +51,13 @@
 		{/if}
 	</button>
 </div>
+
+<style>
+	.btn {
+		height: 100%;
+		background-color: transparent;
+		border-radius: 0;
+		border: none;
+		box-shadow: none;
+	}
+</style>

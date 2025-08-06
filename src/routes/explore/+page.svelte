@@ -4,7 +4,7 @@
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import { blur } from 'svelte/transition';
-	import AudioComp from '$lib/components/mini-components/AudioComp.svelte';
+	// import AudioComp from '$lib/components/mini-components/AudioControl.svelte';
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
 	import Scene from '$lib/components/visual-module/Instance_Nesting.svelte';
@@ -114,9 +114,9 @@
 	<Canvas>
 		<Scene bind:controls data={testData} bind:selectedStory />
 	</Canvas>
-	<div class="audio-icon-container">
+	<!-- <div class="audio-icon-container">
 		<AudioComp songIdx={0} />
-	</div>
+	</div> -->
 	<div class="navigation-icons-container">
 		<NavIcons bind:value={navButtonValue} />
 	</div>
@@ -137,12 +137,12 @@
 		left: 0;
 	}
 
-	.audio-icon-container {
+	/* .audio-icon-container {
 		position: absolute;
 		z-index: 100;
 		bottom: 20px;
 		left: 20px;
-	}
+	} */
 
 	.navigation-icons-container {
 		position: absolute;

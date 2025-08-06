@@ -1,23 +1,32 @@
 <script lang="ts">
-	// import { browser } from '$app/environment';
 	import '../app.css';
 	import '$lib/i18n';
 	import { onMount } from 'svelte';
-	// import { setContext } from 'svelte'
+	import { setContext } from 'svelte';
+	import { fade, blur } from 'svelte/transition';
 	import { locale, waitLocale, init } from 'svelte-i18n';
 	import { getAuthToken } from '$lib/utils/api_token';
 	import { apiRequest } from '$lib/utils/api_request';
+	import CardLang from '$lib/components/cards/CardLang.svelte';
+	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
 	import CardError from '$lib/components/cards/CardError.svelte';
+	import Header from '$lib/components/mini-components/Header.svelte';
 
-	import { setContext } from 'svelte';
-	import type { LayoutProps } from './$types';
-	// let { data }: LayoutProps = $props();
+	let { children } = $props();
 
 	let questions = $state(null);
 	let raiseError = $state(false);
+	let showLang = $state(false);
+	let transitionDuration = 500;
+	let translateStories = $state(false);
 
 	// Set context at component initialization
 	setContext('questions', () => questions);
+
+	init({
+		fallbackLocale: 'en',
+		initialLocale: 'en'
+	});
 
 	const API_QUESTIONS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_questions',
@@ -56,11 +65,6 @@
 	// 	await waitLocale();
 	// };
 
-	init({
-		fallbackLocale: 'en',
-		initialLocale: 'en'
-	});
-
 	// onMount(() => {
 	// 	if (browser) {
 	// 		const savedLocale = localStorage.getItem('locale');
@@ -77,49 +81,56 @@
 	// 	}
 	// });
 
-	let { children } = $props();
+	let handleToggleLang = () => {
+		showLang = !showLang;
+	};
 
 	onMount(() => {
 		window.scrollTo(0, 0);
 		handleGetToken();
 	});
 
-	$inspect(questions);
+	// $inspect(questions);
 </script>
-
-<!-- put the car error, the nav bar , and the audio icon here -->
 
 <svelte:head>
 	<link rel="icon" type="image/svg" href="/favicon.ico" />
 </svelte:head>
 
 <div class="app">
+	<!-- Lang Card -->
+	{#if showLang}
+		<div
+			in:fade={{ duration: transitionDuration }}
+			out:fade={{ duration: transitionDuration }}
+			class="lang-container"
+		>
+			<CardLang closeLangCard={handleToggleLang} bind:translate={translateStories} />
+		</div>
+	{/if}
+	<!-- Header -->
+	<div class="header-container">
+		<Header toggleLang={handleToggleLang} />
+	</div>
+	<!-- Audio Control -->
+	<div class="audio-control-container">
+		<AudioControl />
+	</div>
+	<!-- Pages -->
 	{@render children()}
 </div>
 
 <style>
-	/* :global(body) {
-		background-color: black;
-		color: white;
-		font-family: 'Roboto', sans-serif;
-		overflow: hidden;
-	} */
-
 	.app {
 		background-color: black;
 		color: white;
 		font-family: 'Roboto', sans-serif;
 	}
-	/* 
-	.audio-icon-container {
+	.audio-control-container {
 		position: absolute;
-		z-index: 100;
+		z-index: 1000;
 		bottom: 20px;
 		left: 20px;
-	}
-
-	.app-container {
-		height: 100vh;
 	}
 
 	.header-container {
@@ -131,10 +142,6 @@
 		right: 0;
 	}
 
-	.card-container {
-		height: 100%;
-	}
-
 	.lang-container {
 		width: 100vw;
 		height: 100vh;
@@ -142,8 +149,7 @@
 		position: absolute;
 		top: 0;
 		left: 0;
-		/* transform: translate(-50%, -50%); */
-	/* } */
+	}
 	/* 
 	.error-container {
 		width: 100vw;
