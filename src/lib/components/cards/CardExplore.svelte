@@ -17,9 +17,7 @@
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
 	let response_clusters: any = $state(null);
-	let response_stories: any = $state(null);
 	let requestLanguage = $state('Any');
-	let audioState = $state(false);
 	let raiseError = $state(false);
 	let toastEnabled = $state(true);
 	let navButtonValue = $state('');
@@ -81,11 +79,6 @@
 			}, 3000);
 		}
 	});
-
-	// $inspect(response_clusters, getOnlyTranslated, toggleAudio, triggeredFrom, toastEnabled);
-	// $inspect(selectedStory);
-	// $inspect('response_clusters', response_clusters);
-	// $inspect(playingState);
 </script>
 
 <!-- Error Card -->

@@ -3,6 +3,7 @@
 	import Footer from '$lib/components/mini-components/Footer.svelte';
 	import CardLoader from '$lib/components/cards/CardLoader.svelte';
 	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
+	import AudioComp from '$lib/components/mini-components/AudioComp.svelte';
 
 	let { toSubmit, toExplore } = $props();
 	let backgroundRef: BackgroundMouse | undefined = $state();
@@ -47,7 +48,10 @@
 			<button class="btn btn-submit" onclick={() => toSubmit()}>{$_('btn_take_part')}</button>
 			<button class="btn btn-explore" onclick={() => toExplore()}>{$_('btn_explore')}</button>
 		</div>
-
+		<!-- Audio Icon -->
+		<div class="audio-icon-container">
+			<AudioComp songIdx={1} />
+		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
 			<Footer />
@@ -103,6 +107,13 @@
 		font-size: 16px;
 		border-radius: 0px;
 		color: white;
+	}
+
+	.audio-icon-container {
+		position: absolute;
+		z-index: 100;
+		bottom: 20px;
+		left: 20px;
 	}
 
 	.btn-explore {
