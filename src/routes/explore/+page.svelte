@@ -79,6 +79,8 @@
 			}, 3000);
 		}
 	});
+
+	$inspect(response_clusters);
 </script>
 
 <!-- Error Card -->

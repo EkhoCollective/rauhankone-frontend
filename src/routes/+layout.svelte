@@ -11,6 +11,7 @@
 	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
 	import CardError from '$lib/components/cards/CardError.svelte';
 	import Header from '$lib/components/mini-components/Header.svelte';
+	import { page } from '$app/state';
 
 	let { children } = $props();
 
@@ -117,7 +118,15 @@
 		<AudioControl />
 	</div>
 	<!-- Pages -->
-	{@render children()}
+	{#key page.url.pathname}
+		<div
+			class="page-container"
+			in:fade={{ duration: transitionDuration }}
+			out:fade={{ duration: transitionDuration }}
+		>
+			{@render children()}
+		</div>
+	{/key}
 </div>
 
 <style>
