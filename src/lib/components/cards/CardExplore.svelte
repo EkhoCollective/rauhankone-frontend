@@ -4,7 +4,7 @@
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import { blur } from 'svelte/transition';
-	import AudioIcon from '$lib/components/mini-components/AudioIcon.svelte';
+	import AudioComp from '$lib/components/mini-components/AudioComp.svelte';
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
 	import Scene from '$lib/components/visual-module/Instance_Nesting.svelte';
@@ -13,7 +13,6 @@
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
 	import testData from '$lib/utils/testDataStrings.json';
-	import { tracklist } from '$lib/components/media/audio/tracklist';
 
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
@@ -27,9 +26,6 @@
 	let selectedStory = $state(null);
 	let controls = $state.raw<CameraControlsRef>();
 
-	let playingState = $state('paused');
-	let song = $state<HTMLAudioElement | null>(null);
-
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
 		API_METHOD: 'POST',
@@ -40,10 +36,8 @@
 		await apiRequest(API_CLUSTERS_OPTIONS)
 			.then((response) => {
 				response_clusters = response;
-				// console.log('response_clusters', response_clusters);
 			})
 			.catch((error) => {
-				// console.log('Error getting clusters', error);
 				raiseError = true;
 			});
 	}
@@ -73,30 +67,6 @@
 		}
 	}
 
-	function togglePlaying() {
-		playingState === 'paused' ? play() : pause();
-	}
-
-	function loadSong() {
-		song = new Audio(tracklist[0].src);
-		song.volume = 0.2;
-		song.play();
-	}
-
-	function play() {
-		if (playingState === 'playing') {
-			pause();
-		}
-
-		playingState = 'playing';
-		loadSong();
-	}
-
-	function pause() {
-		playingState = 'paused';
-		song?.pause();
-	}
-
 	$effect(() => {
 		handleNavButton(navButtonValue);
 	});
@@ -115,7 +85,7 @@
 	// $inspect(response_clusters, getOnlyTranslated, toggleAudio, triggeredFrom, toastEnabled);
 	// $inspect(selectedStory);
 	// $inspect('response_clusters', response_clusters);
-	$inspect(playingState);
+	// $inspect(playingState);
 </script>
 
 <!-- Error Card -->
@@ -152,7 +122,7 @@
 		<Scene bind:controls data={testData} bind:selectedStory />
 	</Canvas>
 	<div class="audio-icon-container">
-		<AudioIcon handleAudio={togglePlaying} audioValue={audioState} />
+		<AudioComp songIdx={0} />
 	</div>
 	<div class="navigation-icons-container">
 		<NavIcons bind:value={navButtonValue} />
