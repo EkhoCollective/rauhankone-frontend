@@ -10,9 +10,12 @@
 	import Loader from '$lib/components/mini-components/Loader.svelte';
 	import CardError from '$lib/components/cards/CardError.svelte';
 	import { blur } from 'svelte/transition';
+	import { getContext } from 'svelte';
 
 	// Props
-	let { toExplore, questionsData } = $props();
+	let { toExplore } = $props();
+
+	const getQuestionsData = getContext('questions') as () => any;
 
 	// States
 	let question = $state<string | null>(null);
@@ -70,6 +73,7 @@
 	}
 
 	function handleGetQuestionContainer() {
+		const questionsData = getQuestionsData();
 		if (!questionsData) {
 			raiseError = true;
 			return;
@@ -157,7 +161,7 @@
 	$effect(() => {
 		$locale;
 		// console.log('locale changed', localStorage.getItem('locale'));
-		if (questionsData) {
+		if (getQuestionsData()) {
 			handleGetQuestion();
 		}
 	});

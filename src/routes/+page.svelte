@@ -2,6 +2,7 @@
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
 	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
+	import Footer from '$lib/components/mini-components/Footer.svelte';
 	// import { onMount } from 'svelte';
 	// import { page } from '$app/state';
 	// import { beforeNavigate } from '$app/navigation';
@@ -103,26 +104,32 @@
 	<title>{$_('rk_title')} | {$_('rk_layer')} | Oulu 2026</title>
 </svelte:head>
 
-<div class="card-bg-container">
-	<BackgroundMouse bind:this={backgroundRef} maxMovement={75} stiffness={0.05} damping={0.95} />
-</div>
 <div class="card-main-container" onmousemove={handleMouseMove} role="presentation">
-	<!-- Title -->
-	<div class="card-title-container">
-		<div>{$_('rk_title')}</div>
+	<div class="card-bg-container">
+		<BackgroundMouse bind:this={backgroundRef} maxMovement={75} stiffness={0.05} damping={0.95} />
 	</div>
-	<!-- Subtitle -->
-	<div class="card-sub-title-container">
-		<div>{$_('rk_layer')}</div>
-	</div>
-	<!-- Main Text -->
-	<div class="card-description-container">
-		<div>{splitA($_('description'))}<br /><br />{splitB($_('description'))}</div>
-	</div>
-	<!-- Buttons Container -->
-	<div class="card-btn-container">
-		<button class="btn btn-submit" onclick={() => goto('/submit')}>{$_('btn_take_part')}</button>
-		<button class="btn btn-explore" onclick={() => goto('/explore')}>{$_('btn_explore')}</button>
+	<div class="card-main-container-inner">
+		<!-- Title -->
+		<div class="card-title-container">
+			<div>{$_('rk_title')}</div>
+		</div>
+		<!-- Subtitle -->
+		<div class="card-sub-title-container">
+			<div>{$_('rk_layer')}</div>
+		</div>
+		<!-- Main Text -->
+		<div class="card-description-container">
+			<div>{splitA($_('description'))}<br /><br />{splitB($_('description'))}</div>
+		</div>
+		<!-- Buttons Container -->
+		<div class="card-btn-container">
+			<button class="btn btn-submit" onclick={() => goto('/submit')}>{$_('btn_take_part')}</button>
+			<button class="btn btn-explore" onclick={() => goto('/explore')}>{$_('btn_explore')}</button>
+		</div>
+		<!-- Footer -->
+		<div class="card-footer-container">
+			<Footer />
+		</div>
 	</div>
 </div>
 
@@ -211,10 +218,19 @@
 	.card-main-container {
 		width: 100vw;
 		height: 100vh;
-		/* background-color: black; */
+		background-color: black;
+	}
+
+	.card-main-container-inner {
+		width: 100vw;
+		height: 100vh;
+		position: absolute;
+		top: 0;
+		left: 0;
 		display: grid;
 		grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
 		padding: 50px 10% 50px 10%;
+		z-index: 50;
 	}
 
 	.card-title-container {
@@ -253,13 +269,6 @@
 		color: white;
 	}
 
-	.audio-icon-container {
-		position: absolute;
-		z-index: 100;
-		bottom: 20px;
-		left: 20px;
-	}
-
 	.btn-explore {
 		background-color: black;
 		border-color: none;
@@ -288,7 +297,7 @@
 			z-index: 0;
 		}
 
-		.card-main-container {
+		.card-main-container-inner {
 			position: absolute;
 			top: 0;
 			left: 0;
@@ -301,7 +310,6 @@
 				'text btn-container'
 				'footer footer';
 		}
-
 		.card-title-container {
 			grid-area: title;
 		}
@@ -334,41 +342,5 @@
 			border-top: none;
 			/* justify-items: start; */
 		}
-	}
-	.app-container {
-		height: 100vh;
-	}
-
-	.header-container {
-		height: 50px;
-		z-index: 1000;
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-	}
-
-	.card-container {
-		height: 100%;
-	}
-
-	.lang-container {
-		width: 100vw;
-		height: 100vh;
-		z-index: 2000;
-		position: absolute;
-		top: 0;
-		left: 0;
-		/* transform: translate(-50%, -50%); */
-	}
-
-	.error-container {
-		width: 100vw;
-		height: 100vh;
-		z-index: 3000;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
 	}
 </style>
