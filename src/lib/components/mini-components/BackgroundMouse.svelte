@@ -50,7 +50,7 @@
 		--y: 0px;
 		width: 110%;
 		height: 110%;
-		background-image: url('../extras/EKHO_Sketch_bg.webp');
+		background-image: url('../media/images/EKHO_Sketch_bg.webp');
 		background-position: var(--x) var(--y);
 		background-size: cover;
 		background-repeat: no-repeat;

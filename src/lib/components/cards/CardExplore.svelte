@@ -13,18 +13,22 @@
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
 	import testData from '$lib/utils/testDataStrings.json';
+	import { tracklist } from '$lib/components/media/audio/tracklist';
 
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
 	let response_clusters: any = $state(null);
 	let response_stories: any = $state(null);
 	let requestLanguage = $state('Any');
-	let toggleAudio = $state(false);
+	let audioState = $state(false);
 	let raiseError = $state(false);
 	let toastEnabled = $state(true);
 	let navButtonValue = $state('');
 	let selectedStory = $state(null);
 	let controls = $state.raw<CameraControlsRef>();
+
+	let playingState = $state('paused');
+	let song = $state<HTMLAudioElement | null>(null);
 
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
@@ -69,6 +73,30 @@
 		}
 	}
 
+	function togglePlaying() {
+		playingState === 'paused' ? play() : pause();
+	}
+
+	function loadSong() {
+		song = new Audio(tracklist[0].src);
+		song.volume = 0.2;
+		song.play();
+	}
+
+	function play() {
+		if (playingState === 'playing') {
+			pause();
+		}
+
+		playingState = 'playing';
+		loadSong();
+	}
+
+	function pause() {
+		playingState = 'paused';
+		song?.pause();
+	}
+
 	$effect(() => {
 		handleNavButton(navButtonValue);
 	});
@@ -86,7 +114,8 @@
 
 	// $inspect(response_clusters, getOnlyTranslated, toggleAudio, triggeredFrom, toastEnabled);
 	// $inspect(selectedStory);
-	$inspect('response_clusters', response_clusters);
+	// $inspect('response_clusters', response_clusters);
+	$inspect(playingState);
 </script>
 
 <!-- Error Card -->
@@ -123,7 +152,7 @@
 		<Scene bind:controls data={testData} bind:selectedStory />
 	</Canvas>
 	<div class="audio-icon-container">
-		<AudioIcon bind:audioValue={toggleAudio} />
+		<AudioIcon handleAudio={togglePlaying} audioValue={audioState} />
 	</div>
 	<div class="navigation-icons-container">
 		<NavIcons bind:value={navButtonValue} />
