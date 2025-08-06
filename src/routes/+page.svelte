@@ -3,20 +3,6 @@
 	import { goto } from '$app/navigation';
 	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
 	import Footer from '$lib/components/mini-components/Footer.svelte';
-	// import { onMount } from 'svelte';
-	// import { page } from '$app/state';
-	// import { beforeNavigate } from '$app/navigation';
-	// // import { getAuthToken } from '$lib/utils/api_token';
-	// // import { apiRequest } from '$lib/utils/api_request';
-	// // import { _, waitLocale } from 'svelte-i18n';
-	// import Header from '$lib/components/mini-components/Header.svelte';
-	// import CardLoader from '$lib/components/cards/CardLoader.svelte';
-	// import CardMain from '$lib/components/cards/CardMain.svelte';
-	// import CardLang from '$lib/components/cards/CardLang.svelte';
-	// // import CardSubmit from '$lib/components/cards/CardSubmit.svelte';
-	// // import CardExplore from '$lib/components/cards/CardExplore.svelte';
-	// // import CardError from '$lib/components/cards/CardError.svelte';
-	// import { fade, blur } from 'svelte/transition';
 
 	let backgroundRef: BackgroundMouse | undefined = $state();
 
@@ -33,71 +19,6 @@
 	function splitB(text: string): string {
 		return text.slice(text.indexOf('.') + 1);
 	}
-
-	// // UI Toggle states
-	// let showLang = $state(false);
-	// let currentCard = $state('main');
-	// let triggerCard = $state('');
-	// let transitionDuration = 500;
-	// let translateStories = $state(false);
-	// let questions = $state(null);
-	// let raiseError = $state(false);
-
-	// const API_QUESTIONS_OPTIONS = () => ({
-	// 	API_ENDPOINT: '/get_questions',
-	// 	API_METHOD: 'POST',
-	// 	REQUEST_BODY: { question_type: 'starter' }
-	// });
-
-	// let handleToggleLang = () => {
-	// 	showLang = !showLang;
-	// };
-
-	// function handleCardView(card: string, cardTrigger: string) {
-	// 	currentCard = card;
-	// 	triggerCard = cardTrigger;
-	// }
-
-	// async function handleGetToken() {
-	// 	await getAuthToken()
-	// 		.then(() => {
-	// 			handleGetQuestions();
-	// 		})
-	// 		.catch((error) => {
-	// 			console.log('Error getting token', error);
-	// 			raiseError = true;
-	// 		});
-	// }
-
-	// async function handleGetQuestions() {
-	// 	await apiRequest(API_QUESTIONS_OPTIONS())
-	// 		.then((response) => {
-	// 			questions = response;
-	// 		})
-	// 		.catch((error) => {
-	// 			console.log('Error getting questions', error);
-	// 			raiseError = true;
-	// 		});
-	// }
-
-	// Get token and questions
-	// onMount(() => {
-	// 	window.scrollTo(0, 0);
-	// 	handleGetToken();
-	// });
-
-	// beforeNavigate(({ type }) => {
-	// 	if (type === 'popstate') {
-	// 		location.reload();
-	// 	}
-	// });
-
-	// Check for internet connection
-	// $effect(() => {
-	// 	window.addEventListener('offline', () => {
-	// 		raiseError = true;
-	// 	});
-	// });
 </script>
 
 <svelte:head>
