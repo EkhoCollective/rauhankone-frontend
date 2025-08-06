@@ -177,90 +177,91 @@
 	<title>{$_('rk_title')} | {$_('rk_layer')} | Oulu 2026 | Submit</title>
 </svelte:head>
 
-{#if raiseError}
+<!-- {#if raiseError}
 	<div transition:blur>
 		<CardError errorMessage={$_('error_map')} />
 	</div>
-{:else}
-	<div class="card-submit-container">
-		<!-- Main Text -->
-		<div class="question-container">
-			<p>{question}</p>
-		</div>
-		<!-- Input Area -->
-		<div class="input-container">
-			<Textarea
-				bind:textValue={story}
-				minHeight="200px"
-				debounceTime={typingTimer}
-				bind:typingActive={isTyping}
-			/>
-		</div>
-		<!-- Suggestions -->
-		<div class="suggestions-container">
-			{#if suggestionState !== 'off'}
-				<div></div>
-			{/if}
-			<!-- Show warning if story is too short -->
-			{#if suggestionState === 'warning'}
-				<div transition:blur class="warning-bubble bubble">
-					{$_('type_more')}
-				</div>
-			{/if}
-			<!-- Show loader when waiting for suggestions -->
-			{#if suggestionState === 'loading'}
-				<div transition:blur class="loader-bubble bubble">
-					<Loader color="white" pulseSize="30px" pulseTiming="1s" />
-				</div>
-			{/if}
-			<!-- Show suggestion if user has typed something -->
-			{#if suggestionState === 'ok'}
-				<div
-					in:blur
-					out:blur={{ delay: suggestionFadeTimer, duration: 500 }}
-					class="suggestions-bubble bubble"
-				>
-					<p>{suggestion}</p>
-					<p>{$_('please_extend')}</p>
-				</div>
-			{/if}
-			<!-- Show thank you message if user has finished the story -->
-			{#if suggestionState === 'done'}
-				<p
-					in:blur={{ delay: thankYouFadeTimer, duration: 500 }}
-					out:blur
-					class="thank-you-bubble bubble"
-				>
-					{$_('submit_ack')}
-				</p>
-			{/if}
-		</div>
-		<!-- Actions -->
-
-		<div class="actions-container">
-			{#if (suggestionState === 'done' || suggestionState === 'ok' || storyComplete === true) && story.length > minStoryLength}
-				<!-- Disclaimer -->
-				<div transition:blur class="disclaimer-container">
-					<!-- Checkmark -->
-					<div class="checkmark-container">
-						<Checkmark bind:checkValue={userAgreed} />
-					</div>
-					<div class="disclaimer-text">
-						<p>{$_('disclaimer')}</p>
-					</div>
-				</div>
-				<!-- Buttons Container -->
-				<div transition:blur class="disclaimer-btn-container">
-					<div>
-						<button disabled={!userAgreed} class="btn" onclick={handleSubmit}
-							>{$_('btn_submit')}</button
-						>
-					</div>
-				</div>
-			{/if}
-		</div>
+{:else} -->
+<div class="card-submit-container">
+	<!-- Main Text -->
+	<div class="question-container">
+		<p>{question}</p>
 	</div>
-{/if}
+	<!-- Input Area -->
+	<div class="input-container">
+		<Textarea
+			bind:textValue={story}
+			minHeight="200px"
+			debounceTime={typingTimer}
+			bind:typingActive={isTyping}
+		/>
+	</div>
+	<!-- Suggestions -->
+	<div class="suggestions-container">
+		{#if suggestionState !== 'off'}
+			<div></div>
+		{/if}
+		<!-- Show warning if story is too short -->
+		{#if suggestionState === 'warning'}
+			<div transition:blur class="warning-bubble bubble">
+				{$_('type_more')}
+			</div>
+		{/if}
+		<!-- Show loader when waiting for suggestions -->
+		{#if suggestionState === 'loading'}
+			<div transition:blur class="loader-bubble bubble">
+				<Loader color="white" pulseSize="30px" pulseTiming="1s" />
+			</div>
+		{/if}
+		<!-- Show suggestion if user has typed something -->
+		{#if suggestionState === 'ok'}
+			<div
+				in:blur
+				out:blur={{ delay: suggestionFadeTimer, duration: 500 }}
+				class="suggestions-bubble bubble"
+			>
+				<p>{suggestion}</p>
+				<p>{$_('please_extend')}</p>
+			</div>
+		{/if}
+		<!-- Show thank you message if user has finished the story -->
+		{#if suggestionState === 'done'}
+			<p
+				in:blur={{ delay: thankYouFadeTimer, duration: 500 }}
+				out:blur
+				class="thank-you-bubble bubble"
+			>
+				{$_('submit_ack')}
+			</p>
+		{/if}
+	</div>
+	<!-- Actions -->
+
+	<div class="actions-container">
+		{#if (suggestionState === 'done' || suggestionState === 'ok' || storyComplete === true) && story.length > minStoryLength}
+			<!-- Disclaimer -->
+			<div transition:blur class="disclaimer-container">
+				<!-- Checkmark -->
+				<div class="checkmark-container">
+					<Checkmark bind:checkValue={userAgreed} />
+				</div>
+				<div class="disclaimer-text">
+					<p>{$_('disclaimer')}</p>
+				</div>
+			</div>
+			<!-- Buttons Container -->
+			<div transition:blur class="disclaimer-btn-container">
+				<div>
+					<button disabled={!userAgreed} class="btn" onclick={handleSubmit}
+						>{$_('btn_submit')}</button
+					>
+				</div>
+			</div>
+		{/if}
+	</div>
+</div>
+
+<!-- {/if} -->
 
 <style>
 	.card-submit-container {
