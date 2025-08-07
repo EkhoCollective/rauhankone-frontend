@@ -56,7 +56,7 @@
 			const cluster = data.clusters[i];
 
 			for (let j = 0; j < cluster.stories.length; j += 1) {
-				const story = cluster.stories[0][0];
+				const story = cluster.stories[0][0]; // FIX THIS
 				const story_text = story.text;
 				const story_x = story.coordinates[0] * worldScale;
 				const story_y = story.coordinates[1] * worldScale;
