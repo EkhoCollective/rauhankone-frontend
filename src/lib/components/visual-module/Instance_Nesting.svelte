@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	// import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import ClusterInstance from '$lib/components/visual-module/instances/ClusterInstance.svelte';
 	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
@@ -14,6 +14,7 @@
 		CameraControls,
 		type CameraControlsRef
 	} from '@threlte/extras';
+	import { soundEffects, SOUND_EFFECTS } from '$lib/utils/soundEffects';
 
 	// World parameters
 	// let storiesNumber = $state(null);
@@ -189,6 +190,14 @@
 	onMount(() => {
 		console.log(data);
 		populateFromData();
+
+		// Preload sound effects for better performance
+		soundEffects.preloadSounds([SOUND_EFFECTS.MODAL_OPEN]);
+	});
+
+	onDestroy(() => {
+		// Clean up sound cache when component is destroyed
+		soundEffects.clearCache();
 	});
 </script>
 
@@ -214,6 +223,8 @@
 			color={instance.color}
 			onclick={() => {
 				selectedStory = instance;
+				// Play sound effect when modal opens
+				soundEffects.playEffect(SOUND_EFFECTS.MODAL_OPEN);
 			}}
 			onpointerenter={() => {
 				instance.tw.set(1);

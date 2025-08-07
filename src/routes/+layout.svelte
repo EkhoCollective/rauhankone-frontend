@@ -6,7 +6,7 @@
 	import { page } from '$app/state';
 	import { fade, blur } from 'svelte/transition';
 	import { error } from '@sveltejs/kit';
-	import { locale, waitLocale, init } from 'svelte-i18n';
+	import { _, locale, waitLocale, init } from 'svelte-i18n';
 	import { getAuthToken } from '$lib/utils/api_token';
 	import { apiRequest } from '$lib/utils/api_request';
 	import CardLang from '$lib/components/cards/CardLang.svelte';

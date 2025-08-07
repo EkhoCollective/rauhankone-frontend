@@ -10,6 +10,7 @@
 	import Scene from '$lib/components/visual-module/Instance_Nesting.svelte';
 	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { error } from '@sveltejs/kit';
+	import { soundEffects, SOUND_EFFECTS } from '$lib/utils/soundEffects';
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
@@ -69,6 +70,14 @@
 
 	$effect(() => {
 		handleNavButton(navButtonValue);
+	});
+
+	// Effect to stop sound when modal closes
+	$effect(() => {
+		if (selectedStory === null) {
+			// Modal closed, stop the sound effect
+			soundEffects.stopEffect(SOUND_EFFECTS.MODAL_OPEN);
+		}
 	});
 
 	onMount(() => {
