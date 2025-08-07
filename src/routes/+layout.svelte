@@ -127,10 +127,7 @@
 		<div class="header-container">
 			<Header toggleLang={handleToggleLang} />
 		</div>
-		<!-- Audio Control -->
-		<div class="audio-control-container">
-			<AudioControl />
-		</div>
+
 		<!-- Pages -->
 		{#key page.url.pathname}
 			<div
@@ -150,15 +147,9 @@
 		color: white;
 		font-family: 'Roboto', sans-serif;
 	}
-	.audio-control-container {
-		position: absolute;
-		z-index: 1000;
-		bottom: 20px;
-		left: 20px;
-	}
 
 	.header-container {
-		height: 50px;
+		height: 100px;
 		z-index: 1000;
 		position: absolute;
 		top: 0;
