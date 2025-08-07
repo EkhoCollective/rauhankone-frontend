@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
 	import Footer from '$lib/components/mini-components/Footer.svelte';
 
@@ -44,8 +45,12 @@
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
-			<button class="btn btn-submit" onclick={() => goto('/submit')}>{$_('btn_take_part')}</button>
-			<button class="btn btn-explore" onclick={() => goto('/explore')}>{$_('btn_explore')}</button>
+			<button class="btn btn-submit" onclick={() => goto(`${base}/submit`)}
+				>{$_('btn_take_part')}</button
+			>
+			<button class="btn btn-explore" onclick={() => goto(`${base}/explore`)}
+				>{$_('btn_explore')}</button
+			>
 		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
