@@ -3,7 +3,6 @@
 	import { _, locale } from 'svelte-i18n';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import DOMPurify from 'dompurify';
@@ -59,7 +58,7 @@
 			await apiRequest(API_ADD_STORY_OPTIONS())
 				.then((response) => {
 					console.log('Add Story Response:', response);
-					goto(`${base}/explore`);
+					goto('/explore');
 				})
 				.catch((err) => {
 					throw error(500, 'Failed to add story');

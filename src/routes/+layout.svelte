@@ -4,7 +4,6 @@
 	// import { onMount } from 'svelte';
 	import { onMount, setContext, getContext } from 'svelte';
 	import { page } from '$app/state';
-	import { base } from '$app/paths';
 	import { fade, blur } from 'svelte/transition';
 	import { error } from '@sveltejs/kit';
 	import { _, locale, waitLocale, init } from 'svelte-i18n';
@@ -100,7 +99,7 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" type="image/svg" href="{base}/favicon.ico" />
+	<link rel="icon" type="image/svg" href="/favicon.ico" />
 </svelte:head>
 
 <div class="app">

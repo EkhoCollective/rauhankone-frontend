@@ -3,7 +3,6 @@
 	import { Globe, ArrowLeft } from 'lucide-svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
 	import { blur } from 'svelte/transition';
 	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
 
@@ -11,9 +10,9 @@
 </script>
 
 <div class="card-header-container">
-	{#if page.url.pathname === `${base}/explore` || page.url.pathname === '/explore'}
+	{#if page.url.pathname === '/explore'}
 		<div transition:blur class="back-btn-container">
-			<button class="btn" onclick={() => goto(base || '/')}
+			<button class="btn" onclick={() => goto('/')}
 				><ArrowLeft color="#ffffff" /> {$_('btn_exit')}</button
 			>
 		</div>
