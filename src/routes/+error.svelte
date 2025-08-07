@@ -1,7 +1,6 @@
 <script>
 	import { _ } from 'svelte-i18n';
-
-	let { errorMessage } = $props();
+	import { page } from '$app/state';
 
 	const reloadPage = () => {
 		window.location.reload();
@@ -10,7 +9,8 @@
 
 <div class="loader-container">
 	<div class="error-container">
-		<h1>{errorMessage}</h1>
+		<h1>{page.error?.message || 'An error occurred'}</h1>
+		<p>Status: {page.status}</p>
 	</div>
 	<div class="button-container">
 		<button class="btn btn-home" onclick={() => reloadPage()}>{$_('btn_home')}</button>

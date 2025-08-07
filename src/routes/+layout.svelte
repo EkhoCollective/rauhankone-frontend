@@ -1,9 +1,66 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import '../app.css';
 	import '$lib/i18n';
-	import { onMount } from 'svelte';
-	import { locale, waitLocale, init } from 'svelte-i18n';
+	// import { onMount } from 'svelte';
+	import { onMount, setContext, getContext } from 'svelte';
+	import { page } from '$app/state';
+	import { fade, blur } from 'svelte/transition';
+	import { error } from '@sveltejs/kit';
+	import { _, locale, waitLocale, init } from 'svelte-i18n';
+	import { getAuthToken } from '$lib/utils/api_token';
+	import { apiRequest } from '$lib/utils/api_request';
+	import CardLang from '$lib/components/cards/CardLang.svelte';
+	import CardError from '$lib/components/cards/CardError.svelte';
+	import CardLoader from '$lib/components/cards/CardLoader.svelte';
+	import Header from '$lib/components/mini-components/Header.svelte';
+	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
+
+	let { children } = $props();
+
+	let questions = $state(null);
+	// let raiseError = getContext('raiseError') as () => boolean;
+	let showLang = $state(false);
+	let transitionDuration = 500;
+	let translateStories = $state(false);
+
+	// Set context at component initialization
+	setContext('questions', () => questions);
+
+	init({
+		fallbackLocale: 'en',
+		initialLocale: 'en'
+	});
+
+	const API_QUESTIONS_OPTIONS = () => ({
+		API_ENDPOINT: '/get_questions',
+		API_METHOD: 'POST',
+		REQUEST_BODY: { question_type: 'starter' }
+	});
+
+	async function handleGetToken() {
+		await getAuthToken()
+			.then(() => {
+				handleGetQuestions();
+			})
+			.catch((err) => {
+				// console.log('Error getting token', error);
+				// raiseError = true;
+				throw error(500, 'Failed to get token');
+			});
+	}
+
+	async function handleGetQuestions() {
+		await apiRequest(API_QUESTIONS_OPTIONS())
+			.then((response) => {
+				questions = response;
+			})
+			.catch((err) => {
+				// console.log('Error getting questions', error);
+				// raiseError = true;
+				throw error(500, 'Failed to get questions');
+			});
+	}
+
 	// import type { LayoutLoad } from './$types';
 
 	// export const load: LayoutLoad = async () => {
@@ -12,11 +69,6 @@
 	// 	}
 	// 	await waitLocale();
 	// };
-
-	init({
-		fallbackLocale: 'en',
-		initialLocale: 'en'
-	});
 
 	// onMount(() => {
 	// 	if (browser) {
@@ -34,20 +86,102 @@
 	// 	}
 	// });
 
-	let { children } = $props();
+	let handleToggleLang = () => {
+		showLang = !showLang;
+	};
+
+	onMount(() => {
+		window.scrollTo(0, 0);
+		handleGetToken();
+	});
+
+	// $inspect(questions);
 </script>
 
 <svelte:head>
 	<link rel="icon" type="image/svg" href="/favicon.ico" />
 </svelte:head>
 
-{@render children()}
+<div class="app">
+	<!-- Loader -->
+	{#await waitLocale()}
+		<CardLoader />
+	{:then}
+		<!-- Error Card -->
+		<!-- {#if raiseError()}
+		<div transition:blur>
+			<CardError errorMessage={$_('error_map')} />
+		</div>
+	{/if} -->
+		<!-- Lang Card -->
+		{#if showLang}
+			<div
+				in:fade={{ duration: transitionDuration }}
+				out:fade={{ duration: transitionDuration }}
+				class="lang-container"
+			>
+				<CardLang closeLangCard={handleToggleLang} bind:translate={translateStories} />
+			</div>
+		{/if}
+		<!-- Header -->
+		<div class="header-container">
+			<Header toggleLang={handleToggleLang} />
+		</div>
+		<!-- Audio Control -->
+		<div class="audio-control-container">
+			<AudioControl />
+		</div>
+		<!-- Pages -->
+		{#key page.url.pathname}
+			<div
+				class="page-container"
+				in:fade={{ duration: transitionDuration }}
+				out:fade={{ duration: transitionDuration }}
+			>
+				{@render children()}
+			</div>
+		{/key}
+	{/await}
+</div>
 
 <style>
-	:global(body) {
+	.app {
 		background-color: black;
 		color: white;
 		font-family: 'Roboto', sans-serif;
-		/* overflow: hidden; */
 	}
+	.audio-control-container {
+		position: absolute;
+		z-index: 1000;
+		bottom: 20px;
+		left: 20px;
+	}
+
+	.header-container {
+		height: 50px;
+		z-index: 1000;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+	}
+
+	.lang-container {
+		width: 100vw;
+		height: 100vh;
+		z-index: 2000;
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+	/* 
+	.error-container {
+		width: 100vw;
+		height: 100vh;
+		z-index: 3000;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	} */
 </style>
