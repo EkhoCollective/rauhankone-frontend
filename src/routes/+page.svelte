@@ -46,7 +46,9 @@
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<button class="btn btn-submit" onclick={() => goto('/submit')}>{$_('btn_take_part')}</button>
-			<button class="btn btn-explore" onclick={() => goto('/explore')}>{$_('btn_explore')}</button>
+			<button class="btn btn-explore" onclick={() => goto(`${base}/explore`)}
+				>{$_('btn_explore')}</button
+			>
 		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
