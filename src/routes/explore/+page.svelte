@@ -7,7 +7,7 @@
 	// import AudioComp from '$lib/components/mini-components/AudioControl.svelte';
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
-	import Scene from '$lib/components/visual-module/Instance_Nesting.svelte';
+	import Scene from '$lib/components/visual-module/Instances_Spheres.svelte';
 	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { error } from '@sveltejs/kit';
 	import { soundEffects, SOUND_EFFECTS } from '$lib/utils/soundEffects';
