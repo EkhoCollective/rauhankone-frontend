@@ -14,7 +14,7 @@
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
-	import testData from '$lib/utils/testDataStrings.json';
+	// import testData from '$lib/utils/testDataStrings.json';
 
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
@@ -125,7 +125,7 @@
 		{/if}
 	</div>
 	<Canvas>
-		<Scene bind:controls data={testData} bind:selectedStory />
+		<Scene bind:controls data={response_clusters} bind:selectedStory />
 	</Canvas>
 	<!-- <div class="audio-icon-container">
 		<AudioComp songIdx={0} />
