@@ -9,12 +9,15 @@
 	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
 	import Loader from '$lib/components/mini-components/Loader.svelte';
-	import CardError from '$lib/components/cards/CardError.svelte';
+	import { error } from '@sveltejs/kit';
+	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { blur } from 'svelte/transition';
-	import { getContext } from 'svelte';
+	import { setContext, getContext } from 'svelte';
 
 	// Get Questions Data from Parent Layout
 	const getQuestionsData = getContext('questions') as () => any;
+
+	// setContext('raiseError', () => raiseError);
 
 	// States
 	let question = $state<string | null>(null);
@@ -30,7 +33,7 @@
 	let suggestionState = $state('off');
 	let suggestionFadeTimer = $state(3000);
 	let thankYouFadeTimer = $state(3000);
-	let raiseError = $state(false);
+	// let raiseError = $state(false);
 
 	// API Options
 	const API_SUGGESTION_OPTIONS = () => ({
@@ -52,10 +55,14 @@
 	// Functions
 	async function handleSubmit() {
 		if (userAgreed === true) {
-			await apiRequest(API_ADD_STORY_OPTIONS()).then((response) => {
-				console.log('Add Story Response:', response);
-				goto('/explore');
-			});
+			await apiRequest(API_ADD_STORY_OPTIONS())
+				.then((response) => {
+					console.log('Add Story Response:', response);
+					goto('/explore');
+				})
+				.catch((err) => {
+					throw error(500, 'Failed to add story');
+				});
 		}
 	}
 
@@ -64,17 +71,20 @@
 			const response = await apiRequest(API_SUGGESTION_OPTIONS());
 			suggestion = response.suggestion;
 			suggestionState = 'ok';
-		} catch (error) {
-			// If suggestion request fails, raise error
-			console.error('Failed to get suggestions:', error);
-			raiseError = true;
+
+			// if (suggestion.length <= 0) {
+			// 	throw error(500, 'Failed to get suggestions');
+			// }
+		} catch (err) {
+			// console.error('Failed to get suggestions:', err);
+			throw error(500, 'Failed to get suggestions');
 		}
 	}
 
 	function handleGetQuestionContainer() {
 		const questionsData = getQuestionsData();
 		if (!questionsData) {
-			raiseError = true;
+			throw error(500, 'Failed to get questions');
 			return;
 		}
 		const randomGroupIndex = Math.floor(Math.random() * questionsData.questions.length);
@@ -94,7 +104,7 @@
 		}
 
 		if (!filteredQuestion) {
-			raiseError = true;
+			throw error(500, 'Failed to get question container');
 			return;
 		}
 		question = filteredQuestion.text;

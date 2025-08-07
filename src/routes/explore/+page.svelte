@@ -8,7 +8,8 @@
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
 	import Scene from '$lib/components/visual-module/Instance_Nesting.svelte';
-	import CardError from '$lib/components/cards/CardError.svelte';
+	// import CardError from '$lib/components/cards/CardError.svelte';
+	import { error } from '@sveltejs/kit';
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
@@ -18,7 +19,7 @@
 
 	let response_clusters: any = $state(null);
 	let requestLanguage = $state('Any');
-	let raiseError = $state(false);
+	// let raiseError = $state(false);
 	let toastEnabled = $state(true);
 	let navButtonValue = $state('');
 	let selectedStory = $state(null);
@@ -35,8 +36,9 @@
 			.then((response) => {
 				response_clusters = response;
 			})
-			.catch((error) => {
-				raiseError = true;
+			.catch((err) => {
+				// console.error('Failed to get clusters:', err);
+				throw error(500, 'Failed to get clusters');
 			});
 	}
 

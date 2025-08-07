@@ -1,22 +1,24 @@
 <script lang="ts">
 	import '../app.css';
 	import '$lib/i18n';
-	import { onMount } from 'svelte';
-	import { setContext } from 'svelte';
+	// import { onMount } from 'svelte';
+	import { onMount, setContext, getContext } from 'svelte';
+	import { page } from '$app/state';
 	import { fade, blur } from 'svelte/transition';
+	import { error } from '@sveltejs/kit';
 	import { locale, waitLocale, init } from 'svelte-i18n';
 	import { getAuthToken } from '$lib/utils/api_token';
 	import { apiRequest } from '$lib/utils/api_request';
 	import CardLang from '$lib/components/cards/CardLang.svelte';
-	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
 	import CardError from '$lib/components/cards/CardError.svelte';
+	import CardLoader from '$lib/components/cards/CardLoader.svelte';
 	import Header from '$lib/components/mini-components/Header.svelte';
-	import { page } from '$app/state';
+	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
 
 	let { children } = $props();
 
 	let questions = $state(null);
-	let raiseError = $state(false);
+	// let raiseError = getContext('raiseError') as () => boolean;
 	let showLang = $state(false);
 	let transitionDuration = 500;
 	let translateStories = $state(false);
@@ -40,9 +42,10 @@
 			.then(() => {
 				handleGetQuestions();
 			})
-			.catch((error) => {
-				console.log('Error getting token', error);
-				raiseError = true;
+			.catch((err) => {
+				// console.log('Error getting token', error);
+				// raiseError = true;
+				throw error(500, 'Failed to get token');
 			});
 	}
 
@@ -51,9 +54,10 @@
 			.then((response) => {
 				questions = response;
 			})
-			.catch((error) => {
-				console.log('Error getting questions', error);
-				raiseError = true;
+			.catch((err) => {
+				// console.log('Error getting questions', error);
+				// raiseError = true;
+				throw error(500, 'Failed to get questions');
 			});
 	}
 
@@ -99,34 +103,45 @@
 </svelte:head>
 
 <div class="app">
-	<!-- Lang Card -->
-	{#if showLang}
-		<div
-			in:fade={{ duration: transitionDuration }}
-			out:fade={{ duration: transitionDuration }}
-			class="lang-container"
-		>
-			<CardLang closeLangCard={handleToggleLang} bind:translate={translateStories} />
+	<!-- Loader -->
+	{#await waitLocale()}
+		<CardLoader />
+	{:then}
+		<!-- Error Card -->
+		<!-- {#if raiseError()}
+		<div transition:blur>
+			<CardError errorMessage={$_('error_map')} />
 		</div>
-	{/if}
-	<!-- Header -->
-	<div class="header-container">
-		<Header toggleLang={handleToggleLang} />
-	</div>
-	<!-- Audio Control -->
-	<div class="audio-control-container">
-		<AudioControl />
-	</div>
-	<!-- Pages -->
-	{#key page.url.pathname}
-		<div
-			class="page-container"
-			in:fade={{ duration: transitionDuration }}
-			out:fade={{ duration: transitionDuration }}
-		>
-			{@render children()}
+	{/if} -->
+		<!-- Lang Card -->
+		{#if showLang}
+			<div
+				in:fade={{ duration: transitionDuration }}
+				out:fade={{ duration: transitionDuration }}
+				class="lang-container"
+			>
+				<CardLang closeLangCard={handleToggleLang} bind:translate={translateStories} />
+			</div>
+		{/if}
+		<!-- Header -->
+		<div class="header-container">
+			<Header toggleLang={handleToggleLang} />
 		</div>
-	{/key}
+		<!-- Audio Control -->
+		<div class="audio-control-container">
+			<AudioControl />
+		</div>
+		<!-- Pages -->
+		{#key page.url.pathname}
+			<div
+				class="page-container"
+				in:fade={{ duration: transitionDuration }}
+				out:fade={{ duration: transitionDuration }}
+			>
+				{@render children()}
+			</div>
+		{/key}
+	{/await}
 </div>
 
 <style>
