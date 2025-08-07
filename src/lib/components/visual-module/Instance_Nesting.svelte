@@ -4,7 +4,8 @@
 	import ClusterInstance from '$lib/components/visual-module/instances/ClusterInstance.svelte';
 	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
 	import * as THREE from 'three';
-	import { Color } from 'three';
+	import { Color, SphereGeometry } from 'three';
+	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import {
 		interactivity,
@@ -24,6 +25,11 @@
 	let instances: StoryInstance[] = $state([]);
 	const startColor = new Color('dimgray');
 	const endColor = new Color('white');
+
+	// Noise parameters - make it very obvious for testing
+	const baseNoiseScale = 1.5;
+	const baseNoiseStrength = 0.8;
+	let noisySphereGeometries: SphereGeometry[] = $state([]);
 
 	// Flocking parameters
 	// let maxSpeed = 0.05; // Increased for more visible movement
@@ -51,7 +57,48 @@
 		}
 	});
 
+	function createNoisySphereGeometry(seed: number, noiseScale: number, noiseStrength: number) {
+		const geometry = new SphereGeometry(1, 32, 32);
+		const positions = geometry.getAttribute('position');
+		const noise = new SimplexNoise();
+
+		// Apply noise to each vertex with unique parameters
+		for (let i = 0; i < positions.count; i += 1) {
+			const x = positions.getX(i);
+			const y = positions.getY(i);
+			const z = positions.getZ(i);
+
+			// Create unique noise using seed offset
+			const noiseValue = noise.noise3d(
+				(x + seed) * noiseScale,
+				(y + seed * 1.3) * noiseScale,
+				(z + seed * 1.7) * noiseScale
+			);
+
+			// Calculate the original distance from center (radius)
+			const originalRadius = Math.sqrt(x * x + y * y + z * z);
+
+			// Apply noise to the radius
+			const newRadius = originalRadius + noiseValue * noiseStrength;
+
+			// Normalize the direction and apply the new radius
+			const length = Math.sqrt(x * x + y * y + z * z);
+			if (length > 0) {
+				positions.setX(i, (x / length) * newRadius);
+				positions.setY(i, (y / length) * newRadius);
+				positions.setZ(i, (z / length) * newRadius);
+			}
+		}
+
+		positions.needsUpdate = true;
+		geometry.computeVertexNormals();
+
+		return geometry;
+	}
+
 	function populateFromData() {
+		let instanceIndex = 0;
+
 		for (let i = 0; i < data.clusters.length; i += 1) {
 			const cluster = data.clusters[i];
 
@@ -63,6 +110,15 @@
 				const story_z = story.z * worldScale;
 				const cluster_id = cluster.id;
 				const scale = Math.random() + 0.1;
+
+				// Create unique noise parameters for each sphere
+				const seed = instanceIndex * 123.456; // Unique seed per instance
+				const noiseScale = baseNoiseScale + (Math.random() - 0.5) * 0.8; // Vary scale ±0.4
+				const noiseStrength = baseNoiseStrength + (Math.random() - 0.5) * 0.6; // Vary strength ±0.3
+
+				// Create unique geometry for this instance
+				const uniqueGeometry = createNoisySphereGeometry(seed, noiseScale, noiseStrength);
+				noisySphereGeometries.push(uniqueGeometry);
 
 				instances.push(
 					new StoryInstance(
@@ -79,6 +135,8 @@
 						(Math.random() - 0.5) * 0.1
 					)
 				);
+
+				instanceIndex++;
 			}
 		}
 	}
@@ -188,8 +246,16 @@
 	// });
 
 	onMount(() => {
-		console.log(data);
-		populateFromData();
+		console.log('Instance_Nesting mounted, data:', data);
+
+		try {
+			console.log('Creating unique noisy sphere geometries...');
+			populateFromData();
+			console.log('Instances populated:', instances.length);
+			console.log('Unique geometries created:', noisySphereGeometries.length);
+		} catch (error) {
+			console.error('Error creating noisy sphere geometries:', error);
+		}
 
 		// Preload sound effects for better performance
 		soundEffects.preloadSounds([SOUND_EFFECTS.MODAL_OPEN]);
@@ -210,17 +276,11 @@
 <T.AmbientLight intensity={0.4} />
 <T.DirectionalLight position={[1, 2, 5]} />
 
-<InstancedMesh {instances} range={instances.length}>
-	<T.SphereGeometry />
-	<T.MeshToonMaterial />
-
-	{#each instances as instance}
-		<Instance
-			position.x={instance.x}
-			position.y={instance.y}
-			position.z={instance.z}
+{#if noisySphereGeometries.length > 0 && instances.length > 0}
+	{#each instances as instance, index}
+		<T.Mesh
+			position={[instance.x, instance.y, instance.z]}
 			scale={instance.scale}
-			color={instance.color}
 			onclick={() => {
 				selectedStory = instance;
 				// Play sound effect when modal opens
@@ -232,6 +292,9 @@
 			onpointerleave={() => {
 				instance.tw.set(0);
 			}}
-		/>
+		>
+			<T is={noisySphereGeometries[index]} />
+			<T.MeshToonMaterial color={instance.color} />
+		</T.Mesh>
 	{/each}
-</InstancedMesh>
+{/if}
