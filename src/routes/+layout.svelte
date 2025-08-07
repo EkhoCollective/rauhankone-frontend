@@ -1,10 +1,9 @@
 <script lang="ts">
 	import '../app.css';
 	import '$lib/i18n';
-	// import { onMount } from 'svelte';
-	import { onMount, setContext, getContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import { page } from '$app/state';
-	import { fade, blur } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 	import { error } from '@sveltejs/kit';
 	import { _, locale, waitLocale, init } from 'svelte-i18n';
 	import { getAuthToken } from '$lib/utils/api_token';
@@ -13,7 +12,6 @@
 	import CardError from '$lib/components/cards/CardError.svelte';
 	import CardLoader from '$lib/components/cards/CardLoader.svelte';
 	import Header from '$lib/components/mini-components/Header.svelte';
-	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
 
 	let { children } = $props();
 

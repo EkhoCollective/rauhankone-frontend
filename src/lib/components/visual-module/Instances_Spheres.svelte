@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+
 	// import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import ClusterInstance from '$lib/components/visual-module/instances/ClusterInstance.svelte';
 	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
@@ -52,6 +53,11 @@
 	});
 
 	function populateFromData() {
+		if (!data || !data.clusters) return;
+
+		// Clear existing instances to avoid duplicates
+		instances.length = 0;
+
 		for (let i = 0; i < data.clusters.length; i += 1) {
 			const cluster = data.clusters[i];
 
@@ -83,6 +89,16 @@
 		}
 	}
 
+	// Effect to populate data when it becomes available
+	$effect(() => {
+		console.log('Effect triggered, data:', data);
+		if (data && data.clusters) {
+			console.log('Populating from data, clusters:', data.clusters.length);
+			populateFromData();
+			console.log('Instances after populate:', instances.length);
+		}
+	});
+
 	// Effect to reset selected sphere when modal closes
 	$effect(() => {
 		if (selectedStory === null) {
@@ -97,9 +113,6 @@
 	});
 
 	onMount(() => {
-		// console.log(data);
-		populateFromData();
-
 		// Preload sound effects for better performance
 		soundEffects.preloadSounds([SOUND_EFFECTS.MODAL_OPEN]);
 	});
@@ -109,7 +122,7 @@
 		soundEffects.clearCache();
 	});
 
-	$inspect(data.clusters);
+	$inspect(data?.clusters);
 </script>
 
 <T.PerspectiveCamera makeDefault position={[0, 0, 50]}>

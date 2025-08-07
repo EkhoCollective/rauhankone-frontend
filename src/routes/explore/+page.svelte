@@ -4,7 +4,8 @@
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import { blur } from 'svelte/transition';
-	// import AudioComp from '$lib/components/mini-components/AudioControl.svelte';
+	import CardLoader from '$lib/components/cards/CardLoader.svelte';
+
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
 	import Scene from '$lib/components/visual-module/Instances_Spheres.svelte';
@@ -14,11 +15,11 @@
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
-	// import testData from '$lib/utils/testDataStrings.json';
 
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
 	let response_clusters: any = $state(null);
+	let responsefromDB = $state(false);
 	let requestLanguage = $state('Any');
 	// let raiseError = $state(false);
 	let toastEnabled = $state(true);
@@ -36,6 +37,7 @@
 		await apiRequest(API_CLUSTERS_OPTIONS)
 			.then((response) => {
 				response_clusters = response;
+				responsefromDB = true;
 			})
 			.catch((err) => {
 				// console.error('Failed to get clusters:', err);
@@ -124,12 +126,16 @@
 			</div>
 		{/if}
 	</div>
-	<Canvas>
-		<Scene bind:controls data={response_clusters} bind:selectedStory />
-	</Canvas>
-	<!-- <div class="audio-icon-container">
-		<AudioComp songIdx={0} />
-	</div> -->
+	{#if responsefromDB === false}
+		<div class="loader-container">
+			<CardLoader />
+		</div>
+	{:else}
+		<Canvas>
+			<Scene bind:controls data={response_clusters} bind:selectedStory />
+		</Canvas>
+	{/if}
+
 	<div class="navigation-icons-container">
 		<NavIcons bind:value={navButtonValue} />
 	</div>
