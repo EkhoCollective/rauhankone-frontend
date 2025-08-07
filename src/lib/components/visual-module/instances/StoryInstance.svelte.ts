@@ -16,6 +16,9 @@ export default class {
   vy = $state(0)
   vz = $state(0)
   
+  // Track if this sphere is currently selected
+  selected = $state(false)
+  
   get scale() {
     return this.tw.current + this.scale_init
     // fix this. put a minimum max size for every single point

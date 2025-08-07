@@ -6,11 +6,17 @@
 <div class="modal-story-container">
 	<div class="modal-story-content">
 		<div class="modal-story-header">
-			<h1>{story.cluster_id}</h1>
+			<!-- <h1>{story.cluster_id}</h1> -->
 			<button class="btn btn-close" onclick={() => closeModal()}><X color="#ffffff" /></button>
 		</div>
 		<div class="modal-story-body">
 			<h1>{story.text}</h1>
+		</div>
+
+		<div class="modal-story-actions">
+			<button class="btn btn-action"> Closest</button>
+			<button class="btn btn-action"> Farthest</button>
+			<!-- <button class="btn btn-action"> Random</button> -->
 		</div>
 	</div>
 </div>
@@ -43,7 +49,7 @@
 
 	.modal-story-header {
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-end;
 		align-items: center;
 		padding: 10px 0 0 20px;
 	}
@@ -52,7 +58,22 @@
 		padding: 20px;
 	}
 
+	.modal-story-actions {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 20px;
+	}
+
 	.btn-close {
+		background-color: transparent;
+		border-radius: 0;
+		border: none;
+		box-shadow: none;
+	}
+
+	.btn {
+		height: 100%;
 		background-color: transparent;
 		border-radius: 0;
 		border: none;
