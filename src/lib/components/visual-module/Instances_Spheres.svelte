@@ -62,11 +62,14 @@
 			const cluster = data.clusters[i];
 
 			for (let j = 0; j < cluster.stories.length; j += 1) {
-				const story = cluster.stories[0][0]; // FIX THIS
-				const story_text = story.text;
-				const story_x = story.coordinates[0] * worldScale;
-				const story_y = story.coordinates[1] * worldScale;
-				const story_z = story.coordinates[2] * worldScale;
+				const story = cluster.stories[j];
+
+				// const story_text = story.text;
+				const storyObject = story;
+				// Get coordinates from the first variant of the story
+				const story_x = story[0].coordinates[0] * worldScale;
+				const story_y = story[0].coordinates[1] * worldScale;
+				const story_z = story[0].coordinates[2] * worldScale;
 				const cluster_id = cluster.text;
 				const scale = Math.random() + 0.1;
 
@@ -76,7 +79,7 @@
 						endColor,
 						scale,
 						cluster_id,
-						story_text,
+						storyObject,
 						story_x,
 						story_y,
 						story_z,
@@ -123,7 +126,7 @@
 		soundEffects.clearCache();
 	});
 
-	$inspect(data?.clusters);
+	// $inspect(data?.clusters);
 </script>
 
 <T.PerspectiveCamera makeDefault position={[0, 0, 50]}>

@@ -28,7 +28,7 @@ export default class {
     endColor: Color,
     public scale_init: number,
     public cluster_id: string,
-    public text: string, // set size based on the length of the story
+    public story: any[], 
     x: number,
     y: number,
     z: number,

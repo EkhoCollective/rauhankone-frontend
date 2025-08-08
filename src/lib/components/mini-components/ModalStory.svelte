@@ -10,7 +10,7 @@
 			<button class="btn btn-close" onclick={() => closeModal()}><X color="#ffffff" /></button>
 		</div>
 		<div class="modal-story-body">
-			<h1>{story.text}</h1>
+			<h1>{story}</h1>
 		</div>
 
 		<div class="modal-story-actions">

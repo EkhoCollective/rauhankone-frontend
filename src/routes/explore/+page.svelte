@@ -9,6 +9,7 @@
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
 	import Scene from '$lib/components/visual-module/Instances_Spheres.svelte';
+	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
 	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { error } from '@sveltejs/kit';
 	import { soundEffects, SOUND_EFFECTS } from '$lib/utils/soundEffects';
@@ -24,7 +25,8 @@
 	// let raiseError = $state(false);
 	let toastEnabled = $state(true);
 	let navButtonValue = $state('');
-	let selectedStory = $state(null);
+	let selectedStory: StoryInstance | null = $state(null);
+	let selectedStoryLanguageText = $state(null);
 	let controls = $state.raw<CameraControlsRef>();
 
 	const API_CLUSTERS_OPTIONS = {
@@ -82,6 +84,12 @@
 		}
 	});
 
+	$effect(() => {
+		if (selectedStory !== null) {
+			selectedStoryLanguageText = selectedStory.story[0]?.text;
+		}
+	});
+
 	onMount(() => {
 		fetchClusters();
 
@@ -93,7 +101,7 @@
 		}
 	});
 
-	$inspect(response_clusters);
+	$inspect(selectedStory);
 </script>
 
 <!-- Error Card -->
@@ -122,7 +130,7 @@
 				in:blur={{ duration: 500 }}
 				out:blur={{ duration: 500 }}
 			>
-				<ModalStory story={selectedStory} closeModal={() => (selectedStory = null)} />
+				<ModalStory story={selectedStoryLanguageText} closeModal={() => (selectedStory = null)} />
 			</div>
 		{/if}
 	</div>
