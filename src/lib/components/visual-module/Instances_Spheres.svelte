@@ -90,14 +90,14 @@
 	}
 
 	// Effect to populate data when it becomes available
-	$effect(() => {
-		console.log('Effect triggered, data:', data);
-		if (data && data.clusters) {
-			console.log('Populating from data, clusters:', data.clusters.length);
-			populateFromData();
-			console.log('Instances after populate:', instances.length);
-		}
-	});
+	// $effect(() => {
+	// 	console.log('Effect triggered, data:', data);
+	// 	if (data && data.clusters) {
+	// 		console.log('Populating from data, clusters:', data.clusters.length);
+	// 		populateFromData();
+	// 		console.log('Instances after populate:', instances.length);
+	// 	}
+	// });
 
 	// Effect to reset selected sphere when modal closes
 	$effect(() => {
@@ -114,6 +114,7 @@
 
 	onMount(() => {
 		// Preload sound effects for better performance
+		populateFromData();
 		soundEffects.preloadSounds([SOUND_EFFECTS.MODAL_OPEN]);
 	});
 

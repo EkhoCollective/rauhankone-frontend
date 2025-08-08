@@ -19,7 +19,7 @@
 	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
 
 	let response_clusters: any = $state(null);
-	let responsefromDB = $state(false);
+	// let responsefromDB = $state(false);
 	let requestLanguage = $state('Any');
 	// let raiseError = $state(false);
 	let toastEnabled = $state(true);
@@ -37,7 +37,7 @@
 		await apiRequest(API_CLUSTERS_OPTIONS)
 			.then((response) => {
 				response_clusters = response;
-				responsefromDB = true;
+				// responsefromDB = true;
 			})
 			.catch((err) => {
 				// console.error('Failed to get clusters:', err);
@@ -126,14 +126,14 @@
 			</div>
 		{/if}
 	</div>
-	{#if responsefromDB === false}
-		<div class="loader-container">
-			<CardLoader />
-		</div>
-	{:else}
+	{#if response_clusters !== null}
 		<Canvas>
 			<Scene bind:controls data={response_clusters} bind:selectedStory />
 		</Canvas>
+	{:else}
+		<div class="loader-container">
+			<CardLoader />
+		</div>
 	{/if}
 
 	<div class="navigation-icons-container">
