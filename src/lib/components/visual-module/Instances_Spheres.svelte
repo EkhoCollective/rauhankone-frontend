@@ -22,6 +22,7 @@
 	import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
 	// import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { T, useTask, useThrelte } from '@threlte/core';
+	import { base } from '$app/paths';
 	import {
 		interactivity,
 		Instance,
@@ -40,7 +41,7 @@
 	const loader = new FontLoader();
 	let loadedFont: Font | null = null;
 
-	const font = loader.load('/Roboto_Slab_Regular.json', (font) => {
+	const font = loader.load(`${base}/Roboto_Slab_Regular.json`, (font) => {
 		loadedFont = font;
 		// console.log('Font loaded successfully', loadedFont);
 		// Repopulate data now that font is loaded to get text geometries
