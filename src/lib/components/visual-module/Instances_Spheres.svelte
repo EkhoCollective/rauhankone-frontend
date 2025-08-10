@@ -23,7 +23,7 @@
 	let instances: StoryInstance[] = $state([]);
 	const startColor = new Color('dimgray');
 	const endColor = new Color('white');
-
+	const centroidOffset: number = 25;
 	let centroid = $state(new THREE.Vector3());
 
 	// const geometry = new SphereGeometry(10, 16, 16);
@@ -74,15 +74,21 @@
 			for (let j = 0; j < cluster.stories.length; j += 1) {
 				const story = cluster.stories[j];
 				const text_length = story[0].text.length * 0.005;
-				const scale = 1;
+				const scale = 1 + text_length;
 				const cluster_id = cluster.text;
 				const storyObject = story;
 
 				// Calculate the scale of the sphere based on the text length
+				// let story_shape = {
+				// 	radius: text_length,
+				// 	wSeg: Math.floor(Math.random() * 10) + 3,
+				// 	hSeg: Math.floor(Math.random() * 10) + 3
+				// };
+
 				let story_shape = {
-					radius: 1,
-					wSeg: Math.floor(Math.random() * 10) + 3,
-					hSeg: Math.floor(Math.random() * 10) + 3
+					radius: text_length,
+					wSeg: 16,
+					hSeg: 16
 				};
 
 				// Get coordinates from the first variant of the story
@@ -129,7 +135,7 @@
 			centroidValue.add(instances[i].positions);
 		}
 		centroidValue.divideScalar(instances.length);
-		return centroidValue.multiplyScalar(worldScale);
+		return centroidValue;
 	}
 
 	// Effect to reset selected sphere when modal closes
@@ -154,6 +160,16 @@
 			.filter((track) => track.type === 'cluster')
 			.map((track) => track.title);
 		soundEffects.preloadSounds(clusterSounds);
+
+		controls?.setLookAt(
+			centroid.x,
+			centroid.y,
+			centroid.z + centroidOffset,
+			centroid.x,
+			centroid.y,
+			centroid.z,
+			true
+		);
 	});
 
 	onDestroy(() => {
@@ -161,7 +177,7 @@
 		soundEffects.clearCache();
 	});
 
-	$inspect(centroid);
+	$inspect(centroid, data);
 </script>
 
 <T.PerspectiveCamera makeDefault position={[50, 20, 50]}>
@@ -173,10 +189,10 @@
 <T.AmbientLight intensity={0.4} />
 <T.DirectionalLight position={[1, 2, 5]} />
 
-<T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
+<!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
 	<T.BoxGeometry />
 	<T.MeshBasicMaterial color="red" />
-</T.Mesh>
+</T.Mesh> -->
 
 <InstancedMesh {instances} range={instances.length}>
 	<!-- <T.SphereGeometry radius={instance.scale} /> -->
