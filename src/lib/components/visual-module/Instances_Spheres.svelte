@@ -2,16 +2,30 @@
 	import { onMount, onDestroy } from 'svelte';
 	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
 	import * as THREE from 'three';
-	import { SphereGeometry, Color } from 'three';
-	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
+	import {
+		SphereGeometry,
+		BoxGeometry,
+		ConeGeometry,
+		CylinderGeometry,
+		DodecahedronGeometry,
+		IcosahedronGeometry,
+		OctahedronGeometry,
+		TetrahedronGeometry,
+		TorusGeometry,
+		TorusKnotGeometry,
+		PlaneGeometry,
+		RingGeometry,
+		CapsuleGeometry,
+		Color
+	} from 'three';
+	// import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import {
 		interactivity,
 		Instance,
 		InstancedMesh,
 		CameraControls,
-		type CameraControlsRef,
-		FakeGlowMaterial
+		type CameraControlsRef
 	} from '@threlte/extras';
 	import { tracklist } from '$lib/components/media/audio/tracklist';
 	import { soundEffects } from '$lib/utils/soundEffects';
@@ -22,6 +36,85 @@
 	const endColor = new Color('white');
 	const centroidOffset: number = 25;
 	let centroid = $state(new THREE.Vector3());
+
+	// Array of possible geometries with their creation functions
+	const geometryTypes = [
+		{
+			name: 'sphere',
+			create: (size: number) => new SphereGeometry(size, 16, 16)
+		},
+		{
+			name: 'box',
+			create: (size: number) => new BoxGeometry(size, size, size)
+		},
+		{
+			name: 'cone',
+			create: (size: number) => new ConeGeometry(size, size * 1.5, 8)
+		},
+		{
+			name: 'cylinder',
+			create: (size: number) => new CylinderGeometry(size, size, size * 1.5, 8)
+		},
+		{
+			name: 'dodecahedron',
+			create: (size: number) => new DodecahedronGeometry(size)
+		},
+		{
+			name: 'icosahedron',
+			create: (size: number) => new IcosahedronGeometry(size)
+		},
+		{
+			name: 'octahedron',
+			create: (size: number) => new OctahedronGeometry(size)
+		},
+		{
+			name: 'tetrahedron',
+			create: (size: number) => new TetrahedronGeometry(size)
+		},
+		{
+			name: 'torus',
+			create: (size: number) => new TorusGeometry(size, size * 0.3, 8, 16)
+		},
+		{
+			name: 'torusKnot',
+			create: (size: number) => new TorusKnotGeometry(size, size * 0.3, 64, 8)
+		},
+		{
+			name: 'capsule',
+			create: (size: number) => new CapsuleGeometry(size * 0.5, size, 4, 8)
+		}
+	];
+
+	// Function to get a random geometry type
+	function getRandomGeometry(size: number) {
+		const randomIndex = Math.floor(Math.random() * geometryTypes.length);
+		return geometryTypes[randomIndex].create(size);
+	}
+
+	// Function to get geometry by cluster (consistent shapes per cluster)
+	function getClusterGeometry(clusterIndex: number, size: number) {
+		const geometryIndex = clusterIndex % geometryTypes.length;
+		return geometryTypes[geometryIndex].create(size);
+	}
+
+	// Function to map text length to a range from 1 to 5
+	function mapTextLengthToRange(textLength: number): number {
+		// Define the expected range of text lengths (you may need to adjust these based on your data)
+		const minRange = 1;
+		const maxRange = 5;
+		const minTextLength = 0;
+		const maxTextLength = 1000; // Adjust this based on your typical text lengths
+
+		// Clamp the text length to the expected range
+		const clampedLength = Math.max(minTextLength, Math.min(maxTextLength, textLength));
+
+		// Map from [minTextLength, maxTextLength] to [1, 5]
+		const mappedLength =
+			minRange +
+			((clampedLength - minTextLength) / (maxTextLength - minTextLength)) * (maxRange - minRange);
+
+		return mappedLength;
+	}
 
 	let {
 		data,
@@ -47,54 +140,6 @@
 		return clusterTracks[randomIndex].title;
 	}
 
-	function createNoisySphereGeometry(
-		size: number,
-		resolution: number,
-		seed: number,
-		noiseScale: number,
-		noiseStrength: number,
-		clusterNoise: SimplexNoise
-	) {
-		const geometry = new SphereGeometry(size, resolution, resolution);
-		const positions = geometry.getAttribute('position');
-		const noise = clusterNoise;
-
-		// Apply noise to each vertex with unique parameters
-		// for (let i = 0; i < positions.count; i += 1) {
-		// 	const x = positions.getX(i);
-		// 	const y = positions.getY(i);
-		// 	// const z = positions.getZ(i);
-
-		// 	// // Create unique noise using seed offset
-		// 	// const noiseValue = noise.noise3d(
-		// 	// 	(x + seed) * noiseScale,
-		// 	// 	(y + seed * 1.3) * noiseScale,
-		// 	// 	(z + seed * 1.7) * noiseScale
-		// 	// );
-
-		// 	// // Calculate the original distance from center (radius)
-		// 	// const originalRadius = Math.sqrt(x * x + y * y + z * z);
-
-		// 	// // Apply noise to the radius
-		// 	// const newRadius = originalRadius + noiseValue * noiseStrength;
-
-		// 	// // Normalize the direction and apply the new radius
-		// 	// const length = Math.sqrt(x * x + y * y + z * z);
-		// 	// if (length > 0) {
-		// 	// positions.setX(i, (x / length) * newRadius);
-		// 	// positions.setY(i, (y / length) * newRadius);
-		// 	// positions.setZ(i, (z / length) * newRadius);
-		// 	// }
-		// 	// positions.setX(i, noise.noise(x, y) * noiseStrength);
-		// 	// positions.setY(i, noise.noise(x, y) * noiseStrength);
-		// 	positions.setZ(i, noise.noise(x, y) * 10);
-		// }
-
-		positions.needsUpdate = true;
-		// geometry.computeVertexNormals();
-		return geometry;
-	}
-
 	function populateFromData() {
 		if (!data || !data.clusters) return;
 
@@ -105,27 +150,15 @@
 			const cluster = data.clusters[i];
 			const cluster_audio_id = getRandomClusterTitle();
 
-			const clusterNoiseScale = 0.1;
-			const clusterNoiseStrength = 0.1;
-			const clusterNoiseSeed = 16;
-			const clusterNoiseResolution = 16;
-			const clusterNoise = new SimplexNoise();
-
 			for (let j = 0; j < cluster.stories.length; j += 1) {
 				const story = cluster.stories[j];
-				const text_length = story[0].text.length * 0.005;
+				const text_length = mapTextLengthToRange(story[0].text.length);
 				const scale = 1 + text_length;
 				const cluster_id = cluster.text;
 				const storyObject = story;
 
-				const storyGeometry = createNoisySphereGeometry(
-					text_length / 10,
-					clusterNoiseResolution,
-					clusterNoiseSeed,
-					clusterNoiseScale,
-					clusterNoiseStrength,
-					clusterNoise
-				);
+				// Use cluster-based geometry (same shape for all stories in a cluster)
+				const storyGeometry = getClusterGeometry(i, text_length / 10);
 
 				// Get coordinates from the first variant of the story
 				let story_positions = {
@@ -231,15 +264,12 @@
 <T.DirectionalLight position={[1, 2, 5]} />
 
 <!-- Centroid -->
-<!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
+<T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
 	<T.BoxGeometry />
 	<T.MeshBasicMaterial color="red" />
-</T.Mesh> -->
+</T.Mesh>
 
 <InstancedMesh {instances} range={instances.length}>
-	<T.MeshBasicMaterial />
-	<FakeGlowMaterial glowColor="red" />
-
 	{#each instances as instance}
 		<Instance
 			position.x={instance.positions.x}
@@ -285,7 +315,9 @@
 				}
 			}}
 		>
-			<T.Mesh geometry={instance.geometry} />
+			<T.Mesh geometry={instance.geometry}>
+				<T.MeshToonMaterial />
+			</T.Mesh>
 		</Instance>
 	{/each}
 </InstancedMesh>
