@@ -32,9 +32,7 @@
 
 	const worldScale: number = 10;
 	let instances: StoryInstance[] = $state([]);
-	const startColor = new Color('dimgray');
-	const endColor = new Color('white');
-	const centroidOffset: number = 25;
+	const centroidOffset: number = 15;
 	let centroid = $state(new THREE.Vector3());
 
 	// Array of possible geometries with their creation functions
@@ -101,7 +99,7 @@
 	function mapTextLengthToRange(textLength: number): number {
 		// Define the expected range of text lengths (you may need to adjust these based on your data)
 		const minRange = 1;
-		const maxRange = 5;
+		const maxRange = 4;
 		const minTextLength = 0;
 		const maxTextLength = 1000; // Adjust this based on your typical text lengths
 
@@ -150,6 +148,11 @@
 			const cluster = data.clusters[i];
 			const cluster_audio_id = getRandomClusterTitle();
 
+			// Get the color of the cluster
+			// const grayValue = Math.random();
+			const initialColor = new Color(Math.random(), Math.random(), Math.random());
+			const selectedColor = new Color('white');
+
 			for (let j = 0; j < cluster.stories.length; j += 1) {
 				const story = cluster.stories[j];
 				const text_length = mapTextLengthToRange(story[0].text.length);
@@ -180,8 +183,8 @@
 
 				instances.push(
 					new StoryInstance(
-						startColor,
-						endColor,
+						initialColor,
+						selectedColor,
 						scale,
 						cluster_id,
 						cluster_audio_id,
@@ -260,14 +263,13 @@
 	<CameraControls bind:ref={controls} />
 </T.PerspectiveCamera>
 
-<T.AmbientLight intensity={0.4} />
-<T.DirectionalLight position={[1, 2, 5]} />
+<T.DirectionalLight position={[1, 2, 5]} intensity={0.8} />
 
 <!-- Centroid -->
-<T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
+<!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
 	<T.BoxGeometry />
 	<T.MeshBasicMaterial color="red" />
-</T.Mesh>
+</T.Mesh> -->
 
 <InstancedMesh {instances} range={instances.length}>
 	{#each instances as instance}
