@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
-import { audioStore } from '$lib/stores/audioStore';
+import { audioStore, audioActions } from '$lib/stores/audioStore';
 import { tracklist } from '$lib/components/media/audio/tracklist';
+import { audioFader } from '$lib/utils/audioFader';
 
 export class SoundEffects {
 	private static instance: SoundEffects;
@@ -49,11 +50,10 @@ export class SoundEffects {
 				this.soundCache.set(soundKey, audio);
 			}
 
-			// Set volume (default to half of global volume for effects)
+			// Set target volume (default to half of global volume for effects)
 			const effectVolume = volume !== undefined ? volume : audioState.globalVolume * 0.5;
-			audio.volume = effectVolume;
 
-			// Reset audio to beginning and play
+			// Reset audio to beginning
 			audio.currentTime = 0;
 			
 			// Add to playing sounds set
@@ -64,7 +64,10 @@ export class SoundEffects {
 				this.playingSounds.delete(audio);
 			}, { once: true });
 			
+			// Start at volume 0 and fade in
+			audio.volume = 0;
 			await audio.play();
+			await audioFader.fadeIn(audio, effectVolume, audioState.fadeDuration * 0.3); // Shorter fade for effects
 		} catch (error) {
 			console.warn('Failed to play sound effect:', error);
 		}
@@ -74,10 +77,11 @@ export class SoundEffects {
 	 * Stop a specific sound effect
 	 * @param soundKey - Key from tracklist or direct audio source
 	 */
-	stopEffect(soundKey: string): void {
+	async stopEffect(soundKey: string): Promise<void> {
+		const audioState = get(audioStore);
 		const audio = this.soundCache.get(soundKey);
 		if (audio && this.playingSounds.has(audio)) {
-			audio.pause();
+			await audioFader.fadeOut(audio, audioState.fadeDuration * 0.2); // Even faster fade out
 			audio.currentTime = 0;
 			this.playingSounds.delete(audio);
 		}
@@ -88,6 +92,7 @@ export class SoundEffects {
 	 */
 	stopAllEffects(): void {
 		this.playingSounds.forEach(audio => {
+			audioFader.cancelFade(audio);
 			audio.pause();
 			audio.currentTime = 0;
 		});
@@ -129,3 +134,26 @@ export const SOUND_EFFECTS = {
 	MODAL_OPEN: 'FXecho',
 	// Add more sound effect mappings as needed
 } as const;
+
+// Fade duration presets
+export const FADE_PRESETS = {
+	INSTANT: 0,
+	FAST: 250,
+	NORMAL: 500,
+	SLOW: 1000,
+	VERY_SLOW: 2000
+} as const;
+
+// Audio configuration utilities
+export const audioConfig = {
+	/**
+	 * Set global fade duration for all audio fading
+	 * @param duration - Duration in milliseconds or preset name
+	 */
+	setFadeDuration: (duration: number | keyof typeof FADE_PRESETS) => {
+		const actualDuration = typeof duration === 'number' ? duration : FADE_PRESETS[duration];
+		audioActions.setFadeDuration(actualDuration);
+	},
+	
+	getFadeDuration: () => get(audioStore).fadeDuration
+};

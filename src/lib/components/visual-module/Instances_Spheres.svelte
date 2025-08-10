@@ -68,9 +68,9 @@
 
 				// Get coordinates from the first variant of the story
 				let story_positions = {
-					x: story[0].coordinates[0],
-					y: story[0].coordinates[1],
-					z: story[0].coordinates[2]
+					x: story[0].coordinates[0] * worldScale,
+					y: story[0].coordinates[1] * worldScale,
+					z: story[0].coordinates[2] * worldScale
 				};
 				let story_velocities = {
 					vx: (Math.random() - 0.5) * 0.1,
