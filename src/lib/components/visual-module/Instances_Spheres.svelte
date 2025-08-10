@@ -61,7 +61,7 @@
 			for (let j = 0; j < cluster.stories.length; j += 1) {
 				const story = cluster.stories[j];
 
-				const scale = Math.random() + 0.1;
+				const scale = 0.2 + story[0].text.length * 0.005;
 				const cluster_id = cluster.text;
 				const cluster_audio_id = 'test';
 				const storyObject = story;
