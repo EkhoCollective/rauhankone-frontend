@@ -18,6 +18,8 @@
 		CapsuleGeometry,
 		Color
 	} from 'three';
+	import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+	import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
 	// import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import {
@@ -34,6 +36,18 @@
 	let instances: StoryInstance[] = $state([]);
 	const centroidOffset: number = 15;
 	let centroid = $state(new THREE.Vector3());
+
+	const loader = new FontLoader();
+	let loadedFont: Font | null = null;
+
+	const font = loader.load('/Roboto_Slab_Regular.json', (font) => {
+		loadedFont = font;
+		// console.log('Font loaded successfully', loadedFont);
+		// Repopulate data now that font is loaded to get text geometries
+		if (data) {
+			populateFromData();
+		}
+	});
 
 	// Array of possible geometries with their creation functions
 	const geometryTypes = [
@@ -80,6 +94,33 @@
 		{
 			name: 'capsule',
 			create: (size: number) => new CapsuleGeometry(size * 0.5, size, 4, 8)
+		},
+		{
+			name: 'text',
+			create: (size: number, text: string = 'Default') => {
+				if (!loadedFont) {
+					// console.warn('Font not loaded yet, falling back to sphere geometry');
+					return new SphereGeometry(size, 16, 16);
+				}
+				try {
+					// console.log(
+					// 	`Creating TextGeometry with: text="${text}", size=${size}, font:`,
+					// 	loadedFont
+					// );
+					const textGeometry = new TextGeometry(text, {
+						font: loadedFont,
+						size: size,
+						depth: 0.1,
+						curveSegments: 2,
+						bevelEnabled: false
+					});
+					// console.log('TextGeometry created successfully:', textGeometry);
+					return textGeometry;
+				} catch (error) {
+					// console.error('Error creating TextGeometry:', error);
+					return new SphereGeometry(size, 16, 16);
+				}
+			}
 		}
 	];
 
@@ -90,9 +131,26 @@
 	}
 
 	// Function to get geometry by cluster (consistent shapes per cluster)
-	function getClusterGeometry(clusterIndex: number, size: number) {
+	function getClusterGeometry(clusterIndex: number, size: number, text?: string) {
 		const geometryIndex = clusterIndex % geometryTypes.length;
-		return geometryTypes[geometryIndex].create(size);
+		const selectedGeometry = geometryTypes[geometryIndex];
+
+		// console.log(
+		// 	`Cluster ${clusterIndex}: Selected geometry type: ${selectedGeometry.name}, Font loaded: ${!!loadedFont}`
+		// );
+
+		// If it's a text geometry and we have text, pass it to the create function
+		if (selectedGeometry.name === 'text' && text) {
+			// console.log(`Creating text geometry with text: "${text}"`);
+			return selectedGeometry.create(size, text);
+		}
+
+		return selectedGeometry.create(size);
+	}
+
+	// Function to add line breaks after periods for better text geometry formatting
+	function processTextForGeometry(text: string): string {
+		return text.replace(/\./g, '.\n');
 	}
 
 	// Function to map text length to a range from 1 to 5
@@ -160,8 +218,10 @@
 				const cluster_id = cluster.text;
 				const storyObject = story;
 
+				const processedText = processTextForGeometry(story[0].text);
 				// Use cluster-based geometry (same shape for all stories in a cluster)
-				const storyGeometry = getClusterGeometry(i, text_length / 10);
+				// Pass processed text with line breaks for text geometry
+				const storyGeometry = getClusterGeometry(i, text_length / 10, processedText);
 
 				// Get coordinates from the first variant of the story
 				let story_positions = {
@@ -199,6 +259,7 @@
 			}
 		}
 		centroid = calculateCentroid();
+		lookAtCentroid();
 	}
 
 	function calculateCentroid() {
@@ -229,16 +290,7 @@
 		}
 	});
 
-	onMount(() => {
-		// Preload sound effects for better performance
-		populateFromData();
-
-		// Preload all cluster sounds
-		const clusterSounds = tracklist
-			.filter((track) => track.type === 'cluster')
-			.map((track) => track.title);
-		soundEffects.preloadSounds(clusterSounds);
-
+	function lookAtCentroid() {
 		controls?.setLookAt(
 			centroid.x,
 			centroid.y,
@@ -248,6 +300,17 @@
 			centroid.z,
 			true
 		);
+	}
+
+	onMount(() => {
+		// Preload sound effects for better performance
+		// populateFromData();
+
+		// Preload all cluster sounds
+		const clusterSounds = tracklist
+			.filter((track) => track.type === 'cluster')
+			.map((track) => track.title);
+		soundEffects.preloadSounds(clusterSounds);
 	});
 
 	onDestroy(() => {
