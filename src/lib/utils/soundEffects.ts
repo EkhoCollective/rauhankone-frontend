@@ -67,7 +67,7 @@ export class SoundEffects {
 			// Start at volume 0 and fade in
 			audio.volume = 0;
 			await audio.play();
-			await audioFader.fadeIn(audio, effectVolume, audioState.fadeDuration * 0.3); // Shorter fade for effects
+			await audioFader.fadeIn(audio, effectVolume, globalFadeDuration * 0.3); // Shorter fade for effects
 		} catch (error) {
 			console.warn('Failed to play sound effect:', error);
 		}
@@ -78,10 +78,9 @@ export class SoundEffects {
 	 * @param soundKey - Key from tracklist or direct audio source
 	 */
 	async stopEffect(soundKey: string): Promise<void> {
-		const audioState = get(audioStore);
 		const audio = this.soundCache.get(soundKey);
 		if (audio && this.playingSounds.has(audio)) {
-			await audioFader.fadeOut(audio, audioState.fadeDuration * 0.2); // Even faster fade out
+			await audioFader.fadeOut(audio, globalFadeDuration * 0.2); // Even faster fade out
 			audio.currentTime = 0;
 			this.playingSounds.delete(audio);
 		}
@@ -144,16 +143,19 @@ export const FADE_PRESETS = {
 	VERY_SLOW: 2000
 } as const;
 
+// Global fade duration for sound effects (separate from audio control props)
+let globalFadeDuration = 500;
+
 // Audio configuration utilities
 export const audioConfig = {
 	/**
-	 * Set global fade duration for all audio fading
+	 * Set global fade duration for sound effects
 	 * @param duration - Duration in milliseconds or preset name
 	 */
 	setFadeDuration: (duration: number | keyof typeof FADE_PRESETS) => {
 		const actualDuration = typeof duration === 'number' ? duration : FADE_PRESETS[duration];
-		audioActions.setFadeDuration(actualDuration);
+		globalFadeDuration = actualDuration;
 	},
 	
-	getFadeDuration: () => get(audioStore).fadeDuration
+	getFadeDuration: () => globalFadeDuration
 };

@@ -4,16 +4,14 @@ interface AudioState {
 	isGloballyMuted: boolean;
 	playingState: 'playing' | 'paused';
 	currentSong: HTMLAudioElement | null;
-	globalVolume: number;
-	fadeDuration: number;
+	globalVolume: number; // Keep for backwards compatibility and sound effects
 }
 
 const initialState: AudioState = {
 	isGloballyMuted: true,
 	playingState: 'paused',
 	currentSong: null,
-	globalVolume: 0.3,
-	fadeDuration: 500
+	globalVolume: 0.3
 };
 
 export const audioStore = writable<AudioState>(initialState);
@@ -45,13 +43,6 @@ export const audioActions = {
 		audioStore.update(state => ({
 			...state,
 			globalVolume: Math.max(0, Math.min(1, volume))
-		}));
-	},
-	
-	setFadeDuration: (duration: number) => {
-		audioStore.update(state => ({
-			...state,
-			fadeDuration: Math.max(100, duration)
 		}));
 	}
 };

@@ -6,6 +6,15 @@
 	import { soundEffects } from '$lib/utils/soundEffects';
 	import { audioFader } from '$lib/utils/audioFader';
 
+	// Props for configurable audio settings
+	let {
+		volume = $bindable(0.3),
+		fadeTime = $bindable(500)
+	}: {
+		volume?: number;
+		fadeTime?: number;
+	} = $props();
+
 	let songIdx = $state(0);
 	let currentLoadedSong = $state(-1);
 	let song = $state<HTMLAudioElement | null>(null);
@@ -25,7 +34,7 @@
 			if (newMuted) {
 				// Muting - fade out and stop
 				if (song) {
-					const duration = isFinite(currentState.fadeDuration) ? currentState.fadeDuration : 500;
+					const duration = isFinite(fadeTime) ? fadeTime : 500;
 					await audioFader.fadeOut(song, duration);
 					audioActions.setPlayingState('paused');
 				}
@@ -40,8 +49,6 @@
 	}
 
 	async function startPlaying() {
-		const currentState = $audioStore;
-
 		// If we already have the right song playing, just ensure it's playing
 		if (song && currentLoadedSong === songIdx && !song.paused) {
 			return;
@@ -55,9 +62,9 @@
 		}
 
 		try {
-			// Validate audio parameters
-			const volume = isFinite(currentState.globalVolume) ? currentState.globalVolume : 0.3;
-			const duration = isFinite(currentState.fadeDuration) ? currentState.fadeDuration : 500;
+			// Validate audio parameters from props
+			const safeVolume = isFinite(volume) ? volume : 0.3;
+			const safeDuration = isFinite(fadeTime) ? fadeTime : 500;
 
 			// Create and play new song
 			song = new Audio(tracklist[songIdx].src);
@@ -65,11 +72,12 @@
 			song.volume = 0;
 
 			await song.play();
-			await audioFader.fadeIn(song, volume, duration);
+			await audioFader.fadeIn(song, safeVolume, safeDuration);
 
 			currentLoadedSong = songIdx;
 			audioActions.setCurrentSong(song);
 			audioActions.setPlayingState('playing');
+			audioActions.setVolume(safeVolume);
 		} catch (error) {
 			console.error('Failed to start playing song:', error);
 			// Reset state on error
@@ -82,14 +90,12 @@
 	async function changeSong() {
 		if (!song || isToggling) return;
 
-		const currentState = $audioStore;
-
-		// Validate audio parameters
-		const volume = isFinite(currentState.globalVolume) ? currentState.globalVolume : 0.3;
-		const duration = isFinite(currentState.fadeDuration) ? currentState.fadeDuration : 500;
+		// Validate audio parameters from props
+		const safeVolume = isFinite(volume) ? volume : 0.3;
+		const safeDuration = isFinite(fadeTime) ? fadeTime : 500;
 
 		// Fade out current song
-		await audioFader.fadeOut(song, duration * 0.5);
+		await audioFader.fadeOut(song, safeDuration * 0.5);
 
 		// Load and fade in new song
 		song = new Audio(tracklist[songIdx].src);
@@ -97,10 +103,11 @@
 		song.volume = 0;
 
 		await song.play();
-		await audioFader.fadeIn(song, volume, duration * 0.5);
+		await audioFader.fadeIn(song, safeVolume, safeDuration * 0.5);
 
 		currentLoadedSong = songIdx;
 		audioActions.setCurrentSong(song);
+		audioActions.setVolume(safeVolume);
 	}
 
 	async function crossFadeToNewSong() {
@@ -110,12 +117,11 @@
 		isToggling = true;
 
 		try {
-			const currentState = $audioStore;
 			const oldSong = song;
 
-			// Validate audio parameters
-			const volume = isFinite(currentState.globalVolume) ? currentState.globalVolume : 0.3;
-			const duration = isFinite(currentState.fadeDuration) ? currentState.fadeDuration : 500;
+			// Validate audio parameters from props
+			const safeVolume = isFinite(volume) ? volume : 0.3;
+			const safeDuration = isFinite(fadeTime) ? fadeTime : 500;
 
 			// Create new song
 			const newSong = new Audio(tracklist[songIdx].src);
@@ -126,8 +132,8 @@
 			await newSong.play();
 
 			// Cross-fade: fade out old song and fade in new song simultaneously
-			const fadeOutPromise = audioFader.fadeOut(oldSong, duration * 0.7);
-			const fadeInPromise = audioFader.fadeIn(newSong, volume, duration * 0.7);
+			const fadeOutPromise = audioFader.fadeOut(oldSong, safeDuration * 0.7);
+			const fadeInPromise = audioFader.fadeIn(newSong, safeVolume, safeDuration * 0.7);
 
 			// Wait for both fades to complete
 			await Promise.all([fadeOutPromise, fadeInPromise]);
@@ -136,6 +142,7 @@
 			song = newSong;
 			currentLoadedSong = songIdx;
 			audioActions.setCurrentSong(newSong);
+			audioActions.setVolume(safeVolume);
 		} catch (error) {
 			console.error('Cross-fade failed:', error);
 			// Fallback to regular song change
@@ -173,13 +180,15 @@
 		}
 	});
 
-	$inspect('AudioControl state:', {
-		songIdx,
-		currentLoadedSong,
-		isToggling,
-		isGloballyMuted: $audioStore.isGloballyMuted,
-		currentPage: page.url.pathname
-	});
+	// $inspect('AudioControl state:', {
+	// 	songIdx,
+	// 	currentLoadedSong,
+	// 	isToggling,
+	// 	volume,
+	// 	fadeTime,
+	// 	isGloballyMuted: $audioStore.isGloballyMuted,
+	// 	currentPage: page.url.pathname
+	// });
 </script>
 
 <div class="audio-icon-container">
