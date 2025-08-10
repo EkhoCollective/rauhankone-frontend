@@ -23,7 +23,9 @@
 	const startColor = new Color('dimgray');
 	const endColor = new Color('white');
 
-	const geometry = new SphereGeometry(10, 16, 16);
+	let centroid = $state(new THREE.Vector3());
+
+	// const geometry = new SphereGeometry(10, 16, 16);
 
 	// Flocking parameters
 	// let maxSpeed = 0.05; // Increased for more visible movement
@@ -63,14 +65,14 @@
 			for (let j = 0; j < cluster.stories.length; j += 1) {
 				const story = cluster.stories[j];
 				const text_length = story[0].text.length * 0.005;
-				const scale = 1 + text_length;
+				const scale = 1;
 				const cluster_id = cluster.text;
 				const cluster_audio_id = 'test';
 				const storyObject = story;
 
 				// Calculate the scale of the sphere based on the text length
 				let story_shape = {
-					radius: text_length,
+					radius: 1,
 					wSeg: Math.floor(Math.random() * 10) + 3,
 					hSeg: Math.floor(Math.random() * 10) + 3
 				};
@@ -109,6 +111,16 @@
 				);
 			}
 		}
+		centroid = calculateCentroid();
+	}
+
+	function calculateCentroid() {
+		const centroidValue = new THREE.Vector3();
+		for (let i = 0; i < instances.length; i++) {
+			centroidValue.add(instances[i].positions);
+		}
+		centroidValue.divideScalar(instances.length);
+		return centroidValue.multiplyScalar(worldScale);
 	}
 
 	// Effect to reset selected sphere when modal closes
@@ -135,11 +147,11 @@
 		soundEffects.clearCache();
 	});
 
-	$inspect(data);
+	$inspect(centroid);
 </script>
 
-<T.PerspectiveCamera makeDefault position={[0, 0, 50]}>
-	<CameraControls bind:ref={controls} />
+<T.PerspectiveCamera makeDefault position={[50, 20, 50]}>
+	<CameraControls bind:ref={controls} setLookAt={centroid} />
 	<!-- <OrbitControls autoRotate={true} autoRotateSpeed={10} /> -->
 	<!-- Only orbit or camera but not both because they control the same camera -->
 </T.PerspectiveCamera>
