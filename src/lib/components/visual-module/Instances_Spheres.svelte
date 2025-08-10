@@ -12,6 +12,7 @@
 		CameraControls,
 		type CameraControlsRef
 	} from '@threlte/extras';
+	import { tracklist } from '$lib/components/media/audio/tracklist';
 	import { soundEffects, SOUND_EFFECTS } from '$lib/utils/soundEffects';
 
 	// World parameters
@@ -53,6 +54,13 @@
 		}
 	});
 
+	// Helper function to get random cluster title
+	function getRandomClusterTitle(): string {
+		const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
+		const randomIndex = Math.floor(Math.random() * clusterTracks.length);
+		return clusterTracks[randomIndex].title;
+	}
+
 	function populateFromData() {
 		if (!data || !data.clusters) return;
 
@@ -61,13 +69,13 @@
 
 		for (let i = 0; i < data.clusters.length; i += 1) {
 			const cluster = data.clusters[i];
+			const cluster_audio_id = getRandomClusterTitle();
 
 			for (let j = 0; j < cluster.stories.length; j += 1) {
 				const story = cluster.stories[j];
 				const text_length = story[0].text.length * 0.005;
 				const scale = 1;
 				const cluster_id = cluster.text;
-				const cluster_audio_id = 'test';
 				const storyObject = story;
 
 				// Calculate the scale of the sphere based on the text length
@@ -103,6 +111,7 @@
 						cluster_id,
 						cluster_audio_id,
 						storyObject,
+						text_length,
 						story_shape,
 						story_positions,
 						story_velocities,

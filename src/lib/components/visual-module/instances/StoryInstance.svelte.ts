@@ -28,6 +28,7 @@ export default class {
     public cluster_id: string,
     public cluster_audio_id: string,
     public story: any[], 
+    public story_text_length: number,
     shape:{radius: number, wSeg: number, hSeg: number},
     positions: {x: number, y: number, z: number},
     velocities: {vx: number, vy: number, vz: number},
