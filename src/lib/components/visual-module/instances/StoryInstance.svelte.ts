@@ -4,9 +4,9 @@ import { cubicOut } from 'svelte/easing'
 
 export default class {
   tw = new Tween(0, { easing: cubicOut, duration: 250 })
-  startColor = new Color()
-  endColor = new Color()
-  color = $derived(this.startColor.clone().lerpHSL(this.endColor, this.tw.current))
+  initialColor = new Color()
+  selectedColor = new Color()
+  color = $derived(this.initialColor.clone().lerpHSL(this.selectedColor, this.tw.current))
   
   // Make position and velocity properties reactive 
   shape = $state({radius: 1, wSeg: 3, hSeg: 3})
@@ -22,23 +22,23 @@ export default class {
     // fix this. put a minimum max size for every single point
   }
   constructor(
-    startColor: Color,
-    endColor: Color,
+    initialColor: Color,
+    selectedColor: Color,
     public scale_init: number,
     public cluster_id: string,
     public cluster_audio_id: string,
     public story: any[], 
     public story_text_length: number,
-    shape:{radius: number, wSeg: number, hSeg: number},
+    public geometry: any,
     positions: {x: number, y: number, z: number},
     velocities: {vx: number, vy: number, vz: number},
     cluster_initial_position: {cx: number, cy: number, cz: number},
   ) {
-    this.startColor.set(startColor)
-    this.endColor.set(endColor)
+    this.initialColor.set(initialColor)
+    this.selectedColor.set(selectedColor)
     
     // Set initial positions and velocities
-    this.shape = shape
+    this.geometry = geometry
     this.positions = positions
     this.velocities = velocities
     this.cluster_initial_position = cluster_initial_position

@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
-	import { blur } from 'svelte/transition';
+	import { fade, blur } from 'svelte/transition';
 	import CardLoader from '$lib/components/cards/CardLoader.svelte';
 
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
@@ -146,7 +146,7 @@
 			<Scene bind:controls data={response_clusters} bind:selectedStory />
 		</Canvas>
 	{:else}
-		<div class="loader-container">
+		<div class="loader-container" in:fade={{ duration: 500 }} out:fade={{ duration: 500 }}>
 			<CardLoader />
 		</div>
 	{/if}
