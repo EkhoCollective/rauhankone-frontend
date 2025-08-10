@@ -3,94 +3,200 @@
 	import { tracklist } from '$lib/components/media/audio/tracklist';
 	import { page } from '$app/state';
 	import { audioStore, audioActions } from '$lib/stores/audioStore';
-	import { soundEffects } from '$lib/utils/soundEffects';
+	import { soundEffects, audioConfig } from '$lib/utils/soundEffects';
+	import { audioFader } from '$lib/utils/audioFader';
+
+	// Props for configurable audio settings
+	let {
+		volume = $bindable(0.3),
+		clusterVolume = $bindable(1),
+		fadeTime = $bindable(500)
+	}: {
+		volume?: number;
+		clusterVolume?: number;
+		fadeTime?: number;
+	} = $props();
 
 	let songIdx = $state(0);
-	let currentLoadedSong = $state(-1); // Track which song is currently loaded
-
-	// Use global audio store
-	let playingState = $state('paused');
+	let currentLoadedSong = $state(-1);
 	let song = $state<HTMLAudioElement | null>(null);
+	let isToggling = false;
 
-	function togglePlaying() {
-		// Toggle global mute state instead of just local playing
-		audioStore.update((state) => {
-			const newMuted = !state.isGloballyMuted;
+	async function togglePlaying() {
+		if (isToggling) return;
 
-			// Handle audio playback based on new mute state
+		try {
+			isToggling = true;
+			const currentState = $audioStore;
+			const newMuted = !currentState.isGloballyMuted;
+
+			// Update the mute state
+			audioActions.setMuted(newMuted);
+
 			if (newMuted) {
-				// Muting - pause the song and stop all sound effects
+				// Muting - fade out and stop
 				if (song) {
-					song.pause();
+					const duration = isFinite(fadeTime) ? fadeTime : 500;
+					await audioFader.fadeOut(song, duration);
+					audioActions.setPlayingState('paused');
 				}
 				soundEffects.stopAllEffects();
-				playingState = 'paused';
 			} else {
-				// Unmuting - start playing if not already playing
-				if (playingState === 'paused') {
-					play();
-				}
+				// Unmuting - start playing
+				await startPlaying();
 			}
-
-			return {
-				...state,
-				isGloballyMuted: newMuted
-			};
-		});
+		} finally {
+			isToggling = false;
+		}
 	}
 
-	function loadSong() {
-		// Stop the current song if it exists
+	async function startPlaying() {
+		// If we already have the right song playing, just ensure it's playing
+		if (song && currentLoadedSong === songIdx && !song.paused) {
+			return;
+		}
+
+		// Stop existing song
 		if (song) {
+			audioFader.cancelFade(song);
 			song.pause();
 			song = null;
 		}
 
+		try {
+			// Validate audio parameters from props
+			const safeVolume = isFinite(volume) ? volume : 0.3;
+			const safeDuration = isFinite(fadeTime) ? fadeTime : 500;
+
+			// Create and play new song
+			song = new Audio(tracklist[songIdx].src);
+			song.loop = true;
+			song.volume = 0;
+
+			await song.play();
+			await audioFader.fadeIn(song, safeVolume, safeDuration);
+
+			currentLoadedSong = songIdx;
+			audioActions.setCurrentSong(song);
+			audioActions.setPlayingState('playing');
+			audioActions.setVolume(safeVolume);
+		} catch (error) {
+			console.error('Failed to start playing song:', error);
+			// Reset state on error
+			song = null;
+			currentLoadedSong = -1;
+			audioActions.setPlayingState('paused');
+		}
+	}
+
+	async function changeSong() {
+		if (!song || isToggling) return;
+
+		// Validate audio parameters from props
+		const safeVolume = isFinite(volume) ? volume : 0.3;
+		const safeDuration = isFinite(fadeTime) ? fadeTime : 500;
+
+		// Fade out current song
+		await audioFader.fadeOut(song, safeDuration * 0.5);
+
+		// Load and fade in new song
 		song = new Audio(tracklist[songIdx].src);
-		song.volume = 0.3;
 		song.loop = true;
-		song.play();
+		song.volume = 0;
+
+		await song.play();
+		await audioFader.fadeIn(song, safeVolume, safeDuration * 0.5);
+
 		currentLoadedSong = songIdx;
-
-		// Update global store
 		audioActions.setCurrentSong(song);
-		audioActions.setVolume(0.3);
+		audioActions.setVolume(safeVolume);
 	}
 
-	function play() {
-		if (playingState === 'playing') {
-			pause();
+	async function crossFadeToNewSong() {
+		if (!song || isToggling) return;
+
+		// Set a temporary flag to prevent other operations
+		isToggling = true;
+
+		try {
+			const oldSong = song;
+
+			// Validate audio parameters from props
+			const safeVolume = isFinite(volume) ? volume : 0.3;
+			const safeDuration = isFinite(fadeTime) ? fadeTime : 500;
+
+			// Create new song
+			const newSong = new Audio(tracklist[songIdx].src);
+			newSong.loop = true;
+			newSong.volume = 0;
+
+			// Start new song
+			await newSong.play();
+
+			// Cross-fade: fade out old song and fade in new song simultaneously
+			const fadeOutPromise = audioFader.fadeOut(oldSong, safeDuration * 0.7);
+			const fadeInPromise = audioFader.fadeIn(newSong, safeVolume, safeDuration * 0.7);
+
+			// Wait for both fades to complete
+			await Promise.all([fadeOutPromise, fadeInPromise]);
+
+			// Update state
+			song = newSong;
+			currentLoadedSong = songIdx;
+			audioActions.setCurrentSong(newSong);
+			audioActions.setVolume(safeVolume);
+		} catch (error) {
+			console.error('Cross-fade failed:', error);
+			// Fallback to regular song change
+			await startPlaying();
+		} finally {
+			isToggling = false;
 		}
-
-		playingState = 'playing';
-		audioActions.setPlayingState('playing');
-		loadSong();
 	}
 
-	function pause() {
-		playingState = 'paused';
-		audioActions.setPlayingState('paused');
-		song?.pause();
-	}
-
-	// Effect to update songIdx based on URL
+	// Effect to handle page changes and cross-fade songs
 	$effect(() => {
-		if (page.url.pathname === '/explore') {
-			songIdx = 1;
+		const newSongIdx = page.url.pathname === '/explore' ? 1 : 0;
+
+		// If the song index is changing and we're currently playing
+		if (
+			newSongIdx !== songIdx &&
+			!$audioStore.isGloballyMuted &&
+			$audioStore.playingState === 'playing' &&
+			song &&
+			!isToggling
+		) {
+			// Update songIdx first
+			const oldSongIdx = songIdx;
+			songIdx = newSongIdx;
+
+			// Trigger cross-fade
+			crossFadeToNewSong().catch((error) => {
+				console.error('Failed to cross-fade to new song:', error);
+				// Fallback: just update the index
+				songIdx = newSongIdx;
+			});
 		} else {
-			songIdx = 0;
+			// Just update the index if not playing
+			songIdx = newSongIdx;
 		}
 	});
 
-	// Separate effect to handle song loading when songIdx changes
+	// Effect to update cluster volume in sound effects system
 	$effect(() => {
-		// Only load song if playing and the song index actually changed
-		if (playingState === 'playing' && songIdx !== currentLoadedSong) {
-			loadSong();
-		}
+		const safeClusterVolume = isFinite(clusterVolume) ? clusterVolume : 1.0;
+		audioConfig.setClusterVolume(safeClusterVolume);
 	});
 
-	// $inspect(page.url.pathname, songIdx, currentLoadedSong);
+	// $inspect('AudioControl state:', {
+	// 	songIdx,
+	// 	currentLoadedSong,
+	// 	isToggling,
+	// 	volume,
+	// 	fadeTime,
+	// 	isGloballyMuted: $audioStore.isGloballyMuted,
+	// 	currentPage: page.url.pathname
+	// });
 </script>
 
 <div class="audio-icon-container">

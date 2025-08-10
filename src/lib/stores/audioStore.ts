@@ -4,7 +4,7 @@ interface AudioState {
 	isGloballyMuted: boolean;
 	playingState: 'playing' | 'paused';
 	currentSong: HTMLAudioElement | null;
-	globalVolume: number;
+	globalVolume: number; // Keep for backwards compatibility and sound effects
 }
 
 const initialState: AudioState = {

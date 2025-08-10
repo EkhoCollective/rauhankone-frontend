@@ -8,6 +8,9 @@
 	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
 
 	let { toggleLang } = $props();
+	let audioVolume = $state(0.5);
+	let audioClusterVolume = $state(1);
+	let audioFadeTime = $state(500);
 </script>
 
 <div class="card-header-container">
@@ -24,7 +27,11 @@
 	</div>
 	<!-- Audio Control -->
 	<div class="audio-control-container">
-		<AudioControl />
+		<AudioControl
+			bind:volume={audioVolume}
+			bind:fadeTime={audioFadeTime}
+			bind:clusterVolume={audioClusterVolume}
+		/>
 	</div>
 </div>
 

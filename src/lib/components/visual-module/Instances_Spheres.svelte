@@ -1,30 +1,32 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-
-	// import { getLocaleFullName } from '$lib/utils/locale_handler';
-	import ClusterInstance from '$lib/components/visual-module/instances/ClusterInstance.svelte';
 	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
 	import * as THREE from 'three';
-	import { Color } from 'three';
+	import { SphereGeometry, Color } from 'three';
+	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import {
 		interactivity,
 		Instance,
 		InstancedMesh,
-		OrbitControls,
 		CameraControls,
 		type CameraControlsRef
 	} from '@threlte/extras';
-	import { soundEffects, SOUND_EFFECTS } from '$lib/utils/soundEffects';
+	import { tracklist } from '$lib/components/media/audio/tracklist';
+	import { soundEffects } from '$lib/utils/soundEffects';
 
 	// World parameters
 	// let storiesNumber = $state(null);
-	const worldRadius: number = 20;
+	// const worldRadius: number = 20;
 	const worldScale: number = 10;
-	let clusters: ClusterInstance[] = $state([]);
+	// let clusters: ClusterInstance[] = $state([]);
 	let instances: StoryInstance[] = $state([]);
 	const startColor = new Color('dimgray');
 	const endColor = new Color('white');
+	const centroidOffset: number = 25;
+	let centroid = $state(new THREE.Vector3());
+
+	// const geometry = new SphereGeometry(10, 16, 16);
 
 	// Flocking parameters
 	// let maxSpeed = 0.05; // Increased for more visible movement
@@ -52,6 +54,13 @@
 		}
 	});
 
+	// Helper function to get random cluster title
+	function getRandomClusterTitle(): string {
+		const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
+		const randomIndex = Math.floor(Math.random() * clusterTracks.length);
+		return clusterTracks[randomIndex].title;
+	}
+
 	function populateFromData() {
 		if (!data || !data.clusters) return;
 
@@ -60,18 +69,45 @@
 
 		for (let i = 0; i < data.clusters.length; i += 1) {
 			const cluster = data.clusters[i];
+			const cluster_audio_id = getRandomClusterTitle();
 
 			for (let j = 0; j < cluster.stories.length; j += 1) {
 				const story = cluster.stories[j];
-
-				// const story_text = story.text;
-				const storyObject = story;
-				// Get coordinates from the first variant of the story
-				const story_x = story[0].coordinates[0] * worldScale;
-				const story_y = story[0].coordinates[1] * worldScale;
-				const story_z = story[0].coordinates[2] * worldScale;
+				const text_length = story[0].text.length * 0.005;
+				const scale = 1 + text_length;
 				const cluster_id = cluster.text;
-				const scale = Math.random() + 0.1;
+				const storyObject = story;
+
+				// Calculate the scale of the sphere based on the text length
+				// let story_shape = {
+				// 	radius: text_length,
+				// 	wSeg: Math.floor(Math.random() * 10) + 3,
+				// 	hSeg: Math.floor(Math.random() * 10) + 3
+				// };
+
+				let story_shape = {
+					radius: text_length,
+					wSeg: 16,
+					hSeg: 16
+				};
+
+				// Get coordinates from the first variant of the story
+				let story_positions = {
+					x: story[0].coordinates[0] * worldScale,
+					y: story[0].coordinates[1] * worldScale,
+					z: story[0].coordinates[2] * worldScale
+				};
+				let story_velocities = {
+					vx: (Math.random() - 0.5) * 0.1,
+					vy: (Math.random() - 0.5) * 0.1,
+					vz: (Math.random() - 0.5) * 0.1
+				};
+
+				let cluster_center = {
+					cx: cluster.som[0],
+					cy: cluster.som[0],
+					cz: cluster.som[0]
+				};
 
 				instances.push(
 					new StoryInstance(
@@ -79,28 +115,28 @@
 						endColor,
 						scale,
 						cluster_id,
+						cluster_audio_id,
 						storyObject,
-						story_x,
-						story_y,
-						story_z,
-						(Math.random() - 0.5) * 0.1,
-						(Math.random() - 0.5) * 0.1,
-						(Math.random() - 0.5) * 0.1
+						text_length,
+						story_shape,
+						story_positions,
+						story_velocities,
+						cluster_center
 					)
 				);
 			}
 		}
+		centroid = calculateCentroid();
 	}
 
-	// Effect to populate data when it becomes available
-	// $effect(() => {
-	// 	console.log('Effect triggered, data:', data);
-	// 	if (data && data.clusters) {
-	// 		console.log('Populating from data, clusters:', data.clusters.length);
-	// 		populateFromData();
-	// 		console.log('Instances after populate:', instances.length);
-	// 	}
-	// });
+	function calculateCentroid() {
+		const centroidValue = new THREE.Vector3();
+		for (let i = 0; i < instances.length; i++) {
+			centroidValue.add(instances[i].positions);
+		}
+		centroidValue.divideScalar(instances.length);
+		return centroidValue;
+	}
 
 	// Effect to reset selected sphere when modal closes
 	$effect(() => {
@@ -118,7 +154,22 @@
 	onMount(() => {
 		// Preload sound effects for better performance
 		populateFromData();
-		soundEffects.preloadSounds([SOUND_EFFECTS.MODAL_OPEN]);
+
+		// Preload all cluster sounds
+		const clusterSounds = tracklist
+			.filter((track) => track.type === 'cluster')
+			.map((track) => track.title);
+		soundEffects.preloadSounds(clusterSounds);
+
+		controls?.setLookAt(
+			centroid.x,
+			centroid.y,
+			centroid.z + centroidOffset,
+			centroid.x,
+			centroid.y,
+			centroid.z,
+			true
+		);
 	});
 
 	onDestroy(() => {
@@ -126,10 +177,10 @@
 		soundEffects.clearCache();
 	});
 
-	// $inspect(data?.clusters);
+	$inspect(centroid, data);
 </script>
 
-<T.PerspectiveCamera makeDefault position={[0, 0, 50]}>
+<T.PerspectiveCamera makeDefault position={[50, 20, 50]}>
 	<CameraControls bind:ref={controls} />
 	<!-- <OrbitControls autoRotate={true} autoRotateSpeed={10} /> -->
 	<!-- Only orbit or camera but not both because they control the same camera -->
@@ -138,15 +189,21 @@
 <T.AmbientLight intensity={0.4} />
 <T.DirectionalLight position={[1, 2, 5]} />
 
+<!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
+	<T.BoxGeometry />
+	<T.MeshBasicMaterial color="red" />
+</T.Mesh> -->
+
 <InstancedMesh {instances} range={instances.length}>
-	<T.SphereGeometry />
+	<!-- <T.SphereGeometry radius={instance.scale} /> -->
 	<T.MeshToonMaterial />
 
 	{#each instances as instance}
+		<T.SphereGeometry args={[instance.shape.radius, instance.shape.wSeg, instance.shape.hSeg]} />
 		<Instance
-			position.x={instance.x}
-			position.y={instance.y}
-			position.z={instance.z}
+			position.x={instance.positions.x}
+			position.y={instance.positions.y}
+			position.z={instance.positions.z}
 			scale={instance.scale}
 			color={instance.color}
 			onclick={() => {
@@ -161,18 +218,18 @@
 				if (controls) {
 					// Move camera to look at the story with smooth transition
 					controls.setLookAt(
-						instance.x,
-						instance.y,
-						instance.z + 20, // Camera position (offset from story)
-						instance.x,
-						instance.y,
-						instance.z, // Look at the story position
+						instance.positions.x,
+						instance.positions.y,
+						instance.positions.z + 20, // Camera position (offset from story)
+						instance.positions.x,
+						instance.positions.y,
+						instance.positions.z, // Look at the story position
 						true // Enable smooth transition
 					);
 				}
 
-				// Play sound effect when modal opens
-				soundEffects.playEffect(SOUND_EFFECTS.MODAL_OPEN);
+				// Play sound effect when modal opens using cluster-specific sound
+				soundEffects.playEffect(instance.cluster_audio_id);
 			}}
 			onpointerenter={() => {
 				// Only animate if not selected

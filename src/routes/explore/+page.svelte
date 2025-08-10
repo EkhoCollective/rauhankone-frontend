@@ -12,7 +12,7 @@
 	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
 	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { error } from '@sveltejs/kit';
-	import { soundEffects, SOUND_EFFECTS } from '$lib/utils/soundEffects';
+	import { soundEffects } from '$lib/utils/soundEffects';
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
@@ -28,6 +28,7 @@
 	let selectedStory: StoryInstance | null = $state(null);
 	let selectedStoryLanguageText = $state(null);
 	let controls = $state.raw<CameraControlsRef>();
+	let currentPlayingSound: string | null = $state(null);
 
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
@@ -76,11 +77,17 @@
 		handleNavButton(navButtonValue);
 	});
 
-	// Effect to stop sound when modal closes
+	// Effect to stop sound when modal closes or track sound when modal opens
 	$effect(() => {
 		if (selectedStory === null) {
-			// Modal closed, stop the sound effect
-			soundEffects.stopEffect(SOUND_EFFECTS.MODAL_OPEN);
+			// Modal closed, stop the current playing sound
+			if (currentPlayingSound) {
+				soundEffects.stopEffect(currentPlayingSound);
+				currentPlayingSound = null;
+			}
+		} else {
+			// Modal opened, track the current sound
+			currentPlayingSound = selectedStory.cluster_audio_id;
 		}
 	});
 
