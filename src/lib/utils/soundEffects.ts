@@ -50,8 +50,8 @@ export class SoundEffects {
 				this.soundCache.set(soundKey, audio);
 			}
 
-			// Set target volume (default to half of global volume for effects)
-			const effectVolume = volume !== undefined ? volume : audioState.globalVolume * 0.5;
+					// Set target volume (use cluster volume for effects, not background music volume)
+		const effectVolume = volume !== undefined ? volume : globalClusterVolume;
 
 			// Reset audio to beginning
 			audio.currentTime = 0;
@@ -143,8 +143,9 @@ export const FADE_PRESETS = {
 	VERY_SLOW: 2000
 } as const;
 
-// Global fade duration for sound effects (separate from audio control props)
+// Global configuration for sound effects (separate from audio control props)
 let globalFadeDuration = 500;
+let globalClusterVolume = 1.0;
 
 // Audio configuration utilities
 export const audioConfig = {
@@ -157,5 +158,15 @@ export const audioConfig = {
 		globalFadeDuration = actualDuration;
 	},
 	
-	getFadeDuration: () => globalFadeDuration
+	getFadeDuration: () => globalFadeDuration,
+	
+	/**
+	 * Set global cluster volume for sound effects
+	 * @param volume - Volume level (0-1)
+	 */
+	setClusterVolume: (volume: number) => {
+		globalClusterVolume = Math.max(0, Math.min(1, volume));
+	},
+	
+	getClusterVolume: () => globalClusterVolume
 };

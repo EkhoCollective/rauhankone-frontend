@@ -3,15 +3,17 @@
 	import { tracklist } from '$lib/components/media/audio/tracklist';
 	import { page } from '$app/state';
 	import { audioStore, audioActions } from '$lib/stores/audioStore';
-	import { soundEffects } from '$lib/utils/soundEffects';
+	import { soundEffects, audioConfig } from '$lib/utils/soundEffects';
 	import { audioFader } from '$lib/utils/audioFader';
 
 	// Props for configurable audio settings
 	let {
 		volume = $bindable(0.3),
+		clusterVolume = $bindable(1),
 		fadeTime = $bindable(500)
 	}: {
 		volume?: number;
+		clusterVolume?: number;
 		fadeTime?: number;
 	} = $props();
 
@@ -178,6 +180,12 @@
 			// Just update the index if not playing
 			songIdx = newSongIdx;
 		}
+	});
+
+	// Effect to update cluster volume in sound effects system
+	$effect(() => {
+		const safeClusterVolume = isFinite(clusterVolume) ? clusterVolume : 1.0;
+		audioConfig.setClusterVolume(safeClusterVolume);
 	});
 
 	// $inspect('AudioControl state:', {

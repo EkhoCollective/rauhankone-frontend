@@ -13,7 +13,7 @@
 		type CameraControlsRef
 	} from '@threlte/extras';
 	import { tracklist } from '$lib/components/media/audio/tracklist';
-	import { soundEffects, SOUND_EFFECTS } from '$lib/utils/soundEffects';
+	import { soundEffects } from '$lib/utils/soundEffects';
 
 	// World parameters
 	// let storiesNumber = $state(null);
@@ -148,7 +148,12 @@
 	onMount(() => {
 		// Preload sound effects for better performance
 		populateFromData();
-		soundEffects.preloadSounds([SOUND_EFFECTS.MODAL_OPEN]);
+
+		// Preload all cluster sounds
+		const clusterSounds = tracklist
+			.filter((track) => track.type === 'cluster')
+			.map((track) => track.title);
+		soundEffects.preloadSounds(clusterSounds);
 	});
 
 	onDestroy(() => {
@@ -160,13 +165,18 @@
 </script>
 
 <T.PerspectiveCamera makeDefault position={[50, 20, 50]}>
-	<CameraControls bind:ref={controls} setLookAt={centroid} />
+	<CameraControls bind:ref={controls} />
 	<!-- <OrbitControls autoRotate={true} autoRotateSpeed={10} /> -->
 	<!-- Only orbit or camera but not both because they control the same camera -->
 </T.PerspectiveCamera>
 
 <T.AmbientLight intensity={0.4} />
 <T.DirectionalLight position={[1, 2, 5]} />
+
+<T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
+	<T.BoxGeometry />
+	<T.MeshBasicMaterial color="red" />
+</T.Mesh>
 
 <InstancedMesh {instances} range={instances.length}>
 	<!-- <T.SphereGeometry radius={instance.scale} /> -->
@@ -202,8 +212,8 @@
 					);
 				}
 
-				// Play sound effect when modal opens
-				soundEffects.playEffect(SOUND_EFFECTS.MODAL_OPEN);
+				// Play sound effect when modal opens using cluster-specific sound
+				soundEffects.playEffect(instance.cluster_audio_id);
 			}}
 			onpointerenter={() => {
 				// Only animate if not selected
