@@ -316,7 +316,7 @@
 			}}
 		>
 			<T.Mesh geometry={instance.geometry}>
-				<T.MeshToonMaterial />
+				<T.MeshToonMaterial color={instance.color} />
 			</T.Mesh>
 		</Instance>
 	{/each}
