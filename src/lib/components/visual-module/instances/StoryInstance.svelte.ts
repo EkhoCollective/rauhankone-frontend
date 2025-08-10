@@ -29,7 +29,7 @@ export default class {
     public cluster_audio_id: string,
     public story: any[], 
     public story_text_length: number,
-    shape:{radius: number, wSeg: number, hSeg: number},
+    public geometry: any,
     positions: {x: number, y: number, z: number},
     velocities: {vx: number, vy: number, vz: number},
     cluster_initial_position: {cx: number, cy: number, cz: number},
@@ -38,7 +38,7 @@ export default class {
     this.endColor.set(endColor)
     
     // Set initial positions and velocities
-    this.shape = shape
+    this.geometry = geometry
     this.positions = positions
     this.velocities = velocities
     this.cluster_initial_position = cluster_initial_position

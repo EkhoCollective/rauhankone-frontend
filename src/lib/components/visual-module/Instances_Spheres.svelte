@@ -10,32 +10,18 @@
 		Instance,
 		InstancedMesh,
 		CameraControls,
-		type CameraControlsRef
+		type CameraControlsRef,
+		FakeGlowMaterial
 	} from '@threlte/extras';
 	import { tracklist } from '$lib/components/media/audio/tracklist';
 	import { soundEffects } from '$lib/utils/soundEffects';
 
-	// World parameters
-	// let storiesNumber = $state(null);
-	// const worldRadius: number = 20;
 	const worldScale: number = 10;
-	// let clusters: ClusterInstance[] = $state([]);
 	let instances: StoryInstance[] = $state([]);
 	const startColor = new Color('dimgray');
 	const endColor = new Color('white');
 	const centroidOffset: number = 25;
 	let centroid = $state(new THREE.Vector3());
-
-	// const geometry = new SphereGeometry(10, 16, 16);
-
-	// Flocking parameters
-	// let maxSpeed = 0.05; // Increased for more visible movement
-	// let maxForce = 0.02; // Increased for more visible movement
-	// let cohesionWeight = 1.0;
-	// let alignmentWeight = 1.0;
-	// let separationWeight = 1.5;
-	// let perceptionRadius = 3;
-	// let separationDistance = 1;
 
 	let {
 		data,
@@ -61,6 +47,54 @@
 		return clusterTracks[randomIndex].title;
 	}
 
+	function createNoisySphereGeometry(
+		size: number,
+		resolution: number,
+		seed: number,
+		noiseScale: number,
+		noiseStrength: number,
+		clusterNoise: SimplexNoise
+	) {
+		const geometry = new SphereGeometry(size, resolution, resolution);
+		const positions = geometry.getAttribute('position');
+		const noise = clusterNoise;
+
+		// Apply noise to each vertex with unique parameters
+		// for (let i = 0; i < positions.count; i += 1) {
+		// 	const x = positions.getX(i);
+		// 	const y = positions.getY(i);
+		// 	// const z = positions.getZ(i);
+
+		// 	// // Create unique noise using seed offset
+		// 	// const noiseValue = noise.noise3d(
+		// 	// 	(x + seed) * noiseScale,
+		// 	// 	(y + seed * 1.3) * noiseScale,
+		// 	// 	(z + seed * 1.7) * noiseScale
+		// 	// );
+
+		// 	// // Calculate the original distance from center (radius)
+		// 	// const originalRadius = Math.sqrt(x * x + y * y + z * z);
+
+		// 	// // Apply noise to the radius
+		// 	// const newRadius = originalRadius + noiseValue * noiseStrength;
+
+		// 	// // Normalize the direction and apply the new radius
+		// 	// const length = Math.sqrt(x * x + y * y + z * z);
+		// 	// if (length > 0) {
+		// 	// positions.setX(i, (x / length) * newRadius);
+		// 	// positions.setY(i, (y / length) * newRadius);
+		// 	// positions.setZ(i, (z / length) * newRadius);
+		// 	// }
+		// 	// positions.setX(i, noise.noise(x, y) * noiseStrength);
+		// 	// positions.setY(i, noise.noise(x, y) * noiseStrength);
+		// 	positions.setZ(i, noise.noise(x, y) * 10);
+		// }
+
+		positions.needsUpdate = true;
+		// geometry.computeVertexNormals();
+		return geometry;
+	}
+
 	function populateFromData() {
 		if (!data || !data.clusters) return;
 
@@ -71,6 +105,12 @@
 			const cluster = data.clusters[i];
 			const cluster_audio_id = getRandomClusterTitle();
 
+			const clusterNoiseScale = 0.1;
+			const clusterNoiseStrength = 0.1;
+			const clusterNoiseSeed = 16;
+			const clusterNoiseResolution = 16;
+			const clusterNoise = new SimplexNoise();
+
 			for (let j = 0; j < cluster.stories.length; j += 1) {
 				const story = cluster.stories[j];
 				const text_length = story[0].text.length * 0.005;
@@ -78,18 +118,14 @@
 				const cluster_id = cluster.text;
 				const storyObject = story;
 
-				// Calculate the scale of the sphere based on the text length
-				// let story_shape = {
-				// 	radius: text_length,
-				// 	wSeg: Math.floor(Math.random() * 10) + 3,
-				// 	hSeg: Math.floor(Math.random() * 10) + 3
-				// };
-
-				let story_shape = {
-					radius: text_length,
-					wSeg: 16,
-					hSeg: 16
-				};
+				const storyGeometry = createNoisySphereGeometry(
+					text_length / 10,
+					clusterNoiseResolution,
+					clusterNoiseSeed,
+					clusterNoiseScale,
+					clusterNoiseStrength,
+					clusterNoise
+				);
 
 				// Get coordinates from the first variant of the story
 				let story_positions = {
@@ -118,7 +154,7 @@
 						cluster_audio_id,
 						storyObject,
 						text_length,
-						story_shape,
+						storyGeometry,
 						story_positions,
 						story_velocities,
 						cluster_center
@@ -151,6 +187,12 @@
 		}
 	});
 
+	$effect(() => {
+		for (let i = 0; i < instances.length; i++) {
+			instances[i].geometry.computeVertexNormals();
+		}
+	});
+
 	onMount(() => {
 		// Preload sound effects for better performance
 		populateFromData();
@@ -180,26 +222,25 @@
 	$inspect(centroid, data);
 </script>
 
+<!-- Only orbit or camera but not both because they control the same camera -->
 <T.PerspectiveCamera makeDefault position={[50, 20, 50]}>
 	<CameraControls bind:ref={controls} />
-	<!-- <OrbitControls autoRotate={true} autoRotateSpeed={10} /> -->
-	<!-- Only orbit or camera but not both because they control the same camera -->
 </T.PerspectiveCamera>
 
 <T.AmbientLight intensity={0.4} />
 <T.DirectionalLight position={[1, 2, 5]} />
 
+<!-- Centroid -->
 <!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
 	<T.BoxGeometry />
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
 
 <InstancedMesh {instances} range={instances.length}>
-	<!-- <T.SphereGeometry radius={instance.scale} /> -->
-	<T.MeshToonMaterial />
+	<T.MeshBasicMaterial />
+	<FakeGlowMaterial glowColor="red" />
 
 	{#each instances as instance}
-		<T.SphereGeometry args={[instance.shape.radius, instance.shape.wSeg, instance.shape.hSeg]} />
 		<Instance
 			position.x={instance.positions.x}
 			position.y={instance.positions.y}
@@ -243,6 +284,8 @@
 					instance.tw.set(0);
 				}
 			}}
-		/>
+		>
+			<T.Mesh geometry={instance.geometry} />
+		</Instance>
 	{/each}
 </InstancedMesh>
