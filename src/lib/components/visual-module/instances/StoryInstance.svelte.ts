@@ -9,6 +9,7 @@ export default class {
   color = $derived(this.startColor.clone().lerpHSL(this.endColor, this.tw.current))
   
   // Make position and velocity properties reactive 
+  shape = $state({radius: 1, wSeg: 3, hSeg: 3})
   positions = $state({x: 0, y: 0, z: 0})
   velocities = $state({vx: 0, vy: 0, vz: 0})
   cluster_initial_position = $state({cx: 0, cy: 0, cz: 0})
@@ -27,6 +28,7 @@ export default class {
     public cluster_id: string,
     public cluster_audio_id: string,
     public story: any[], 
+    shape:{radius: number, wSeg: number, hSeg: number},
     positions: {x: number, y: number, z: number},
     velocities: {vx: number, vy: number, vz: number},
     cluster_initial_position: {cx: number, cy: number, cz: number},
@@ -35,6 +37,7 @@ export default class {
     this.endColor.set(endColor)
     
     // Set initial positions and velocities
+    this.shape = shape
     this.positions = positions
     this.velocities = velocities
     this.cluster_initial_position = cluster_initial_position

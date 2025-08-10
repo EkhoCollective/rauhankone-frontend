@@ -2,13 +2,13 @@
 	import { onMount, onDestroy } from 'svelte';
 	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
 	import * as THREE from 'three';
-	import { Color } from 'three';
+	import { SphereGeometry, Color } from 'three';
+	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import {
 		interactivity,
 		Instance,
 		InstancedMesh,
-		OrbitControls,
 		CameraControls,
 		type CameraControlsRef
 	} from '@threlte/extras';
@@ -16,12 +16,14 @@
 
 	// World parameters
 	// let storiesNumber = $state(null);
-	const worldRadius: number = 20;
+	// const worldRadius: number = 20;
 	const worldScale: number = 10;
 	// let clusters: ClusterInstance[] = $state([]);
 	let instances: StoryInstance[] = $state([]);
 	const startColor = new Color('dimgray');
 	const endColor = new Color('white');
+
+	const geometry = new SphereGeometry(10, 16, 16);
 
 	// Flocking parameters
 	// let maxSpeed = 0.05; // Increased for more visible movement
@@ -60,11 +62,18 @@
 
 			for (let j = 0; j < cluster.stories.length; j += 1) {
 				const story = cluster.stories[j];
-
-				const scale = 0.2 + story[0].text.length * 0.005;
+				const text_length = story[0].text.length * 0.005;
+				const scale = 1 + text_length;
 				const cluster_id = cluster.text;
 				const cluster_audio_id = 'test';
 				const storyObject = story;
+
+				// Calculate the scale of the sphere based on the text length
+				let story_shape = {
+					radius: text_length,
+					wSeg: Math.floor(Math.random() * 10) + 3,
+					hSeg: Math.floor(Math.random() * 10) + 3
+				};
 
 				// Get coordinates from the first variant of the story
 				let story_positions = {
@@ -92,6 +101,7 @@
 						cluster_id,
 						cluster_audio_id,
 						storyObject,
+						story_shape,
 						story_positions,
 						story_velocities,
 						cluster_center
@@ -138,10 +148,11 @@
 <T.DirectionalLight position={[1, 2, 5]} />
 
 <InstancedMesh {instances} range={instances.length}>
-	<T.SphereGeometry />
+	<!-- <T.SphereGeometry radius={instance.scale} /> -->
 	<T.MeshToonMaterial />
 
 	{#each instances as instance}
+		<T.SphereGeometry args={[instance.shape.radius, instance.shape.wSeg, instance.shape.hSeg]} />
 		<Instance
 			position.x={instance.positions.x}
 			position.y={instance.positions.y}
