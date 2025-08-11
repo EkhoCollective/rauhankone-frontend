@@ -72,10 +72,12 @@
 		"svelte"
 	],
 	"dependencies": {
+		"@dimforge/rapier3d-compat": "^0.18.1",
 		"@theatre/core": "^0.7.2",
 		"@theatre/studio": "^0.7.2",
 		"@threlte/core": "^8.0.2",
 		"@threlte/extras": "^9.4.2",
+		"@threlte/rapier": "^3.1.5",
 		"@threlte/studio": "^0.1.4",
 		"@threlte/theatre": "^3.0.1",
 		"dompurify": "^3.2.6",

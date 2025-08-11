@@ -30,6 +30,7 @@ export default class {
     public story: any[], 
     public story_text_length: number,
     public geometry: any,
+    public curve: any,
     positions: {x: number, y: number, z: number},
     velocities: {vx: number, vy: number, vz: number},
     cluster_initial_position: {cx: number, cy: number, cz: number},
@@ -38,6 +39,7 @@ export default class {
     this.selectedColor.set(selectedColor)
     
     // Set initial positions and velocities
+    this.curve = curve
     this.geometry = geometry
     this.positions = positions
     this.velocities = velocities

@@ -16,34 +16,32 @@
 		PlaneGeometry,
 		RingGeometry,
 		CapsuleGeometry,
-		Vector3,
-		CatmullRomCurve3,
 		Color
 	} from 'three';
 	import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 	import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
 	// import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { T, useTask, useThrelte } from '@threlte/core';
-	import { base } from '$app/paths';
 	import {
 		interactivity,
 		Instance,
 		InstancedMesh,
 		CameraControls,
-		type CameraControlsRef
+		type CameraControlsRef,
+		Text3DGeometry
 	} from '@threlte/extras';
 	import { tracklist } from '$lib/components/media/audio/tracklist';
 	import { soundEffects } from '$lib/utils/soundEffects';
 
 	const worldScale: number = 10;
 	let instances: StoryInstance[] = $state([]);
-	const centroidOffset: number = 20;
+	const centroidOffset: number = 15;
 	let centroid = $state(new THREE.Vector3());
 
 	const loader = new FontLoader();
 	let loadedFont: Font | null = null;
 
-	const font = loader.load(`${base}/Roboto_Slab_Regular.json`, (font) => {
+	const font = loader.load('/Roboto_Slab_Regular.json', (font) => {
 		loadedFont = font;
 		// console.log('Font loaded successfully', loadedFont);
 		// Repopulate data now that font is loaded to get text geometries
@@ -54,50 +52,50 @@
 
 	// Array of possible geometries with their creation functions
 	const geometryTypes = [
-		// {
-		// 	name: 'sphere',
-		// 	create: (size: number) => new SphereGeometry(size, 16, 16)
-		// },
-		// {
-		// 	name: 'box',
-		// 	create: (size: number) => new BoxGeometry(size, size, size)
-		// },
-		// {
-		// 	name: 'cone',
-		// 	create: (size: number) => new ConeGeometry(size, size * 1.5, 8)
-		// },
-		// {
-		// 	name: 'cylinder',
-		// 	create: (size: number) => new CylinderGeometry(size, size, size * 1.5, 8)
-		// },
-		// {
-		// 	name: 'dodecahedron',
-		// 	create: (size: number) => new DodecahedronGeometry(size)
-		// },
-		// {
-		// 	name: 'icosahedron',
-		// 	create: (size: number) => new IcosahedronGeometry(size)
-		// },
-		// {
-		// 	name: 'octahedron',
-		// 	create: (size: number) => new OctahedronGeometry(size)
-		// },
-		// {
-		// 	name: 'tetrahedron',
-		// 	create: (size: number) => new TetrahedronGeometry(size)
-		// },
-		// {
-		// 	name: 'torus',
-		// 	create: (size: number) => new TorusGeometry(size, size * 0.3, 8, 16)
-		// },
-		// {
-		// 	name: 'torusKnot',
-		// 	create: (size: number) => new TorusKnotGeometry(size, size * 0.3, 64, 8)
-		// },
-		// {
-		// 	name: 'capsule',
-		// 	create: (size: number) => new CapsuleGeometry(size * 0.5, size, 4, 8)
-		// },
+		{
+			name: 'sphere',
+			create: (size: number) => new SphereGeometry(size, 16, 16)
+		},
+		{
+			name: 'box',
+			create: (size: number) => new BoxGeometry(size, size, size)
+		},
+		{
+			name: 'cone',
+			create: (size: number) => new ConeGeometry(size, size * 1.5, 8)
+		},
+		{
+			name: 'cylinder',
+			create: (size: number) => new CylinderGeometry(size, size, size * 1.5, 8)
+		},
+		{
+			name: 'dodecahedron',
+			create: (size: number) => new DodecahedronGeometry(size)
+		},
+		{
+			name: 'icosahedron',
+			create: (size: number) => new IcosahedronGeometry(size)
+		},
+		{
+			name: 'octahedron',
+			create: (size: number) => new OctahedronGeometry(size)
+		},
+		{
+			name: 'tetrahedron',
+			create: (size: number) => new TetrahedronGeometry(size)
+		},
+		{
+			name: 'torus',
+			create: (size: number) => new TorusGeometry(size, size * 0.3, 8, 16)
+		},
+		{
+			name: 'torusKnot',
+			create: (size: number) => new TorusKnotGeometry(size, size * 0.3, 64, 8)
+		},
+		{
+			name: 'capsule',
+			create: (size: number) => new CapsuleGeometry(size * 0.5, size, 4, 8)
+		},
 		{
 			name: 'text',
 			create: (size: number, text: string = 'Default') => {
@@ -113,7 +111,7 @@
 					const textGeometry = new TextGeometry(text, {
 						font: loadedFont,
 						size: size,
-						depth: 0.025,
+						depth: 0.1,
 						curveSegments: 2,
 						bevelEnabled: false
 					});
@@ -128,10 +126,10 @@
 	];
 
 	// Function to get a random geometry type
-	// function getRandomGeometry(size: number) {
-	// 	const randomIndex = Math.floor(Math.random() * geometryTypes.length);
-	// 	return geometryTypes[randomIndex].create(size);
-	// }
+	function getRandomGeometry(size: number) {
+		const randomIndex = Math.floor(Math.random() * geometryTypes.length);
+		return geometryTypes[randomIndex].create(size);
+	}
 
 	// Function to get geometry by cluster (consistent shapes per cluster)
 	function getClusterGeometry(clusterIndex: number, size: number, text?: string) {
@@ -152,20 +150,8 @@
 	}
 
 	// Function to add line breaks after periods for better text geometry formatting
-	// function processTextForGeometry(text: string): string {
-	// 	return text.replace(/\./g, '.\n');
-	// }
-
 	function processTextForGeometry(text: string): string {
-		let result = '';
-		const maxLength = 35;
-		for (let i = 0; i < text.length; i += maxLength) {
-			result += text.slice(i, i + maxLength);
-			if (i + maxLength < text.length) {
-				result += '\n';
-			}
-		}
-		return result;
+		return text.replace(/\./g, '.\n');
 	}
 
 	// Function to map text length to a range from 1 to 5
@@ -223,8 +209,7 @@
 
 			// Get the color of the cluster
 			// const grayValue = Math.random();
-			// const initialColor = new Color(Math.random(), Math.random(), Math.random());
-			const initialColor = new Color(0.85, 0.85, 0.85);
+			const initialColor = new Color(Math.random(), Math.random(), Math.random());
 			const selectedColor = new Color('white');
 
 			for (let j = 0; j < cluster.stories.length; j += 1) {
@@ -237,7 +222,7 @@
 				const processedText = processTextForGeometry(story[0].text);
 				// Use cluster-based geometry (same shape for all stories in a cluster)
 				// Pass processed text with line breaks for text geometry
-				const storyGeometry = getClusterGeometry(i, 0.05, processedText);
+				const storyGeometry = getClusterGeometry(i, text_length / 10, processedText);
 
 				// Get coordinates from the first variant of the story
 				let story_positions = {
@@ -267,25 +252,13 @@
 						storyObject,
 						text_length,
 						storyGeometry,
+						[1, 2, 3],
 						story_positions,
 						story_velocities,
 						cluster_center
 					)
 				);
 			}
-
-			// for (let j = 0; j < cluster.stories.length; j += 1) {
-			// 	const story = cluster.stories[j];
-
-			// 	const curve = new CatmullRomCurve3([
-			// 	new Vector3(-3, 0, 0),
-			// 	new Vector3(-1, 1, -1),
-			// 	new Vector3(1, -1, 1),
-			// 	new Vector3(cluster.som[0], cluster.som[1], cluster.som[2])
-
-			// ]);
-
-			// }
 		}
 		centroid = calculateCentroid();
 		lookAtCentroid();
@@ -362,6 +335,11 @@
 	<T.BoxGeometry />
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
+
+<T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
+	<Text3DGeometry text={'Hello World'} size={0.1} depth={0.01} />
+	<T.MeshToonMaterial />
+</T.Mesh>
 
 <InstancedMesh {instances} range={instances.length}>
 	{#each instances as instance}
