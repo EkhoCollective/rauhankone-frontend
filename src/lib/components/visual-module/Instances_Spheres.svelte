@@ -16,6 +16,8 @@
 		PlaneGeometry,
 		RingGeometry,
 		CapsuleGeometry,
+		Vector3,
+		CatmullRomCurve3,
 		Color
 	} from 'three';
 	import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
@@ -271,6 +273,19 @@
 					)
 				);
 			}
+
+			// for (let j = 0; j < cluster.stories.length; j += 1) {
+			// 	const story = cluster.stories[j];
+
+			// 	const curve = new CatmullRomCurve3([
+			// 	new Vector3(-3, 0, 0),
+			// 	new Vector3(-1, 1, -1),
+			// 	new Vector3(1, -1, 1),
+			// 	new Vector3(cluster.som[0], cluster.som[1], cluster.som[2])
+
+			// ]);
+
+			// }
 		}
 		centroid = calculateCentroid();
 		lookAtCentroid();
