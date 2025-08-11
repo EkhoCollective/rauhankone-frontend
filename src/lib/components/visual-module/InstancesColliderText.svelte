@@ -348,7 +348,7 @@
 	createTextInstances(sampleText);
 </script>
 
-<PerfMonitor />
+<PerfMonitor anchorY="bottom" />
 <World gravity={[0, 0, 0]}>
 	<!-- Only orbit or camera but not both because they control the same camera -->
 	<T.PerspectiveCamera makeDefault position={[50, 20, 50]}>
@@ -366,13 +366,18 @@
 	<!-- Render each character as a separate 3D text instance -->
 	{#each textInstances as character, index}
 		<RigidBody>
-			<Collider shape="ball" args={[0.75]} mass={Math.random() * 10} />
+			<Collider shape="ball" args={[0.75]} mass={1} />
 			<T.Mesh
 				position={[0.2 + Math.random() * 2, 0.2 + Math.random() * 2, 0.2 + Math.random() * 2]}
 			>
 				<Text3DGeometry text={character} size={3} depth={0.1} />
 				<T.MeshToonMaterial color="white" />
 			</T.Mesh>
+			<!-- <T.SphereGeometry radius={0.75} position={[0, 0, 0]} />
+			<T.MeshToonMaterial color="red" />
+			<T.Mesh position={[0, 0, 0]}>
+				<T.MeshToonMaterial color="blue" />
+			</T.Mesh> -->
 		</RigidBody>
 	{/each}
 </World>
