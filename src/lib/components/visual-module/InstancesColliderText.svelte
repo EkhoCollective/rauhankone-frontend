@@ -28,7 +28,8 @@
 		InstancedMesh,
 		CameraControls,
 		type CameraControlsRef,
-		Text3DGeometry
+		Text3DGeometry,
+		PerfMonitor
 	} from '@threlte/extras';
 	import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
 	import { tracklist } from '$lib/components/media/audio/tracklist';
@@ -342,11 +343,13 @@
 	}
 
 	// Example usage - you can call this with any text
-	const sampleText = 'Hello World!';
+	const sampleText =
+		'Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdflkgjshdflgkjdfhlgsjkdfhg';
 	createTextInstances(sampleText);
 </script>
 
-<World>
+<PerfMonitor />
+<World gravity={[0, 0, 0]}>
 	<!-- Only orbit or camera but not both because they control the same camera -->
 	<T.PerspectiveCamera makeDefault position={[50, 20, 50]}>
 		<CameraControls bind:ref={controls} />
@@ -364,8 +367,10 @@
 	{#each textInstances as character, index}
 		<RigidBody>
 			<Collider shape="ball" args={[0.75]} mass={Math.random() * 10} />
-			<T.Mesh position={[index * 1, 0, 0]}>
-				<Text3DGeometry text={character} size={1} depth={0.1} />
+			<T.Mesh
+				position={[0.2 + Math.random() * 2, 0.2 + Math.random() * 2, 0.2 + Math.random() * 2]}
+			>
+				<Text3DGeometry text={character} size={3} depth={0.1} />
 				<T.MeshToonMaterial color="white" />
 			</T.Mesh>
 		</RigidBody>
