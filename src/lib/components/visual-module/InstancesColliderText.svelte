@@ -391,7 +391,8 @@
 		<T.Mesh position={[0, 0, 0]}>
 			<!-- <FakeGlowMaterial glowColor="white" /> -->
 			<T.SphereGeometry radius={4} />
-			<T.MeshBasicMaterial color="#ffffff" toneMapped={false} />
+			<!-- <T.MeshBasicMaterial color="#ffffff" toneMapped={false} /> -->
+			<FakeGlowMaterial glowColor="white" toneMapped={false} />
 		</T.Mesh>
 	</RigidBody>
 	<!-- Render each character as a separate 3D text instance -->
