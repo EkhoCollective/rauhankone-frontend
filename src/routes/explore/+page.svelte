@@ -8,7 +8,7 @@
 
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
-	import Scene from '$lib/components/visual-module/InstancesColliderText.svelte';
+	import Scene from '$lib/components/visual-module/InstancesLine.svelte';
 	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
 	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { error } from '@sveltejs/kit';

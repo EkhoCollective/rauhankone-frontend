@@ -1,0 +1,394 @@
+<script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
+	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
+	import * as THREE from 'three';
+	import { CatmullRomCurve3, Vector3, Color } from 'three';
+	import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+	import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
+	// import { SimplexNoise } from 'three/examples/jsm/Addons.js';
+	import { T, useTask, useThrelte } from '@threlte/core';
+	import {
+		interactivity,
+		Instance,
+		InstancedMesh,
+		CameraControls,
+		type CameraControlsRef,
+		Text3DGeometry,
+		PerfMonitor,
+		FakeGlowMaterial,
+		MeshLineGeometry,
+		MeshLineMaterial,
+		BakeShadows
+	} from '@threlte/extras';
+	import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
+	import { tracklist } from '$lib/components/media/audio/tracklist';
+	import { soundEffects } from '$lib/utils/soundEffects';
+
+	// Props
+	let {
+		data,
+		selectedStory = $bindable(),
+		controls = $bindable()
+	}: {
+		data: any;
+		selectedStory: any;
+		controls?: CameraControlsRef;
+	} = $props();
+
+	// State
+	const worldScale: number = 10;
+	let instances: StoryInstance[] = $state([]);
+	const centroidOffset: number = 15;
+	let centroid = $state(new THREE.Vector3());
+	const sphereResolution: number = 16;
+	// Interactivity
+	interactivity({
+		filter(items) {
+			// only report the first intersection
+			return items.slice(0, 1);
+		}
+	});
+
+	// Helper function to get random cluster title
+	function getRandomClusterTitle(): string {
+		const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
+		const randomIndex = Math.floor(Math.random() * clusterTracks.length);
+		return clusterTracks[randomIndex].title;
+	}
+
+	// Function to create character instances from input text
+	function createTextInstances(inputText: string, storyPosition: Vector3) {
+		const textInstances: any[] = [];
+
+		// Convert text to array of characters
+		const characters = inputText.split('');
+
+		// Create an instance for each character
+		characters.forEach((char, index) => {
+			textInstances.push({
+				char: char,
+				position: [
+					storyPosition.x + (Math.random() - 0.5) * 2,
+					storyPosition.y + (Math.random() - 0.5) * 2,
+					storyPosition.z + (Math.random() - 0.5) * 2
+				]
+			});
+		});
+
+		return textInstances;
+	}
+
+	function populateFromData() {
+		if (!data || !data.clusters) return;
+
+		// Clear existing instances to avoid duplicates
+		instances.length = 0;
+
+		for (let i = 0; i < data.clusters.length; i += 1) {
+			const cluster = data.clusters[i];
+			const cluster_audio_id = getRandomClusterTitle();
+
+			// Get the color of the cluster
+			const initialColor = new Color(Math.random(), Math.random(), Math.random());
+			const selectedColor = new Color('white');
+
+			for (let j = 0; j < cluster.stories.length; j += 1) {
+				const story = cluster.stories[j];
+				const text_length = story[0].text.length;
+				const scale = 1;
+				const cluster_id = cluster.text;
+				const storyObject = story;
+
+				// Get coordinates from the first variant of the story
+				let story_positions = {
+					x: story[0].coordinates[0] * worldScale,
+					y: story[0].coordinates[1] * worldScale,
+					z: story[0].coordinates[2] * worldScale
+				};
+				let story_velocities = {
+					vx: (Math.random() - 0.5) * 0.1,
+					vy: (Math.random() - 0.5) * 0.1,
+					vz: (Math.random() - 0.5) * 0.1
+				};
+
+				let text_instances = createTextInstances(
+					story[0].text,
+					new Vector3(story_positions.x, story_positions.y, story_positions.z)
+				);
+
+				instances.push(
+					new StoryInstance(
+						initialColor,
+						selectedColor,
+						scale,
+						cluster_id,
+						cluster_audio_id,
+						storyObject,
+						text_length,
+						[0, 0, 0],
+						text_instances,
+						story_positions,
+						story_velocities
+					)
+				);
+			}
+		}
+		centroid = calculateCentroid();
+		lookAtCentroid();
+	}
+
+	// Calculate centroid
+	function calculateCentroid() {
+		const centroidValue = new THREE.Vector3();
+		for (let i = 0; i < instances.length; i++) {
+			centroidValue.add(instances[i].positions);
+		}
+		centroidValue.divideScalar(instances.length);
+		return centroidValue;
+	}
+
+	// Look at centroid
+	function lookAtCentroid() {
+		controls?.setLookAt(
+			centroid.x,
+			centroid.y,
+			centroid.z + centroidOffset,
+			centroid.x,
+			centroid.y,
+			centroid.z,
+			true
+		);
+	}
+
+	// Effect to reset selected sphere when modal closes
+	$effect(() => {
+		if (selectedStory === null) {
+			// Modal closed, reset all selected states
+			instances.forEach((instance) => {
+				if (instance.selected) {
+					instance.selected = false;
+					instance.tw.set(0);
+				}
+			});
+		}
+	});
+
+	onMount(() => {
+		// Preload sound effects for better performance
+		populateFromData();
+
+		// Preload all cluster sounds
+		const clusterSounds = tracklist
+			.filter((track) => track.type === 'cluster')
+			.map((track) => track.title);
+		soundEffects.preloadSounds(clusterSounds);
+	});
+
+	onDestroy(() => {
+		// Clean up sound cache when component is destroyed
+		soundEffects.clearCache();
+	});
+
+	// $inspect(centroid, data);
+
+	// // Example usage - you can call this with any text
+	// const sampleText = 'Hello World!';
+	// createTextInstances(sampleText);
+
+	// create a smooth curve from 4 points
+	const curve = new CatmullRomCurve3([
+		new Vector3(0, 0, 0),
+		new Vector3(5, -5, 5),
+		new Vector3(10, 10, 10),
+		new Vector3(15, 15, 15)
+	]);
+
+	// convert curve to an array of 100 points
+	const points = curve.getPoints(100);
+
+	// $inspect(instances[0]);
+</script>
+
+<PerfMonitor anchorY="bottom" />
+
+<T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
+	<CameraControls bind:ref={controls} />
+</T.PerspectiveCamera>
+
+<!-- <T.Mesh position={[0, 0, 0]}>
+	<T.SphereGeometry radius={1} />
+	<T.MeshToonMaterial color="red" />
+</T.Mesh> -->
+
+<!-- Only orbit or camera but not both because they control the same camera -->
+
+<!-- Centroid -->
+<!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
+	<T.BoxGeometry />
+	<T.MeshBasicMaterial color="red" />
+</T.Mesh> -->
+
+<InstancedMesh {instances} range={instances.length}>
+	<T.SphereGeometry />
+	<T.MeshBasicMaterial />
+	{#each instances as instance}
+		<Instance
+			position.x={instance.positions.x}
+			position.y={instance.positions.y}
+			position.z={instance.positions.z}
+			scale={instance.scale}
+			color={instance.color}
+			onclick={() => {
+				// Reset all other instances' selected state
+				instances.forEach((inst) => (inst.selected = false));
+				// Set this instance as selected and keep it highlighted
+				instance.selected = true;
+				instance.tw.set(1);
+				selectedStory = instance;
+
+				// Center camera on the selected story
+				if (controls) {
+					// Move camera to look at the story with smooth transition
+					controls.setLookAt(
+						instance.positions.x,
+						instance.positions.y,
+						instance.positions.z + 20, // Camera position (offset from story)
+						instance.positions.x,
+						instance.positions.y,
+						instance.positions.z, // Look at the story position
+						true // Enable smooth transition
+					);
+				}
+
+				// Play sound effect when modal opens using cluster-specific sound
+				soundEffects.playEffect(instance.cluster_audio_id);
+			}}
+			onpointerenter={() => {
+				// Only animate if not selected
+				if (!instance.selected) {
+					instance.tw.set(1);
+				}
+			}}
+			onpointerleave={() => {
+				// Only reset if not selected
+				if (!instance.selected) {
+					instance.tw.set(0);
+				}
+			}}
+		>
+			<!-- <T.Mesh position.y={3} scale={2}>
+				<MeshLineGeometry points={instance.curve} shape="taper" />
+				<MeshLineMaterial color="#fe3d00" />
+			</T.Mesh> -->
+			<!-- <T.Mesh geometry={instance.geometry}>
+				<T.MeshToonMaterial color={instance.color} />
+			</T.Mesh> -->
+			<!-- <T.SphereGeometry />
+			<T.MeshToonMaterial color={instance.color} /> -->
+		</Instance>
+	{/each}
+</InstancedMesh>
+
+<!-- <World gravity={[0, 0, 0]}>
+
+
+	<InstancedMesh {instances} range={instances.length}>
+		{#each instances as story}
+			<Instance
+				position.x={story.positions.x}
+				position.y={story.positions.y}
+				position.z={story.positions.z}
+				scale={story.scale}
+				color={story.color}
+				onclick={() => {
+					// Reset all other instances' selected state
+					instances.forEach((inst) => (inst.selected = false));
+					// Set this instance as selected and keep it highlighted
+					story.selected = true;
+					story.tw.set(1);
+					selectedStory = story;
+
+					// Center camera on the selected story
+					if (controls) {
+						// Move camera to look at the story with smooth transition
+						controls.setLookAt(
+							story.positions.x,
+							story.positions.y,
+							story.positions.z + 20, // Camera position (offset from story)
+							story.positions.x,
+							story.positions.y,
+							story.positions.z, // Look at the story position
+							true // Enable smooth transition
+						);
+					}
+
+					// Play sound effect when modal opens using cluster-specific sound
+					soundEffects.playEffect(story.cluster_audio_id);
+				}}
+				onpointerenter={() => {
+					// Only animate if not selected
+					if (!story.selected) {
+						story.tw.set(1);
+					}
+				}}
+				onpointerleave={() => {
+					// Only reset if not selected
+					if (!story.selected) {
+						story.tw.set(0);
+					}
+				}}
+			>
+				<Attractor
+					range={50}
+					strength={5}
+					position={[
+						story.positions.x + (Math.random() - 0.5) * 0.001,
+						story.positions.y + (Math.random() - 0.5) * 0.001,
+						story.positions.z + (Math.random() - 0.5) * 0.001
+					]}
+				/>
+				<Attractor
+					range={6}
+					strength={-5}
+					position={[
+						story.positions.x + (Math.random() - 0.5) * 0.001,
+						story.positions.y + (Math.random() - 0.5) * 0.001,
+						story.positions.z + (Math.random() - 0.5) * 0.001
+					]}
+				/>
+
+				<RigidBody>
+					<Collider shape="ball" args={[5]} mass={Infinity} />
+					<T.Mesh position={[story.positions.x, story.positions.y, story.positions.z]}>
+						<T.SphereGeometry args={[1, sphereResolution, sphereResolution]} />
+						<T.MeshBasicMaterial color="white" toneMapped={false} />
+					</T.Mesh>
+					<T.Mesh position={[story.positions.x, story.positions.y, story.positions.z]}>
+						<T.SphereGeometry args={[story.scale * 2, sphereResolution, sphereResolution]} />
+						<FakeGlowMaterial glowColor="white" toneMapped={false} glowInternalRadius={5} />
+					</T.Mesh>
+					<T.Mesh position={[story.positions.x, story.positions.y, story.positions.z]}>
+						<T.SphereGeometry args={[story.scale * 10, sphereResolution, sphereResolution]} />
+						<FakeGlowMaterial glowColor="#404040" opacity={0.01} />
+					</T.Mesh>
+				</RigidBody>
+			</Instance>
+		{/each}
+	</InstancedMesh>
+
+	{#each instances as story}
+		{#if story.text_instances && story.text_instances.length > 0}
+			{#each story.text_instances as character}
+				{#if character && character.char && character.position}
+					<RigidBody>
+						<Collider shape="ball" args={[0.1]} mass={1} />
+						<T.Mesh position={character.position}>
+							<Text3DGeometry text={character.char} size={0.25} depth={0.1} curveSegments={2} />
+							<T.MeshBasicMaterial color="#ff0000" toneMapped={false} />
+						</T.Mesh>
+					</RigidBody>
+				{/if}
+			{/each}
+		{/if}
+	{/each}
+</World> -->
