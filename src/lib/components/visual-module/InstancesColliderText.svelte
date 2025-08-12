@@ -29,7 +29,8 @@
 		CameraControls,
 		type CameraControlsRef,
 		Text3DGeometry,
-		PerfMonitor
+		PerfMonitor,
+		FakeGlowMaterial
 	} from '@threlte/extras';
 	import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
 	import { tracklist } from '$lib/components/media/audio/tracklist';
@@ -344,34 +345,53 @@
 
 	// Example usage - you can call this with any text
 	const sampleText =
-		'Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdflkgjshdflgkjdfhlgsjkdfhg';
+		'Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdflkgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74ntcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mgwherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg';
 	createTextInstances(sampleText);
 </script>
 
 <PerfMonitor anchorY="bottom" />
+
+<T.PerspectiveCamera makeDefault position={[50, 20, 50]}>
+	<CameraControls bind:ref={controls} />
+</T.PerspectiveCamera>
+
+<T.DirectionalLight position={[1, 2, 5]} intensity={0.8} />
+
+<!-- <T.Mesh position={[0, 0, 0]}>
+	<T.SphereGeometry radius={1} />
+	<T.MeshToonMaterial color="red" />
+</T.Mesh> -->
+
 <World gravity={[0, 0, 0]}>
 	<!-- Only orbit or camera but not both because they control the same camera -->
-	<T.PerspectiveCamera makeDefault position={[50, 20, 50]}>
-		<CameraControls bind:ref={controls} />
-	</T.PerspectiveCamera>
-
-	<T.DirectionalLight position={[1, 2, 5]} intensity={0.8} />
 
 	<!-- Centroid -->
 	<!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
 	<T.BoxGeometry />
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
-	<Attractor range={20} strength={1} position={[1, 0, 0]} />
+	<Attractor range={100} strength={5} position={[0.001, 0, 0]} />
+	<Attractor range={6} strength={-5} position={[0.001, 0, 0]} />
+
+	<RigidBody>
+		<Collider shape="ball" args={[5]} mass={Infinity} />
+		<T.Mesh position={[0, 0, 0]}>
+			<!-- <FakeGlowMaterial glowColor="white" /> -->
+			<T.SphereGeometry radius={4} />
+			<T.MeshToonMaterial color="white" />
+		</T.Mesh>
+	</RigidBody>
 	<!-- Render each character as a separate 3D text instance -->
 	{#each textInstances as character, index}
 		<RigidBody>
 			<Collider shape="ball" args={[0.75]} mass={1} />
 			<T.Mesh
-				position={[0.2 + Math.random() * 2, 0.2 + Math.random() * 2, 0.2 + Math.random() * 2]}
+				position={[(Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4]}
 			>
-				<Text3DGeometry text={character} size={3} depth={0.1} />
-				<T.MeshToonMaterial color="white" />
+				<!-- <FakeGlowMaterial glowColor="white" /> -->
+				<Text3DGeometry text={character} size={0.5} depth={0.1} />
+				<T.MeshBasicMaterial color="white" />
+				<!-- <T.MeshToonMaterial color="white" /> -->
 			</T.Mesh>
 			<!-- <T.SphereGeometry radius={0.75} position={[0, 0, 0]} />
 			<T.MeshToonMaterial color="red" />
