@@ -3,8 +3,8 @@
 	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
 	import * as THREE from 'three';
 	import { CatmullRomCurve3, Vector3, Color } from 'three';
-	import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-	import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
+	// import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+	// import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
 	// import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import {
@@ -17,8 +17,7 @@
 		PerfMonitor,
 		FakeGlowMaterial,
 		MeshLineGeometry,
-		MeshLineMaterial,
-		BakeShadows
+		MeshLineMaterial
 	} from '@threlte/extras';
 	import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
 	import { tracklist } from '$lib/components/media/audio/tracklist';
@@ -37,10 +36,14 @@
 
 	// State
 	const worldScale: number = 10;
-	let instances: StoryInstance[] = $state([]);
-	const centroidOffset: number = 15;
-	let centroid = $state(new THREE.Vector3());
+	const minSphereScale: number = 0.1;
+	const minMapScale: number = 0.1;
+	const maxMapScale: number = 0.3;
 	const sphereResolution: number = 16;
+	const centroidCameraOffset: number = 15;
+	let centroid = $state(new THREE.Vector3());
+
+	let instances: StoryInstance[] = $state([]);
 	// Interactivity
 	interactivity({
 		filter(items) {
@@ -54,6 +57,25 @@
 		const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
 		const randomIndex = Math.floor(Math.random() * clusterTracks.length);
 		return clusterTracks[randomIndex].title;
+	}
+
+	// Function to map text length to a range from 1 to 5
+	function mapTextLengthToRange(textLength: number): number {
+		// Define the expected range of text lengths (you may need to adjust these based on your data)
+		const minRange = minMapScale;
+		const maxRange = maxMapScale;
+		const minTextLength = 0;
+		const maxTextLength = 1000; // Adjust this based on your typical text lengths
+
+		// Clamp the text length to the expected range
+		const clampedLength = Math.max(minTextLength, Math.min(maxTextLength, textLength));
+
+		// Map from [minTextLength, maxTextLength] to [1, 5]
+		const mappedLength =
+			minRange +
+			((clampedLength - minTextLength) / (maxTextLength - minTextLength)) * (maxRange - minRange);
+
+		return mappedLength;
 	}
 
 	// Function to create character instances from input text
@@ -95,7 +117,7 @@
 			for (let j = 0; j < cluster.stories.length; j += 1) {
 				const story = cluster.stories[j];
 				const text_length = story[0].text.length;
-				const scale = 1;
+				const scale = minSphereScale + mapTextLengthToRange(text_length);
 				const cluster_id = cluster.text;
 				const storyObject = story;
 
@@ -152,7 +174,7 @@
 		controls?.setLookAt(
 			centroid.x,
 			centroid.y,
-			centroid.z + centroidOffset,
+			centroid.z + centroidCameraOffset,
 			centroid.x,
 			centroid.y,
 			centroid.z,
@@ -189,12 +211,6 @@
 		soundEffects.clearCache();
 	});
 
-	// $inspect(centroid, data);
-
-	// // Example usage - you can call this with any text
-	// const sampleText = 'Hello World!';
-	// createTextInstances(sampleText);
-
 	// create a smooth curve from 4 points
 	const curve = new CatmullRomCurve3([
 		new Vector3(0, 0, 0),
@@ -228,66 +244,90 @@
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
 
-<InstancedMesh {instances} range={instances.length}>
-	<T.SphereGeometry />
-	<T.MeshBasicMaterial />
-	{#each instances as instance}
-		<Instance
-			position.x={instance.positions.x}
-			position.y={instance.positions.y}
-			position.z={instance.positions.z}
-			scale={instance.scale}
-			color={instance.color}
-			onclick={() => {
-				// Reset all other instances' selected state
-				instances.forEach((inst) => (inst.selected = false));
-				// Set this instance as selected and keep it highlighted
-				instance.selected = true;
-				instance.tw.set(1);
-				selectedStory = instance;
-
-				// Center camera on the selected story
-				if (controls) {
-					// Move camera to look at the story with smooth transition
-					controls.setLookAt(
-						instance.positions.x,
-						instance.positions.y,
-						instance.positions.z + 20, // Camera position (offset from story)
-						instance.positions.x,
-						instance.positions.y,
-						instance.positions.z, // Look at the story position
-						true // Enable smooth transition
-					);
-				}
-
-				// Play sound effect when modal opens using cluster-specific sound
-				soundEffects.playEffect(instance.cluster_audio_id);
-			}}
-			onpointerenter={() => {
-				// Only animate if not selected
-				if (!instance.selected) {
+<World gravity={[0, 0, 0]}>
+	<InstancedMesh {instances} range={instances.length}>
+		<!-- <T.SphereGeometry /> -->
+		<!-- <T.MeshBasicMaterial /> -->
+		{#each instances as instance}
+			<Instance
+				position.x={instance.positions.x}
+				position.y={instance.positions.y}
+				position.z={instance.positions.z}
+				scale={instance.scale}
+				color={instance.color}
+				onclick={() => {
+					// Reset all other instances' selected state
+					instances.forEach((inst) => (inst.selected = false));
+					// Set this instance as selected and keep it highlighted
+					instance.selected = true;
 					instance.tw.set(1);
-				}
-			}}
-			onpointerleave={() => {
-				// Only reset if not selected
-				if (!instance.selected) {
-					instance.tw.set(0);
-				}
-			}}
-		>
-			<!-- <T.Mesh position.y={3} scale={2}>
-				<MeshLineGeometry points={instance.curve} shape="taper" />
-				<MeshLineMaterial color="#fe3d00" />
-			</T.Mesh> -->
-			<!-- <T.Mesh geometry={instance.geometry}>
-				<T.MeshToonMaterial color={instance.color} />
-			</T.Mesh> -->
-			<!-- <T.SphereGeometry />
-			<T.MeshToonMaterial color={instance.color} /> -->
-		</Instance>
-	{/each}
-</InstancedMesh>
+					selectedStory = instance;
+
+					// Center camera on the selected story
+					if (controls) {
+						// Move camera to look at the story with smooth transition
+						controls.setLookAt(
+							instance.positions.x,
+							instance.positions.y,
+							instance.positions.z + 20, // Camera position (offset from story)
+							instance.positions.x,
+							instance.positions.y,
+							instance.positions.z, // Look at the story position
+							true // Enable smooth transition
+						);
+					}
+
+					// Play sound effect when modal opens using cluster-specific sound
+					soundEffects.playEffect(instance.cluster_audio_id);
+				}}
+				onpointerenter={() => {
+					// Only animate if not selected
+					if (!instance.selected) {
+						instance.tw.set(1);
+					}
+				}}
+				onpointerleave={() => {
+					// Only reset if not selected
+					if (!instance.selected) {
+						instance.tw.set(0);
+					}
+				}}
+			>
+				<Collider shape="ball" args={[5]} mass={Infinity} />
+				<T.Mesh>
+					<T.SphereGeometry args={[instance.scale, sphereResolution, sphereResolution]} />
+					<T.MeshBasicMaterial color="white" toneMapped={false} />
+				</T.Mesh>
+				<T.Mesh>
+					<T.SphereGeometry args={[instance.scale * 2, sphereResolution, sphereResolution]} />
+					<FakeGlowMaterial glowColor="white" toneMapped={false} glowInternalRadius={5} />
+				</T.Mesh>
+				<T.Mesh>
+					<T.SphereGeometry args={[instance.scale * 10, sphereResolution, sphereResolution]} />
+					<FakeGlowMaterial glowColor="#404040" opacity={0.01} />
+				</T.Mesh>
+				<InstancedMesh instances={instance.text_instances} range={instance.text_instances.length}>
+					{#each instance.text_instances as text_instance}
+						<Instance>
+							<RigidBody>
+								<Collider shape="ball" args={[0.1]} mass={1} />
+								<T.Mesh position={text_instance.position}>
+									<Text3DGeometry
+										text={text_instance.char}
+										size={0.25}
+										depth={0.1}
+										curveSegments={2}
+									/>
+									<T.MeshBasicMaterial color="#ff0000" toneMapped={false} />
+								</T.Mesh>
+							</RigidBody>
+						</Instance>
+					{/each}
+				</InstancedMesh>
+			</Instance>
+		{/each}
+	</InstancedMesh>
+</World>
 
 <!-- <World gravity={[0, 0, 0]}>
 

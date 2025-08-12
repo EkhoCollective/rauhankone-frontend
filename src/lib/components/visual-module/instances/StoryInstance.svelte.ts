@@ -18,7 +18,7 @@ export default class {
   selected = $state(false)
   
   get scale() {
-    return this.tw.current + this.scale_init
+    return this.tw.current/5 + this.scale_init
     // fix this. put a minimum max size for every single point
   }
   constructor(
