@@ -40,7 +40,7 @@
 	let instances: StoryInstance[] = $state([]);
 	const centroidOffset: number = 15;
 	let centroid = $state(new THREE.Vector3());
-
+	const sphereResolution: number = 16;
 	// Interactivity
 	interactivity({
 		filter(items) {
@@ -54,6 +54,28 @@
 		const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
 		const randomIndex = Math.floor(Math.random() * clusterTracks.length);
 		return clusterTracks[randomIndex].title;
+	}
+
+	// Function to create character instances from input text
+	function createTextInstances(inputText: string, storyPosition: Vector3) {
+		const textInstances: any[] = [];
+
+		// Convert text to array of characters
+		const characters = inputText.split('');
+
+		// Create an instance for each character
+		characters.forEach((char, index) => {
+			textInstances.push({
+				char: char,
+				position: [
+					storyPosition.x + (Math.random() - 0.5) * 2,
+					storyPosition.y + (Math.random() - 0.5) * 2,
+					storyPosition.z + (Math.random() - 0.5) * 2
+				]
+			});
+		});
+
+		return textInstances;
 	}
 
 	function populateFromData() {
@@ -89,6 +111,11 @@
 					vz: (Math.random() - 0.5) * 0.1
 				};
 
+				let text_instances = createTextInstances(
+					story[0].text,
+					new Vector3(story_positions.x, story_positions.y, story_positions.z)
+				);
+
 				instances.push(
 					new StoryInstance(
 						initialColor,
@@ -98,7 +125,8 @@
 						cluster_audio_id,
 						storyObject,
 						text_length,
-						[1, 2, 3],
+						[0, 0, 0],
+						text_instances,
 						story_positions,
 						story_velocities
 					)
@@ -147,7 +175,7 @@
 
 	onMount(() => {
 		// Preload sound effects for better performance
-		// populateFromData();
+		populateFromData();
 
 		// Preload all cluster sounds
 		const clusterSounds = tracklist
@@ -161,35 +189,11 @@
 		soundEffects.clearCache();
 	});
 
-	$inspect(centroid, data);
+	// $inspect(centroid, data);
 
-	const textInstances: any[] = $state([]);
-
-	// Function to create character instances from input text
-	function createTextInstances(inputText: string) {
-		// Clear existing instances
-		textInstances.length = 0;
-
-		// Convert text to array of characters
-		const characters = inputText.split('');
-
-		// Create an instance for each character
-		characters.forEach((char, index) => {
-			textInstances.push({
-				char: char,
-				position: [Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5]
-			});
-		});
-
-		console.log(textInstances.length);
-
-		return textInstances;
-	}
-
-	// Example usage - you can call this with any text
-	const sampleText =
-		'Hello World! adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdflkgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74n		tcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mgwherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg';
-	createTextInstances(sampleText);
+	// // Example usage - you can call this with any text
+	// const sampleText = 'Hello World!';
+	// createTextInstances(sampleText);
 
 	// create a smooth curve from 4 points
 	const curve = new CatmullRomCurve3([
@@ -201,84 +205,32 @@
 
 	// convert curve to an array of 100 points
 	const points = curve.getPoints(100);
+
+	// $inspect(instances[0]);
 </script>
 
-<!-- <PerfMonitor anchorY="bottom" /> -->
+<PerfMonitor anchorY="bottom" />
 
 <T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 	<CameraControls bind:ref={controls} />
 </T.PerspectiveCamera>
-
-<!-- <T.DirectionalLight
-	position={[1, 2, 5]}
-	intensity={1}
-/> -->
 
 <!-- <T.Mesh position={[0, 0, 0]}>
 	<T.SphereGeometry radius={1} />
 	<T.MeshToonMaterial color="red" />
 </T.Mesh> -->
 
-<World gravity={[0, 0, 0]}>
-	<!-- Only orbit or camera but not both because they control the same camera -->
+<!-- Only orbit or camera but not both because they control the same camera -->
 
-	<!-- Centroid -->
-	<!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
+<!-- Centroid -->
+<!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
 	<T.BoxGeometry />
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
 
-	<T.Mesh position={[0, 0, 0]} scale={5}>
-		<MeshLineGeometry {points} />
-
-		<MeshLineMaterial color="white" width={0.05} />
-	</T.Mesh>
-
-	<Attractor range={50} strength={5} position={[0.001, 0, 0]} />
-	<Attractor range={6} strength={-5} position={[0.001, 0, 0]} />
-
-	<RigidBody>
-		<Collider shape="ball" args={[5]} mass={Infinity} />
-		<T.Mesh position={[0, 0, 0]}>
-			<T.SphereGeometry args={[1, 32, 32]} />
-			<T.MeshBasicMaterial color="white" toneMapped={false} />
-		</T.Mesh>
-		<T.Mesh position={[0, 0, 0]}>
-			<T.SphereGeometry args={[2, 32, 32]} />
-			<FakeGlowMaterial glowColor="white" toneMapped={false} glowInternalRadius={5} />
-		</T.Mesh>
-		<T.Mesh position={[0, 0, 0]}>
-			<T.SphereGeometry args={[10, 32, 32]} />
-			<FakeGlowMaterial glowColor="#404040" opacity={0.01} />
-		</T.Mesh>
-	</RigidBody>
-
-	<!-- Render each character as a separate 3D text instance -->
-
-	<InstancedMesh {textInstances} range={textInstances.length}>
-		{#each textInstances as character}
-			<Instance>
-				<!-- <BakeShadows /> -->
-				<RigidBody>
-					<Collider shape="ball" args={[0.1]} mass={1} />
-					<T.Mesh position={[character.position[0], character.position[1], character.position[2]]}>
-						<!-- <FakeGlowMaterial glowColor="white" /> -->
-						<Text3DGeometry text={character.char} size={0.25} depth={0.1} curveSegments={2} />
-						<T.MeshBasicMaterial color="#ffffff" toneMapped={false} />
-						<!-- <T.MeshToonMaterial color="white" /> -->
-					</T.Mesh>
-					<!-- <T.SphereGeometry radius={0.75} position={[0, 0, 0]} />
-			<T.MeshToonMaterial color="red" />
-			<T.Mesh position={[0, 0, 0]}>
-				<T.MeshToonMaterial color="blue" />
-			</T.Mesh> -->
-				</RigidBody>
-			</Instance>
-		{/each}
-	</InstancedMesh>
-</World>
-
-<!-- <InstancedMesh {instances} range={instances.length}>
+<InstancedMesh {instances} range={instances.length}>
+	<T.SphereGeometry />
+	<T.MeshBasicMaterial />
 	{#each instances as instance}
 		<Instance
 			position.x={instance.positions.x}
@@ -324,9 +276,119 @@
 				}
 			}}
 		>
-			<T.Mesh geometry={instance.geometry}>
+			<!-- <T.Mesh position.y={3} scale={2}>
+				<MeshLineGeometry points={instance.curve} shape="taper" />
+				<MeshLineMaterial color="#fe3d00" />
+			</T.Mesh> -->
+			<!-- <T.Mesh geometry={instance.geometry}>
 				<T.MeshToonMaterial color={instance.color} />
-			</T.Mesh>
+			</T.Mesh> -->
+			<!-- <T.SphereGeometry />
+			<T.MeshToonMaterial color={instance.color} /> -->
 		</Instance>
 	{/each}
-</InstancedMesh> -->
+</InstancedMesh>
+
+<!-- <World gravity={[0, 0, 0]}>
+
+
+	<InstancedMesh {instances} range={instances.length}>
+		{#each instances as story}
+			<Instance
+				position.x={story.positions.x}
+				position.y={story.positions.y}
+				position.z={story.positions.z}
+				scale={story.scale}
+				color={story.color}
+				onclick={() => {
+					// Reset all other instances' selected state
+					instances.forEach((inst) => (inst.selected = false));
+					// Set this instance as selected and keep it highlighted
+					story.selected = true;
+					story.tw.set(1);
+					selectedStory = story;
+
+					// Center camera on the selected story
+					if (controls) {
+						// Move camera to look at the story with smooth transition
+						controls.setLookAt(
+							story.positions.x,
+							story.positions.y,
+							story.positions.z + 20, // Camera position (offset from story)
+							story.positions.x,
+							story.positions.y,
+							story.positions.z, // Look at the story position
+							true // Enable smooth transition
+						);
+					}
+
+					// Play sound effect when modal opens using cluster-specific sound
+					soundEffects.playEffect(story.cluster_audio_id);
+				}}
+				onpointerenter={() => {
+					// Only animate if not selected
+					if (!story.selected) {
+						story.tw.set(1);
+					}
+				}}
+				onpointerleave={() => {
+					// Only reset if not selected
+					if (!story.selected) {
+						story.tw.set(0);
+					}
+				}}
+			>
+				<Attractor
+					range={50}
+					strength={5}
+					position={[
+						story.positions.x + (Math.random() - 0.5) * 0.001,
+						story.positions.y + (Math.random() - 0.5) * 0.001,
+						story.positions.z + (Math.random() - 0.5) * 0.001
+					]}
+				/>
+				<Attractor
+					range={6}
+					strength={-5}
+					position={[
+						story.positions.x + (Math.random() - 0.5) * 0.001,
+						story.positions.y + (Math.random() - 0.5) * 0.001,
+						story.positions.z + (Math.random() - 0.5) * 0.001
+					]}
+				/>
+
+				<RigidBody>
+					<Collider shape="ball" args={[5]} mass={Infinity} />
+					<T.Mesh position={[story.positions.x, story.positions.y, story.positions.z]}>
+						<T.SphereGeometry args={[1, sphereResolution, sphereResolution]} />
+						<T.MeshBasicMaterial color="white" toneMapped={false} />
+					</T.Mesh>
+					<T.Mesh position={[story.positions.x, story.positions.y, story.positions.z]}>
+						<T.SphereGeometry args={[story.scale * 2, sphereResolution, sphereResolution]} />
+						<FakeGlowMaterial glowColor="white" toneMapped={false} glowInternalRadius={5} />
+					</T.Mesh>
+					<T.Mesh position={[story.positions.x, story.positions.y, story.positions.z]}>
+						<T.SphereGeometry args={[story.scale * 10, sphereResolution, sphereResolution]} />
+						<FakeGlowMaterial glowColor="#404040" opacity={0.01} />
+					</T.Mesh>
+				</RigidBody>
+			</Instance>
+		{/each}
+	</InstancedMesh>
+
+	{#each instances as story}
+		{#if story.text_instances && story.text_instances.length > 0}
+			{#each story.text_instances as character}
+				{#if character && character.char && character.position}
+					<RigidBody>
+						<Collider shape="ball" args={[0.1]} mass={1} />
+						<T.Mesh position={character.position}>
+							<Text3DGeometry text={character.char} size={0.25} depth={0.1} curveSegments={2} />
+							<T.MeshBasicMaterial color="#ff0000" toneMapped={false} />
+						</T.Mesh>
+					</RigidBody>
+				{/if}
+			{/each}
+		{/if}
+	{/each}
+</World> -->
