@@ -30,7 +30,8 @@
 		type CameraControlsRef,
 		Text3DGeometry,
 		PerfMonitor,
-		FakeGlowMaterial
+		FakeGlowMaterial,
+		BakeShadows
 	} from '@threlte/extras';
 	import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
 	import { tracklist } from '$lib/components/media/audio/tracklist';
@@ -325,7 +326,7 @@
 
 	$inspect(centroid, data);
 
-	const textInstances: string[] = $state([]);
+	const textInstances: any[] = $state([]);
 
 	// Function to create character instances from input text
 	function createTextInstances(inputText: string) {
@@ -337,25 +338,37 @@
 
 		// Create an instance for each character
 		characters.forEach((char, index) => {
-			textInstances.push(char);
+			textInstances.push({
+				char: char,
+				position: [Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5]
+			});
 		});
+
+		console.log(textInstances.length);
 
 		return textInstances;
 	}
 
 	// Example usage - you can call this with any text
 	const sampleText =
-		'Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdflkgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74ntcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mgwherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg';
+		'Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdfl		kgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74n		tcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mg		wherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg		Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdfl		kgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74n		tcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mg		wherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg		Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdfl		kgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74n		tcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mg		wherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg		Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdfl		kgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74n		tcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mg		wherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg';
 	createTextInstances(sampleText);
 </script>
 
-<PerfMonitor anchorY="bottom" />
+<!-- <PerfMonitor anchorY="bottom" /> -->
 
 <T.PerspectiveCamera makeDefault position={[50, 20, 50]}>
 	<CameraControls bind:ref={controls} />
 </T.PerspectiveCamera>
 
-<T.DirectionalLight position={[1, 2, 5]} intensity={0.8} />
+<T.DirectionalLight
+	position={[1, 2, 5]}
+	intensity={1}
+	castShadow
+	shadow.mapSize.width={1024}
+	shadow.mapSize.height={1024}
+	shadow.bias={0.0001}
+/>
 
 <!-- <T.Mesh position={[0, 0, 0]}>
 	<T.SphereGeometry radius={1} />
@@ -370,7 +383,7 @@
 	<T.BoxGeometry />
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
-	<Attractor range={100} strength={5} position={[0.001, 0, 0]} />
+	<Attractor range={50} strength={5} position={[0.001, 0, 0]} />
 	<Attractor range={6} strength={-5} position={[0.001, 0, 0]} />
 
 	<RigidBody>
@@ -378,28 +391,32 @@
 		<T.Mesh position={[0, 0, 0]}>
 			<!-- <FakeGlowMaterial glowColor="white" /> -->
 			<T.SphereGeometry radius={4} />
-			<T.MeshToonMaterial color="white" />
+			<T.MeshBasicMaterial color="#ffffff" toneMapped={false} />
 		</T.Mesh>
 	</RigidBody>
 	<!-- Render each character as a separate 3D text instance -->
-	{#each textInstances as character, index}
-		<RigidBody>
-			<Collider shape="ball" args={[0.75]} mass={1} />
-			<T.Mesh
-				position={[(Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4]}
-			>
-				<!-- <FakeGlowMaterial glowColor="white" /> -->
-				<Text3DGeometry text={character} size={0.5} depth={0.1} />
-				<T.MeshBasicMaterial color="white" />
-				<!-- <T.MeshToonMaterial color="white" /> -->
-			</T.Mesh>
-			<!-- <T.SphereGeometry radius={0.75} position={[0, 0, 0]} />
+
+	<InstancedMesh {textInstances} range={textInstances.length}>
+		{#each textInstances as character}
+			<Instance>
+				<!-- <BakeShadows /> -->
+				<RigidBody>
+					<Collider shape="ball" args={[0.1]} mass={1} />
+					<T.Mesh position={[character.position[0], character.position[1], character.position[2]]}>
+						<!-- <FakeGlowMaterial glowColor="white" /> -->
+						<Text3DGeometry text={character.char} size={0.5} depth={0.1} curveSegments={2} />
+						<T.MeshBasicMaterial color="#ffffff" toneMapped={false} />
+						<!-- <T.MeshToonMaterial color="white" /> -->
+					</T.Mesh>
+					<!-- <T.SphereGeometry radius={0.75} position={[0, 0, 0]} />
 			<T.MeshToonMaterial color="red" />
 			<T.Mesh position={[0, 0, 0]}>
 				<T.MeshToonMaterial color="blue" />
 			</T.Mesh> -->
-		</RigidBody>
-	{/each}
+				</RigidBody>
+			</Instance>
+		{/each}
+	</InstancedMesh>
 </World>
 
 <!-- <InstancedMesh {instances} range={instances.length}>
