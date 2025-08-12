@@ -147,8 +147,8 @@
 						cluster_audio_id,
 						storyObject,
 						text_length,
-						[0, 0, 0],
 						text_instances,
+						[0, 0, 0],
 						story_positions,
 						story_velocities
 					)
@@ -246,8 +246,6 @@
 
 <World gravity={[0, 0, 0]}>
 	<InstancedMesh {instances} range={instances.length}>
-		<!-- <T.SphereGeometry /> -->
-		<!-- <T.MeshBasicMaterial /> -->
 		{#each instances as instance}
 			<Instance
 				position.x={instance.positions.x}
@@ -324,129 +322,24 @@
 					<T.SphereGeometry args={[instance.scale * 10, sphereResolution, sphereResolution]} />
 					<FakeGlowMaterial glowColor="#404040" opacity={0.01} />
 				</T.Mesh>
-				<InstancedMesh instances={instance.text_instances} range={instance.text_instances.length}>
-					{#each instance.text_instances as text_instance}
-						<Instance>
-							<RigidBody>
-								<Collider shape="ball" args={[0.1]} mass={1} />
-								<T.Mesh position={text_instance.position}>
-									<Text3DGeometry
-										text={text_instance.char}
-										size={0.25}
-										depth={0.1}
-										curveSegments={2}
-									/>
-									<T.MeshBasicMaterial color="#ff0000" toneMapped={false} />
-								</T.Mesh>
-							</RigidBody>
-						</Instance>
-					{/each}
-				</InstancedMesh>
+				{#if instance.text_instances && instance.text_instances.length > 0}
+					<InstancedMesh instances={instance.text_instances} range={instance.text_instances.length}>
+						{#each instance.text_instances as text_instance}
+							{#if text_instance && text_instance.char && text_instance.position}
+								<Instance>
+									<RigidBody>
+										<Collider shape="ball" args={[0.1]} mass={1} />
+										<T.Mesh position={text_instance.position}>
+											<Text3DGeometry text="a" size={0.25} depth={0.1} curveSegments={2} />
+											<T.MeshBasicMaterial color="#ff0000" toneMapped={false} />
+										</T.Mesh>
+									</RigidBody>
+								</Instance>
+							{/if}
+						{/each}
+					</InstancedMesh>
+				{/if}
 			</Instance>
 		{/each}
 	</InstancedMesh>
 </World>
-
-<!-- <World gravity={[0, 0, 0]}>
-
-
-	<InstancedMesh {instances} range={instances.length}>
-		{#each instances as story}
-			<Instance
-				position.x={story.positions.x}
-				position.y={story.positions.y}
-				position.z={story.positions.z}
-				scale={story.scale}
-				color={story.color}
-				onclick={() => {
-					// Reset all other instances' selected state
-					instances.forEach((inst) => (inst.selected = false));
-					// Set this instance as selected and keep it highlighted
-					story.selected = true;
-					story.tw.set(1);
-					selectedStory = story;
-
-					// Center camera on the selected story
-					if (controls) {
-						// Move camera to look at the story with smooth transition
-						controls.setLookAt(
-							story.positions.x,
-							story.positions.y,
-							story.positions.z + 20, // Camera position (offset from story)
-							story.positions.x,
-							story.positions.y,
-							story.positions.z, // Look at the story position
-							true // Enable smooth transition
-						);
-					}
-
-					// Play sound effect when modal opens using cluster-specific sound
-					soundEffects.playEffect(story.cluster_audio_id);
-				}}
-				onpointerenter={() => {
-					// Only animate if not selected
-					if (!story.selected) {
-						story.tw.set(1);
-					}
-				}}
-				onpointerleave={() => {
-					// Only reset if not selected
-					if (!story.selected) {
-						story.tw.set(0);
-					}
-				}}
-			>
-				<Attractor
-					range={50}
-					strength={5}
-					position={[
-						story.positions.x + (Math.random() - 0.5) * 0.001,
-						story.positions.y + (Math.random() - 0.5) * 0.001,
-						story.positions.z + (Math.random() - 0.5) * 0.001
-					]}
-				/>
-				<Attractor
-					range={6}
-					strength={-5}
-					position={[
-						story.positions.x + (Math.random() - 0.5) * 0.001,
-						story.positions.y + (Math.random() - 0.5) * 0.001,
-						story.positions.z + (Math.random() - 0.5) * 0.001
-					]}
-				/>
-
-				<RigidBody>
-					<Collider shape="ball" args={[5]} mass={Infinity} />
-					<T.Mesh position={[story.positions.x, story.positions.y, story.positions.z]}>
-						<T.SphereGeometry args={[1, sphereResolution, sphereResolution]} />
-						<T.MeshBasicMaterial color="white" toneMapped={false} />
-					</T.Mesh>
-					<T.Mesh position={[story.positions.x, story.positions.y, story.positions.z]}>
-						<T.SphereGeometry args={[story.scale * 2, sphereResolution, sphereResolution]} />
-						<FakeGlowMaterial glowColor="white" toneMapped={false} glowInternalRadius={5} />
-					</T.Mesh>
-					<T.Mesh position={[story.positions.x, story.positions.y, story.positions.z]}>
-						<T.SphereGeometry args={[story.scale * 10, sphereResolution, sphereResolution]} />
-						<FakeGlowMaterial glowColor="#404040" opacity={0.01} />
-					</T.Mesh>
-				</RigidBody>
-			</Instance>
-		{/each}
-	</InstancedMesh>
-
-	{#each instances as story}
-		{#if story.text_instances && story.text_instances.length > 0}
-			{#each story.text_instances as character}
-				{#if character && character.char && character.position}
-					<RigidBody>
-						<Collider shape="ball" args={[0.1]} mass={1} />
-						<T.Mesh position={character.position}>
-							<Text3DGeometry text={character.char} size={0.25} depth={0.1} curveSegments={2} />
-							<T.MeshBasicMaterial color="#ff0000" toneMapped={false} />
-						</T.Mesh>
-					</RigidBody>
-				{/if}
-			{/each}
-		{/if}
-	{/each}
-</World> -->
