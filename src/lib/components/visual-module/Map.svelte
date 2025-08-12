@@ -293,6 +293,24 @@
 					}
 				}}
 			>
+				<Attractor
+					range={50}
+					strength={5}
+					position={[
+						instance.positions.x + (Math.random() - 0.5) * 0.001,
+						instance.positions.y + (Math.random() - 0.5) * 0.001,
+						instance.positions.z + (Math.random() - 0.5) * 0.001
+					]}
+				/>
+				<Attractor
+					range={6}
+					strength={-5}
+					position={[
+						instance.positions.x + (Math.random() - 0.5) * 0.001,
+						instance.positions.y + (Math.random() - 0.5) * 0.001,
+						instance.positions.z + (Math.random() - 0.5) * 0.001
+					]}
+				/>
 				<Collider shape="ball" args={[5]} mass={Infinity} />
 				<T.Mesh>
 					<T.SphereGeometry args={[instance.scale, sphereResolution, sphereResolution]} />
