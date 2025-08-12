@@ -2,22 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
 	import * as THREE from 'three';
-	import {
-		SphereGeometry,
-		BoxGeometry,
-		ConeGeometry,
-		CylinderGeometry,
-		DodecahedronGeometry,
-		IcosahedronGeometry,
-		OctahedronGeometry,
-		TetrahedronGeometry,
-		TorusGeometry,
-		TorusKnotGeometry,
-		PlaneGeometry,
-		RingGeometry,
-		CapsuleGeometry,
-		Color
-	} from 'three';
+	import { CatmullRomCurve3, Vector3, Color } from 'three';
 	import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 	import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
 	// import { SimplexNoise } from 'three/examples/jsm/Addons.js';
@@ -31,152 +16,15 @@
 		Text3DGeometry,
 		PerfMonitor,
 		FakeGlowMaterial,
+		MeshLineGeometry,
+		MeshLineMaterial,
 		BakeShadows
 	} from '@threlte/extras';
 	import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
 	import { tracklist } from '$lib/components/media/audio/tracklist';
 	import { soundEffects } from '$lib/utils/soundEffects';
 
-	const worldScale: number = 10;
-	let instances: StoryInstance[] = $state([]);
-	const centroidOffset: number = 15;
-	let centroid = $state(new THREE.Vector3());
-
-	// const loader = new FontLoader();
-	// let loadedFont: Font | null = null;
-
-	// const font = loader.load('/Roboto_Slab_Regular.json', (font) => {
-	// 	loadedFont = font;
-	// 	// console.log('Font loaded successfully', loadedFont);
-	// 	// Repopulate data now that font is loaded to get text geometries
-	// 	if (data) {
-	// 		populateFromData();
-	// 	}
-	// });
-
-	// // Array of possible geometries with their creation functions
-	// const geometryTypes = [
-	// 	{
-	// 		name: 'sphere',
-	// 		create: (size: number) => new SphereGeometry(size, 16, 16)
-	// 	},
-	// 	{
-	// 		name: 'box',
-	// 		create: (size: number) => new BoxGeometry(size, size, size)
-	// 	},
-	// 	{
-	// 		name: 'cone',
-	// 		create: (size: number) => new ConeGeometry(size, size * 1.5, 8)
-	// 	},
-	// 	{
-	// 		name: 'cylinder',
-	// 		create: (size: number) => new CylinderGeometry(size, size, size * 1.5, 8)
-	// 	},
-	// 	{
-	// 		name: 'dodecahedron',
-	// 		create: (size: number) => new DodecahedronGeometry(size)
-	// 	},
-	// 	{
-	// 		name: 'icosahedron',
-	// 		create: (size: number) => new IcosahedronGeometry(size)
-	// 	},
-	// 	{
-	// 		name: 'octahedron',
-	// 		create: (size: number) => new OctahedronGeometry(size)
-	// 	},
-	// 	{
-	// 		name: 'tetrahedron',
-	// 		create: (size: number) => new TetrahedronGeometry(size)
-	// 	},
-	// 	{
-	// 		name: 'torus',
-	// 		create: (size: number) => new TorusGeometry(size, size * 0.3, 8, 16)
-	// 	},
-	// 	{
-	// 		name: 'torusKnot',
-	// 		create: (size: number) => new TorusKnotGeometry(size, size * 0.3, 64, 8)
-	// 	},
-	// 	{
-	// 		name: 'capsule',
-	// 		create: (size: number) => new CapsuleGeometry(size * 0.5, size, 4, 8)
-	// 	},
-	// 	{
-	// 		name: 'text',
-	// 		create: (size: number, text: string = 'Default') => {
-	// 			if (!loadedFont) {
-	// 				// console.warn('Font not loaded yet, falling back to sphere geometry');
-	// 				return new SphereGeometry(size, 16, 16);
-	// 			}
-	// 			try {
-	// 				// console.log(
-	// 				// 	`Creating TextGeometry with: text="${text}", size=${size}, font:`,
-	// 				// 	loadedFont
-	// 				// );
-	// 				const textGeometry = new TextGeometry(text, {
-	// 					font: loadedFont,
-	// 					size: size,
-	// 					depth: 0.1,
-	// 					curveSegments: 2,
-	// 					bevelEnabled: false
-	// 				});
-	// 				// console.log('TextGeometry created successfully:', textGeometry);
-	// 				return textGeometry;
-	// 			} catch (error) {
-	// 				// console.error('Error creating TextGeometry:', error);
-	// 				return new SphereGeometry(size, 16, 16);
-	// 			}
-	// 		}
-	// 	}
-	// ];
-
-	// // Function to get a random geometry type
-	// function getRandomGeometry(size: number) {
-	// 	const randomIndex = Math.floor(Math.random() * geometryTypes.length);
-	// 	return geometryTypes[randomIndex].create(size);
-	// }
-
-	// // Function to get geometry by cluster (consistent shapes per cluster)
-	// function getClusterGeometry(clusterIndex: number, size: number, text?: string) {
-	// 	const geometryIndex = clusterIndex % geometryTypes.length;
-	// 	const selectedGeometry = geometryTypes[geometryIndex];
-
-	// 	// console.log(
-	// 	// 	`Cluster ${clusterIndex}: Selected geometry type: ${selectedGeometry.name}, Font loaded: ${!!loadedFont}`
-	// 	// );
-
-	// 	// If it's a text geometry and we have text, pass it to the create function
-	// 	if (selectedGeometry.name === 'text' && text) {
-	// 		// console.log(`Creating text geometry with text: "${text}"`);
-	// 		return selectedGeometry.create(size, text);
-	// 	}
-
-	// 	return selectedGeometry.create(size);
-	// }
-
-	// // Function to add line breaks after periods for better text geometry formatting
-	// function processTextForGeometry(text: string): string {
-	// 	return text.replace(/\./g, '.\n');
-	// }
-
-	// // Function to map text length to a range from 1 to 5
-	// function mapTextLengthToRange(textLength: number): number {
-	// 	// Define the expected range of text lengths (you may need to adjust these based on your data)
-	// 	const minRange = 1;
-	// 	const maxRange = 4;
-	// 	const minTextLength = 0;
-	// 	const maxTextLength = 1000; // Adjust this based on your typical text lengths
-
-	// 	// Clamp the text length to the expected range
-	// 	const clampedLength = Math.max(minTextLength, Math.min(maxTextLength, textLength));
-
-	// 	// Map from [minTextLength, maxTextLength] to [1, 5]
-	// 	const mappedLength =
-	// 		minRange +
-	// 		((clampedLength - minTextLength) / (maxTextLength - minTextLength)) * (maxRange - minRange);
-
-	// 	return mappedLength;
-	// }
-
+	// Props
 	let {
 		data,
 		selectedStory = $bindable(),
@@ -187,6 +35,13 @@
 		controls?: CameraControlsRef;
 	} = $props();
 
+	// State
+	const worldScale: number = 10;
+	let instances: StoryInstance[] = $state([]);
+	const centroidOffset: number = 15;
+	let centroid = $state(new THREE.Vector3());
+
+	// Interactivity
 	interactivity({
 		filter(items) {
 			// only report the first intersection
@@ -212,7 +67,6 @@
 			const cluster_audio_id = getRandomClusterTitle();
 
 			// Get the color of the cluster
-			// const grayValue = Math.random();
 			const initialColor = new Color(Math.random(), Math.random(), Math.random());
 			const selectedColor = new Color('white');
 
@@ -222,11 +76,6 @@
 				const scale = 1;
 				const cluster_id = cluster.text;
 				const storyObject = story;
-
-				// const processedText = processTextForGeometry(story[0].text);
-				// Use cluster-based geometry (same shape for all stories in a cluster)
-				// Pass processed text with line breaks for text geometry
-				// const storyGeometry = getClusterGeometry(i, text_length / 10, processedText);
 
 				// Get coordinates from the first variant of the story
 				let story_positions = {
@@ -240,12 +89,6 @@
 					vz: (Math.random() - 0.5) * 0.1
 				};
 
-				// let cluster_center = {
-				// 	cx: cluster.som[0],
-				// 	cy: cluster.som[0],
-				// 	cz: cluster.som[0]
-				// };
-
 				instances.push(
 					new StoryInstance(
 						initialColor,
@@ -255,11 +98,9 @@
 						cluster_audio_id,
 						storyObject,
 						text_length,
-						// storyGeometry,
 						[1, 2, 3],
 						story_positions,
 						story_velocities
-						// cluster_center
 					)
 				);
 			}
@@ -268,6 +109,7 @@
 		lookAtCentroid();
 	}
 
+	// Calculate centroid
 	function calculateCentroid() {
 		const centroidValue = new THREE.Vector3();
 		for (let i = 0; i < instances.length; i++) {
@@ -275,6 +117,19 @@
 		}
 		centroidValue.divideScalar(instances.length);
 		return centroidValue;
+	}
+
+	// Look at centroid
+	function lookAtCentroid() {
+		controls?.setLookAt(
+			centroid.x,
+			centroid.y,
+			centroid.z + centroidOffset,
+			centroid.x,
+			centroid.y,
+			centroid.z,
+			true
+		);
 	}
 
 	// Effect to reset selected sphere when modal closes
@@ -289,24 +144,6 @@
 			});
 		}
 	});
-
-	// $effect(() => {
-	// 	for (let i = 0; i < instances.length; i++) {
-	// 		instances[i].geometry.computeVertexNormals();
-	// 	}
-	// });
-
-	function lookAtCentroid() {
-		controls?.setLookAt(
-			centroid.x,
-			centroid.y,
-			centroid.z + centroidOffset,
-			centroid.x,
-			centroid.y,
-			centroid.z,
-			true
-		);
-	}
 
 	onMount(() => {
 		// Preload sound effects for better performance
@@ -353,6 +190,17 @@
 	const sampleText =
 		'Hello World! adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdflkgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74n		tcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mgwherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg';
 	createTextInstances(sampleText);
+
+	// create a smooth curve from 4 points
+	const curve = new CatmullRomCurve3([
+		new Vector3(0, 0, 0),
+		new Vector3(5, -5, 5),
+		new Vector3(10, 10, 10),
+		new Vector3(15, 15, 15)
+	]);
+
+	// convert curve to an array of 100 points
+	const points = curve.getPoints(100);
 </script>
 
 <!-- <PerfMonitor anchorY="bottom" /> -->
@@ -379,6 +227,13 @@
 	<T.BoxGeometry />
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
+
+	<T.Mesh position={[0, 0, 0]} scale={5}>
+		<MeshLineGeometry {points} />
+
+		<MeshLineMaterial color="white" width={0.05} />
+	</T.Mesh>
+
 	<Attractor range={50} strength={5} position={[0.001, 0, 0]} />
 	<Attractor range={6} strength={-5} position={[0.001, 0, 0]} />
 
