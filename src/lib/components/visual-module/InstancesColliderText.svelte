@@ -194,101 +194,101 @@
 		}
 	});
 
-	// // Helper function to get random cluster title
-	// function getRandomClusterTitle(): string {
-	// 	const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
-	// 	const randomIndex = Math.floor(Math.random() * clusterTracks.length);
-	// 	return clusterTracks[randomIndex].title;
-	// }
+	// Helper function to get random cluster title
+	function getRandomClusterTitle(): string {
+		const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
+		const randomIndex = Math.floor(Math.random() * clusterTracks.length);
+		return clusterTracks[randomIndex].title;
+	}
 
-	// function populateFromData() {
-	// 	if (!data || !data.clusters) return;
+	function populateFromData() {
+		if (!data || !data.clusters) return;
 
-	// 	// Clear existing instances to avoid duplicates
-	// 	instances.length = 0;
+		// Clear existing instances to avoid duplicates
+		instances.length = 0;
 
-	// 	for (let i = 0; i < data.clusters.length; i += 1) {
-	// 		const cluster = data.clusters[i];
-	// 		const cluster_audio_id = getRandomClusterTitle();
+		for (let i = 0; i < data.clusters.length; i += 1) {
+			const cluster = data.clusters[i];
+			const cluster_audio_id = getRandomClusterTitle();
 
-	// 		// Get the color of the cluster
-	// 		// const grayValue = Math.random();
-	// 		const initialColor = new Color(Math.random(), Math.random(), Math.random());
-	// 		const selectedColor = new Color('white');
+			// Get the color of the cluster
+			// const grayValue = Math.random();
+			const initialColor = new Color(Math.random(), Math.random(), Math.random());
+			const selectedColor = new Color('white');
 
-	// 		for (let j = 0; j < cluster.stories.length; j += 1) {
-	// 			const story = cluster.stories[j];
-	// 			const text_length = mapTextLengthToRange(story[0].text.length);
-	// 			const scale = 1 + text_length;
-	// 			const cluster_id = cluster.text;
-	// 			const storyObject = story;
+			for (let j = 0; j < cluster.stories.length; j += 1) {
+				const story = cluster.stories[j];
+				const text_length = story[0].text.length;
+				const scale = 1;
+				const cluster_id = cluster.text;
+				const storyObject = story;
 
-	// 			const processedText = processTextForGeometry(story[0].text);
-	// 			// Use cluster-based geometry (same shape for all stories in a cluster)
-	// 			// Pass processed text with line breaks for text geometry
-	// 			const storyGeometry = getClusterGeometry(i, text_length / 10, processedText);
+				// const processedText = processTextForGeometry(story[0].text);
+				// Use cluster-based geometry (same shape for all stories in a cluster)
+				// Pass processed text with line breaks for text geometry
+				// const storyGeometry = getClusterGeometry(i, text_length / 10, processedText);
 
-	// 			// Get coordinates from the first variant of the story
-	// 			let story_positions = {
-	// 				x: story[0].coordinates[0] * worldScale,
-	// 				y: story[0].coordinates[1] * worldScale,
-	// 				z: story[0].coordinates[2] * worldScale
-	// 			};
-	// 			let story_velocities = {
-	// 				vx: (Math.random() - 0.5) * 0.1,
-	// 				vy: (Math.random() - 0.5) * 0.1,
-	// 				vz: (Math.random() - 0.5) * 0.1
-	// 			};
+				// Get coordinates from the first variant of the story
+				let story_positions = {
+					x: story[0].coordinates[0] * worldScale,
+					y: story[0].coordinates[1] * worldScale,
+					z: story[0].coordinates[2] * worldScale
+				};
+				let story_velocities = {
+					vx: (Math.random() - 0.5) * 0.1,
+					vy: (Math.random() - 0.5) * 0.1,
+					vz: (Math.random() - 0.5) * 0.1
+				};
 
-	// 			let cluster_center = {
-	// 				cx: cluster.som[0],
-	// 				cy: cluster.som[0],
-	// 				cz: cluster.som[0]
-	// 			};
+				// let cluster_center = {
+				// 	cx: cluster.som[0],
+				// 	cy: cluster.som[0],
+				// 	cz: cluster.som[0]
+				// };
 
-	// 			instances.push(
-	// 				new StoryInstance(
-	// 					initialColor,
-	// 					selectedColor,
-	// 					scale,
-	// 					cluster_id,
-	// 					cluster_audio_id,
-	// 					storyObject,
-	// 					text_length,
-	// 					storyGeometry,
-	// 					[1, 2, 3],
-	// 					story_positions,
-	// 					story_velocities,
-	// 					cluster_center
-	// 				)
-	// 			);
-	// 		}
-	// 	}
-	// 	centroid = calculateCentroid();
-	// 	lookAtCentroid();
-	// }
+				instances.push(
+					new StoryInstance(
+						initialColor,
+						selectedColor,
+						scale,
+						cluster_id,
+						cluster_audio_id,
+						storyObject,
+						text_length,
+						// storyGeometry,
+						[1, 2, 3],
+						story_positions,
+						story_velocities
+						// cluster_center
+					)
+				);
+			}
+		}
+		centroid = calculateCentroid();
+		lookAtCentroid();
+	}
 
-	// function calculateCentroid() {
-	// 	const centroidValue = new THREE.Vector3();
-	// 	for (let i = 0; i < instances.length; i++) {
-	// 		centroidValue.add(instances[i].positions);
-	// 	}
-	// 	centroidValue.divideScalar(instances.length);
-	// 	return centroidValue;
-	// }
+	function calculateCentroid() {
+		const centroidValue = new THREE.Vector3();
+		for (let i = 0; i < instances.length; i++) {
+			centroidValue.add(instances[i].positions);
+		}
+		centroidValue.divideScalar(instances.length);
+		return centroidValue;
+	}
 
-	// // Effect to reset selected sphere when modal closes
-	// $effect(() => {
-	// 	if (selectedStory === null) {
-	// 		// Modal closed, reset all selected states
-	// 		instances.forEach((instance) => {
-	// 			if (instance.selected) {
-	// 				instance.selected = false;
-	// 				instance.tw.set(0);
-	// 			}
-	// 		});
-	// 	}
-	// });
+	// Effect to reset selected sphere when modal closes
+	$effect(() => {
+		if (selectedStory === null) {
+			// Modal closed, reset all selected states
+			instances.forEach((instance) => {
+				if (instance.selected) {
+					instance.selected = false;
+					instance.tw.set(0);
+				}
+			});
+		}
+	});
 
 	// $effect(() => {
 	// 	for (let i = 0; i < instances.length; i++) {
@@ -350,7 +350,8 @@
 	}
 
 	// Example usage - you can call this with any text
-	const sampleText = 'Hello World!';
+	const sampleText =
+		'Hello World! adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdflkgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74n		tcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mgwherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg';
 	createTextInstances(sampleText);
 </script>
 
@@ -383,19 +384,20 @@
 
 	<RigidBody>
 		<Collider shape="ball" args={[5]} mass={Infinity} />
-
 		<T.Mesh position={[0, 0, 0]}>
 			<T.SphereGeometry args={[1, 32, 32]} />
 			<T.MeshBasicMaterial color="white" toneMapped={false} />
 		</T.Mesh>
 		<T.Mesh position={[0, 0, 0]}>
-			<!-- <FakeGlowMaterial glowColor="white" /> -->
-
 			<T.SphereGeometry args={[2, 32, 32]} />
 			<FakeGlowMaterial glowColor="white" toneMapped={false} glowInternalRadius={5} />
-			<!-- <T.MeshBasicMaterial color="#ffffff" toneMapped={false} /> -->
+		</T.Mesh>
+		<T.Mesh position={[0, 0, 0]}>
+			<T.SphereGeometry args={[10, 32, 32]} />
+			<FakeGlowMaterial glowColor="#404040" opacity={0.01} />
 		</T.Mesh>
 	</RigidBody>
+
 	<!-- Render each character as a separate 3D text instance -->
 
 	<InstancedMesh {textInstances} range={textInstances.length}>
@@ -406,7 +408,7 @@
 					<Collider shape="ball" args={[0.1]} mass={1} />
 					<T.Mesh position={[character.position[0], character.position[1], character.position[2]]}>
 						<!-- <FakeGlowMaterial glowColor="white" /> -->
-						<Text3DGeometry text={character.char} size={0.5} depth={0.1} curveSegments={2} />
+						<Text3DGeometry text={character.char} size={0.25} depth={0.1} curveSegments={2} />
 						<T.MeshBasicMaterial color="#ffffff" toneMapped={false} />
 						<!-- <T.MeshToonMaterial color="white" /> -->
 					</T.Mesh>

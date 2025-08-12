@@ -29,20 +29,20 @@ export default class {
     public cluster_audio_id: string,
     public story: any[], 
     public story_text_length: number,
-    public geometry: any,
+    // public geometry: any,
     public curve: any,
     positions: {x: number, y: number, z: number},
     velocities: {vx: number, vy: number, vz: number},
-    cluster_initial_position: {cx: number, cy: number, cz: number},
+    // cluster_initial_position: {cx: number, cy: number, cz: number},
   ) {
     this.initialColor.set(initialColor)
     this.selectedColor.set(selectedColor)
     
     // Set initial positions and velocities
     this.curve = curve
-    this.geometry = geometry
+    // this.geometry = geometry
     this.positions = positions
     this.velocities = velocities
-    this.cluster_initial_position = cluster_initial_position
+    // this.cluster_initial_position = cluster_initial_position
   }
 }
