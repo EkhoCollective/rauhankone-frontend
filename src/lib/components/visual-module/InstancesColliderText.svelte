@@ -350,25 +350,20 @@
 	}
 
 	// Example usage - you can call this with any text
-	const sampleText =
-		'Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdfl		kgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74n		tcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mg		wherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg		Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdfl		kgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74n		tcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mg		wherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg		Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdfl		kgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74n		tcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mg		wherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg		Hello World!adskjgbaskjghaslfdkjghsldfjkghsdlfkjghsdflkjghsdfl		kgjshdflgkjdjfdabsdlfkawböuhqrluitho3i45ythy3874tyw3i47urycs74n		tcwyj4t4cnejergregfnskegcseknctgn3i84cutyq3xm4k74itymwskeir7mg		wherrmynsgiwskfxrgmjfsujerfhlgsjkdfhg';
+	const sampleText = 'Hello World!';
 	createTextInstances(sampleText);
 </script>
 
 <!-- <PerfMonitor anchorY="bottom" /> -->
 
-<T.PerspectiveCamera makeDefault position={[50, 20, 50]}>
+<T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 	<CameraControls bind:ref={controls} />
 </T.PerspectiveCamera>
 
-<T.DirectionalLight
+<!-- <T.DirectionalLight
 	position={[1, 2, 5]}
 	intensity={1}
-	castShadow
-	shadow.mapSize.width={1024}
-	shadow.mapSize.height={1024}
-	shadow.bias={0.0001}
-/>
+/> -->
 
 <!-- <T.Mesh position={[0, 0, 0]}>
 	<T.SphereGeometry radius={1} />
@@ -388,11 +383,17 @@
 
 	<RigidBody>
 		<Collider shape="ball" args={[5]} mass={Infinity} />
+
+		<T.Mesh position={[0, 0, 0]}>
+			<T.SphereGeometry args={[1, 32, 32]} />
+			<T.MeshBasicMaterial color="white" toneMapped={false} />
+		</T.Mesh>
 		<T.Mesh position={[0, 0, 0]}>
 			<!-- <FakeGlowMaterial glowColor="white" /> -->
-			<T.SphereGeometry radius={4} />
+
+			<T.SphereGeometry args={[2, 32, 32]} />
+			<FakeGlowMaterial glowColor="white" toneMapped={false} glowInternalRadius={5} />
 			<!-- <T.MeshBasicMaterial color="#ffffff" toneMapped={false} /> -->
-			<FakeGlowMaterial glowColor="white" toneMapped={false} />
 		</T.Mesh>
 	</RigidBody>
 	<!-- Render each character as a separate 3D text instance -->
