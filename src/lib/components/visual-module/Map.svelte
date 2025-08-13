@@ -55,7 +55,9 @@
 
 	const clusterSpread: number = 3;
 	const lineThickness: number = 0.025;
+	const pointSize: number = 0.025;
 	const curviness: number = 0.35;
+	const pointCloudShrink: number = 0.5;
 
 	let noise = new SimplexNoise();
 
@@ -105,31 +107,30 @@
 	}
 
 	// Function to create character instances from input text
-	function createTextInstances(inputText: string, storyPosition: Vector3) {
+	function createTextInstances(inputText: string, scale: number, storyPosition: Vector3) {
 		const textInstances: any[] = [];
 
 		// Convert text to array of characters
 		const characters = inputText.split('');
 
-		// Create an instance for each character
-		// characters.forEach((char, index) => {
-		// 	textInstances.push({
-		// 		char: char,
-		// 		position: [
-		// 			storyPosition.x + (Math.random() - 0.5) * 2,
-		// 			storyPosition.y + (Math.random() - 0.5) * 2,
-		// 			storyPosition.z + (Math.random() - 0.5) * 2
-		// 		]
-		// 	});
-		// });
+		// Define spherical distribution parameters
+		const minRadius = scale * 0.85; // Minimum distance from story center
+		const maxRadius = scale; // Maximum distance from story center
 
+		// Create an instance for each character with spherical distribution
 		characters.forEach((char, index) => {
+			// Generate random spherical coordinates
+			const radius = minRadius + Math.random() * (maxRadius - minRadius);
+			const theta = Math.random() * Math.PI * 2; // Azimuthal angle (0 to 2π)
+			const phi = Math.acos(2 * Math.random() - 1); // Polar angle (0 to π) - uniform distribution
+
+			// Convert spherical to cartesian coordinates
+			const x = radius * Math.sin(phi) * Math.cos(theta);
+			const y = radius * Math.sin(phi) * Math.sin(theta);
+			const z = radius * Math.cos(phi);
+
 			textInstances.push(
-				new Vector3(
-					storyPosition.x + (Math.random() - 0.5) * 2,
-					storyPosition.y + (Math.random() - 0.5) * 2,
-					storyPosition.z + (Math.random() - 0.5) * 2
-				)
+				new Vector3(storyPosition.x + x, storyPosition.y + y, storyPosition.z + z)
 			);
 		});
 
@@ -180,22 +181,6 @@
 				}
 			}
 
-			// console.log(allStoryPositions);
-
-			// Create curve from cluster positions (need at least 2 points)
-			// let points: Vector3[] = [];
-			// if (clusterPositions.length >= 2) {
-			// 	// If only 2 points, add intermediate points for better curve
-			// 	if (clusterPositions.length === 2) {
-			// 		const midPoint = clusterPositions[0].clone().lerp(clusterPositions[1], 0.5);
-			// 		const curve = new CatmullRomCurve3([clusterPositions[0], midPoint, clusterPositions[1]]);
-			// 		points = curve.getPoints(100);
-			// 	} else {
-			// 		const curve = new CatmullRomCurve3(clusterPositions);
-			// 		points = curve.getPoints(100);
-			// 	}
-			// }
-
 			for (let j = 0; j < cluster.stories.length; j += 1) {
 				const story = cluster.stories[j];
 				const text_length = story[0].text.length;
@@ -220,6 +205,7 @@
 
 				let text_instances = createTextInstances(
 					story[0].text,
+					scale,
 					new Vector3(story_positions.x, story_positions.y, story_positions.z)
 				);
 
@@ -427,32 +413,27 @@
 				{/each}
 			{/if}
 
+			<!-- Text instance points - outside MeshA for proper radial scaling -->
 			{#if instance.text_instances && instance.text_instances.length > 0}
 				<T.Points>
-					{@const geometry = new BufferGeometry().setFromPoints(instance.text_instances)}
+					{@const scaledPoints = instance.text_instances.map((point) => {
+						// Calculate direction vector from sphere center to point
+						const direction = point
+							.clone()
+							.sub(new Vector3(instance.positions.x, instance.positions.y, instance.positions.z));
+						// Scale the direction vector based on tween value and add back to center
+						const scaleFactor = 1 - instance.tw.current * pointCloudShrink; // Scale from 0.5 to 1.0
+						return new Vector3(
+							instance.positions.x,
+							instance.positions.y,
+							instance.positions.z
+						).add(direction.multiplyScalar(scaleFactor));
+					})}
+					{@const geometry = new BufferGeometry().setFromPoints(scaledPoints)}
 					<T is={geometry} />
-					<T.PointsMaterial size={0.25} />
+					<T.PointsMaterial size={pointSize} color="white" />
 				</T.Points>
 			{/if}
-			<!-- 
-			{#if instance.text_instances && instance.text_instances.length > 0}
-					{#each instance.text_instances as text_instance}
-						{#if text_instance}
-						<T.Mesh position={text_instance.position}>
-							<T.SphereGeometry args={[0.05]} />
-							<T.MeshBasicMaterial
-								color="white"
-								opacity={instance.tw.current * 0.3}
-								transparent={true}
-							/>
-						</T.Mesh>
-
-						<MeshB position={text_instance.position} scale={0.05} />
-						{/if}
-					{/each}
-				{/if} -->
-
-			<!-- Text instance spheres -->
 		{/each}
 	{/snippet}
 </InstancedMeshes>
