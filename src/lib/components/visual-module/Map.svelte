@@ -2,7 +2,16 @@
 	import { onMount, onDestroy } from 'svelte';
 	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
 	import * as THREE from 'three';
-	import { Mesh, SphereGeometry, MeshBasicMaterial, CatmullRomCurve3, Vector3, Color } from 'three';
+	import {
+		Mesh,
+		BoxGeometry,
+		SphereGeometry,
+		MeshBasicMaterial,
+		CatmullRomCurve3,
+		BufferGeometry,
+		Vector3,
+		Color
+	} from 'three';
 	// import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 	// import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
@@ -45,7 +54,7 @@
 	let instances: StoryInstance[] = $state([]);
 
 	const clusterSpread: number = 3;
-	const lineThickness: number = 0.02;
+	const lineThickness: number = 0.025;
 	const curviness: number = 0.35;
 
 	let noise = new SimplexNoise();
@@ -54,7 +63,11 @@
 		new Mesh(
 			new SphereGeometry(1, sphereResolution, sphereResolution),
 			new MeshBasicMaterial({ color: 'white', toneMapped: false, transparent: true, opacity: 0.1 })
-		) // MeshA - main sphere
+		), // MeshA - main sphere
+		new Mesh(
+			new BoxGeometry(1, 1, 1),
+			new MeshBasicMaterial({ color: 'white', toneMapped: false, transparent: true, opacity: 0.5 })
+		) // MeshB - text sphere
 	];
 
 	// Interactivity
@@ -99,15 +112,25 @@
 		const characters = inputText.split('');
 
 		// Create an instance for each character
+		// characters.forEach((char, index) => {
+		// 	textInstances.push({
+		// 		char: char,
+		// 		position: [
+		// 			storyPosition.x + (Math.random() - 0.5) * 2,
+		// 			storyPosition.y + (Math.random() - 0.5) * 2,
+		// 			storyPosition.z + (Math.random() - 0.5) * 2
+		// 		]
+		// 	});
+		// });
+
 		characters.forEach((char, index) => {
-			textInstances.push({
-				char: char,
-				position: [
+			textInstances.push(
+				new Vector3(
 					storyPosition.x + (Math.random() - 0.5) * 2,
 					storyPosition.y + (Math.random() - 0.5) * 2,
 					storyPosition.z + (Math.random() - 0.5) * 2
-				]
-			});
+				)
+			);
 		});
 
 		return textInstances;
@@ -403,6 +426,33 @@
 					</T.Mesh>
 				{/each}
 			{/if}
+
+			{#if instance.text_instances && instance.text_instances.length > 0}
+				<T.Points>
+					{@const geometry = new BufferGeometry().setFromPoints(instance.text_instances)}
+					<T is={geometry} />
+					<T.PointsMaterial size={0.25} />
+				</T.Points>
+			{/if}
+			<!-- 
+			{#if instance.text_instances && instance.text_instances.length > 0}
+					{#each instance.text_instances as text_instance}
+						{#if text_instance}
+						<T.Mesh position={text_instance.position}>
+							<T.SphereGeometry args={[0.05]} />
+							<T.MeshBasicMaterial
+								color="white"
+								opacity={instance.tw.current * 0.3}
+								transparent={true}
+							/>
+						</T.Mesh>
+
+						<MeshB position={text_instance.position} scale={0.05} />
+						{/if}
+					{/each}
+				{/if} -->
+
+			<!-- Text instance spheres -->
 		{/each}
 	{/snippet}
 </InstancedMeshes>
