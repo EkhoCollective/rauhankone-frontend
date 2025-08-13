@@ -14,6 +14,9 @@ export default class {
   velocities = $state({vx: 0, vy: 0, vz: 0})
   cluster_initial_position = $state({cx: 0, cy: 0, cz: 0})
   
+  // Store original positions for jiggle animation
+  originalPositions?: {x: number, y: number, z: number}
+  
   // Track if this sphere is currently selected
   selected = $state(false)
   

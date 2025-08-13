@@ -66,7 +66,14 @@
 	const curviness: number = 0.35;
 	const pointCloudShrink: number = 0.5;
 
+	// Jiggle movement variables
+	const storyJiggleIntensity: number = 0.02; // How much stories move
+	const pointJiggleIntensity: number = 0.1; // How much points move
+	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
+	const pointJiggleTime: number = 1000; // Speed of the jiggle animation
+
 	let noise = new SimplexNoise();
+	let time = $state(0);
 
 	const meshes = [
 		new Mesh(
@@ -398,7 +405,68 @@
 	navigateToClosestStory = navigateToClosest;
 	navigateToFurthestStory = navigateToFurthest;
 
-	// $inspect(instances[0]);
+	// Animation loop for jiggle movement
+	useTask((delta) => {
+		time += delta * jiggleSpeed;
+
+		// Update story positions with SimplexNoise jiggle
+		instances.forEach((instance, index) => {
+			// Use different noise seeds for each instance and axis
+			const noiseOffsetX = noise.noise3d(index * 100, time, 0) * storyJiggleIntensity;
+			const noiseOffsetY = noise.noise3d(index * 100, time, 100) * storyJiggleIntensity;
+			const noiseOffsetZ = noise.noise3d(index * 100, time, 200) * storyJiggleIntensity;
+
+			// Store original positions if not already stored
+			if (!instance.originalPositions) {
+				instance.originalPositions = {
+					x: instance.positions.x,
+					y: instance.positions.y,
+					z: instance.positions.z
+				};
+			}
+
+			// Apply jiggle to positions
+			instance.positions.x = instance.originalPositions.x + noiseOffsetX;
+			instance.positions.y = instance.originalPositions.y + noiseOffsetY;
+			instance.positions.z = instance.originalPositions.z + noiseOffsetZ;
+
+			// Generate random jiggle for text points
+			if (instance.text_instances && instance.text_instances.length > 0) {
+				instance.text_instances.forEach((point, pointIndex) => {
+					// Store original positions if not already stored
+					if (!point.originalPosition) {
+						point.originalPosition = point.clone();
+					}
+
+					// Apply random jiggle to each point
+					const randomOffsetX =
+						noise.noise3d(
+							pointIndex * 100,
+							time * pointJiggleTime * mapTextLengthToRange(instance.text_instances.length),
+							0
+						) * pointJiggleIntensity;
+					const randomOffsetY =
+						noise.noise3d(
+							pointIndex * 100,
+							time * pointJiggleTime * mapTextLengthToRange(instance.text_instances.length),
+							100
+						) * pointJiggleIntensity;
+					const randomOffsetZ =
+						noise.noise3d(
+							pointIndex * 100,
+							time * pointJiggleTime * mapTextLengthToRange(instance.text_instances.length),
+							200
+						) * pointJiggleIntensity;
+
+					point.x = point.originalPosition.x + randomOffsetX;
+					point.y = point.originalPosition.y + randomOffsetY;
+					point.z = point.originalPosition.z + randomOffsetZ;
+				});
+			}
+		});
+	});
+
+	// $inspect(time);
 </script>
 
 <!-- <PerfMonitor anchorY="bottom" /> -->
