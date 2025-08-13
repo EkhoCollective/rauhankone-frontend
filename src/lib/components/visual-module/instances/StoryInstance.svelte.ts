@@ -9,7 +9,7 @@ export default class {
   color = $derived(this.initialColor.clone().lerpHSL(this.selectedColor, this.tw.current))
   
   // Make position and velocity properties reactive 
-  shape = $state({radius: 1, wSeg: 3, hSeg: 3})
+  // shape = $state({radius: 1, wSeg: 3, hSeg: 3})
   positions = $state({x: 0, y: 0, z: 0})
   velocities = $state({vx: 0, vy: 0, vz: 0})
   cluster_initial_position = $state({cx: 0, cy: 0, cz: 0})
@@ -18,7 +18,7 @@ export default class {
   selected = $state(false)
   
   get scale() {
-    return this.tw.current + this.scale_init
+    return this.tw.current/5 + this.scale_init
     // fix this. put a minimum max size for every single point
   }
   constructor(
@@ -29,18 +29,20 @@ export default class {
     public cluster_audio_id: string,
     public story: any[], 
     public story_text_length: number,
-    public geometry: any,
+    public text_instances: any[],
+    public curve: any,
     positions: {x: number, y: number, z: number},
     velocities: {vx: number, vy: number, vz: number},
-    cluster_initial_position: {cx: number, cy: number, cz: number},
+    // cluster_initial_position: {cx: number, cy: number, cz: number},
   ) {
     this.initialColor.set(initialColor)
     this.selectedColor.set(selectedColor)
     
     // Set initial positions and velocities
-    this.geometry = geometry
+    this.curve = curve
+    this.text_instances = text_instances
     this.positions = positions
     this.velocities = velocities
-    this.cluster_initial_position = cluster_initial_position
+    // this.cluster_initial_position = cluster_initial_position
   }
 }
