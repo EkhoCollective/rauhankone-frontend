@@ -14,6 +14,7 @@
 	} from 'three';
 	// import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 	// import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
+	import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import {
@@ -53,15 +54,15 @@
 	const worldScale: number = 50;
 	const minSphereScale: number = 1;
 	const minMapScale: number = 0.1;
-	const maxMapScale: number = 1;
-	const sphereResolution: number = 16;
+	const maxMapScale: number = 1.5;
+	const sphereResolution: number = 32;
 	const cameraOffset: number = 5;
 	const centroidCameraOffset: number = 15;
 	let centroid = $state(new THREE.Vector3());
 	let instances: StoryInstance[] = $state([]);
 
 	const clusterSpread: number = 3;
-	const lineThickness: number = 0.025;
+	const lineThickness: number = 0.035;
 	const pointSize: number = 0.025;
 	const curviness: number = 0.35;
 	const pointCloudShrink: number = 0.5;
@@ -71,6 +72,7 @@
 	const pointJiggleIntensity: number = 0.1; // How much points move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
 	const pointJiggleTime: number = 1000; // Speed of the jiggle animation
+	const storyJiggleTime: number = 250; // Speed of the jiggle animation
 
 	let noise = new SimplexNoise();
 	let time = $state(0);
@@ -79,11 +81,7 @@
 		new Mesh(
 			new SphereGeometry(1, sphereResolution, sphereResolution),
 			new MeshBasicMaterial({ color: 'white', toneMapped: false, transparent: true, opacity: 0.1 })
-		), // MeshA - main sphere
-		new Mesh(
-			new BoxGeometry(1, 1, 1),
-			new MeshBasicMaterial({ color: 'white', toneMapped: false, transparent: true, opacity: 0.5 })
-		) // MeshB - text sphere
+		) // MeshA - main sphere
 	];
 
 	// Interactivity
@@ -412,9 +410,12 @@
 		// Update story positions with SimplexNoise jiggle
 		instances.forEach((instance, index) => {
 			// Use different noise seeds for each instance and axis
-			const noiseOffsetX = noise.noise3d(index * 100, time, 0) * storyJiggleIntensity;
-			const noiseOffsetY = noise.noise3d(index * 100, time, 100) * storyJiggleIntensity;
-			const noiseOffsetZ = noise.noise3d(index * 100, time, 200) * storyJiggleIntensity;
+			const noiseOffsetX =
+				noise.noise3d(index * 100, time * storyJiggleTime, 0) * storyJiggleIntensity;
+			const noiseOffsetY =
+				noise.noise3d(index * 100, time * storyJiggleTime, 100) * storyJiggleIntensity;
+			const noiseOffsetZ =
+				noise.noise3d(index * 100, time * storyJiggleTime, 200) * storyJiggleIntensity;
 
 			// Store original positions if not already stored
 			if (!instance.originalPositions) {
