@@ -109,6 +109,7 @@
 	});
 
 	// $inspect(selectedStory);
+	$inspect(response_clusters);
 </script>
 
 <!-- Error Card -->
