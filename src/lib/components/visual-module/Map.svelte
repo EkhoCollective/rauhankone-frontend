@@ -38,7 +38,7 @@
 	const worldScale: number = 10;
 	const minSphereScale: number = 0.1;
 	const minMapScale: number = 0.1;
-	const maxMapScale: number = 0.3;
+	const maxMapScale: number = 0.5;
 	const sphereResolution: number = 16;
 	const centroidCameraOffset: number = 15;
 	let centroid = $state(new THREE.Vector3());
@@ -223,6 +223,22 @@
 	const points = curve.getPoints(100);
 
 	// $inspect(instances[0]);
+
+	import { InstancedMeshes } from '@threlte/extras';
+	import {
+		Mesh,
+		BoxGeometry,
+		MeshStandardMaterial,
+		SphereGeometry,
+		MeshBasicMaterial
+	} from 'three';
+
+	const meshes = [
+		new Mesh(
+			new SphereGeometry(1, sphereResolution, sphereResolution),
+			new MeshBasicMaterial({ color: 'white', toneMapped: false, transparent: true, opacity: 0.1 })
+		) // MeshA - main sphere
+	];
 </script>
 
 <PerfMonitor anchorY="bottom" />
@@ -244,15 +260,36 @@
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
 
-<World gravity={[0, 0, 0]}>
-	<InstancedMesh {instances} range={instances.length}>
+<!-- <World gravity={[0, 0, 0]}> -->
+<InstancedMeshes {meshes}>
+	{#snippet children({ components: [MeshA, MeshB, MeshC, MeshD] })}
 		{#each instances as instance}
-			<Instance
-				position.x={instance.positions.x}
+			<!-- <Attractor
+					range={50}
+					strength={5}
+					position={[
+						instance.positions.x + (Math.random() - 0.5) * 0.001,
+						instance.positions.y + (Math.random() - 0.5) * 0.001,
+						instance.positions.z + (Math.random() - 0.5) * 0.001
+					]}
+				/>
+				<Attractor
+					range={6}
+					strength={-5}
+					position={[
+						instance.positions.x + (Math.random() - 0.5) * 0.001,
+						instance.positions.y + (Math.random() - 0.5) * 0.001,
+						instance.positions.z + (Math.random() - 0.5) * 0.001
+					]}
+				/>
+				<Collider shape="ball" args={[5]} mass={Infinity} /> -->
+			<!-- <FakeGlowMaterial glowColor="white" toneMapped={false} /> -->
+
+			<MeshA
 				position.y={instance.positions.y}
+				position.x={instance.positions.x}
 				position.z={instance.positions.z}
-				scale={instance.scale}
-				color={instance.color}
+				scale={instance.scale * 2}
 				onclick={() => {
 					// Reset all other instances' selected state
 					instances.forEach((inst) => (inst.selected = false));
@@ -291,7 +328,115 @@
 					}
 				}}
 			>
-				<Attractor
+				<!-- <MeshA scale={instance.scale * 0.75} color="white" /> -->
+				<!-- <InstancedMesh {instances} range={instances.length}> -->
+				<T.Mesh>
+					<T.SphereGeometry args={[instance.scale * 0.75]} />
+					<FakeGlowMaterial glowColor="white" toneMapped={false} opacity={0.5} />
+				</T.Mesh>
+				<!-- <Instance color={instance.color} /> -->
+				<!-- </InstancedMesh> -->
+				<!-- <MeshB scale={instance.scale * 0.5} /> -->
+			</MeshA>
+			<!-- <FakeGlowMaterial glowColor="white" toneMapped={false} /> -->
+			<!-- <MeshB
+					position.y={instance.positions.y}
+					position.x={instance.positions.x}
+					position.z={instance.positions.z}
+				/>
+				<MeshC
+					position.y={instance.positions.y}
+					position.x={instance.positions.x}
+					position.z={instance.positions.z}
+				/> -->
+			<!-- {#each instance.text_instances as text_instance}
+					{#if text_instance && text_instance.char && text_instance.position}
+						<Instance>
+							<RigidBody>
+								<Collider shape="ball" args={[0.1]} mass={1} />
+								<MeshD
+									position.y={text_instance.position.y}
+									position.x={text_instance.position.x}
+									position.z={text_instance.position.z}
+								/>
+								<T.Mesh position={text_instance.position}>
+								<Text3DGeometry text="a" size={0.25} depth={0.1} curveSegments={2} />
+								<T.MeshBasicMaterial color="#ff0000" toneMapped={false} />
+							</T.Mesh>
+							</RigidBody>
+						</Instance>
+					{/if}
+				{/each} -->
+		{/each}
+	{/snippet}
+</InstancedMeshes>
+<!-- </World> -->
+
+<!-- <World gravity={[0, 0, 0]}>
+<InstancedMesh {instances} range={instances.length}>
+	<T.Mesh>
+	<T.SphereGeometry />
+	<T.MeshBasicMaterial color="white" toneMapped={false} />
+
+	</T.Mesh>
+	{#each instances as instance}
+		<T.Mesh position={[instance.positions.x, instance.positions.y, instance.positions.z]}>
+			<T.SphereGeometry args={[instance.scale, sphereResolution, sphereResolution]} />
+			<T.MeshBasicMaterial color="white" toneMapped={false} />
+		</T.Mesh>
+		<T.Mesh position={[instance.positions.x, instance.positions.y, instance.positions.z]}>
+			<T.SphereGeometry args={[instance.scale * 2, sphereResolution, sphereResolution]} />
+			<FakeGlowMaterial glowColor="white" toneMapped={false} glowInternalRadius={5} />
+		</T.Mesh>
+		<T.Mesh position={[instance.positions.x, instance.positions.y, instance.positions.z]}>
+			<T.SphereGeometry args={[instance.scale * 10, sphereResolution, sphereResolution]} />
+			<FakeGlowMaterial glowColor="#404040" opacity={0.01} />
+		</T.Mesh>
+
+		<Instance
+			position.x={instance.positions.x}
+			position.y={instance.positions.y}
+			position.z={instance.positions.z}
+			scale={instance.scale}
+			onclick={() => {
+				// Reset all other instances' selected state
+				instances.forEach((inst) => (inst.selected = false));
+				// Set this instance as selected and keep it highlighted
+				instance.selected = true;
+				instance.tw.set(1);
+				selectedStory = instance;
+
+				// Center camera on the selected story
+				if (controls) {
+					// Move camera to look at the story with smooth transition
+					controls.setLookAt(
+						instance.positions.x,
+						instance.positions.y,
+						instance.positions.z + 20, // Camera position (offset from story)
+						instance.positions.x,
+						instance.positions.y,
+						instance.positions.z, // Look at the story position
+						true // Enable smooth transition
+					);
+				}
+
+				// Play sound effect when modal opens using cluster-specific sound
+				soundEffects.playEffect(instance.cluster_audio_id);
+			}}
+			onpointerenter={() => {
+				// Only animate if not selected
+				if (!instance.selected) {
+					instance.tw.set(1);
+				}
+			}}
+			onpointerleave={() => {
+				// Only reset if not selected
+				if (!instance.selected) {
+					instance.tw.set(0);
+				}
+			}}
+		/>
+		<Attractor
 					range={50}
 					strength={5}
 					position={[
@@ -310,11 +455,11 @@
 					]}
 				/>
 				<Collider shape="ball" args={[5]} mass={Infinity} />
-				<T.Mesh>
+		<T.Mesh>
 					<T.SphereGeometry args={[instance.scale, sphereResolution, sphereResolution]} />
 					<T.MeshBasicMaterial color="white" toneMapped={false} />
 				</T.Mesh>
-				<T.Mesh>
+		<T.Mesh>
 					<T.SphereGeometry args={[instance.scale * 2, sphereResolution, sphereResolution]} />
 					<FakeGlowMaterial glowColor="white" toneMapped={false} glowInternalRadius={5} />
 				</T.Mesh>
@@ -322,7 +467,7 @@
 					<T.SphereGeometry args={[instance.scale * 10, sphereResolution, sphereResolution]} />
 					<FakeGlowMaterial glowColor="#404040" opacity={0.01} />
 				</T.Mesh>
-				{#if instance.text_instances && instance.text_instances.length > 0}
+		{#if instance.text_instances && instance.text_instances.length > 0}
 					<InstancedMesh instances={instance.text_instances} range={instance.text_instances.length}>
 						{#each instance.text_instances as text_instance}
 							{#if text_instance && text_instance.char && text_instance.position}
@@ -339,7 +484,7 @@
 						{/each}
 					</InstancedMesh>
 				{/if}
-			</Instance>
-		{/each}
-	</InstancedMesh>
-</World>
+		</Instance>
+	{/each}
+</InstancedMesh>
+</World> -->
