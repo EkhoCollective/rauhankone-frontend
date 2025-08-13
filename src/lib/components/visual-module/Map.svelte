@@ -44,11 +44,12 @@
 	} = $props();
 
 	// State
-	const worldScale: number = 10;
+	const worldScale: number = 50;
 	const minSphereScale: number = 1;
 	const minMapScale: number = 0.1;
 	const maxMapScale: number = 1;
 	const sphereResolution: number = 16;
+	const cameraOffset: number = 5;
 	const centroidCameraOffset: number = 15;
 	let centroid = $state(new THREE.Vector3());
 	let instances: StoryInstance[] = $state([]);
@@ -374,7 +375,7 @@
 						controls.setLookAt(
 							instance.positions.x,
 							instance.positions.y,
-							instance.positions.z + 20, // Camera position (offset from story)
+							instance.positions.z + cameraOffset, // Camera position (offset from story)
 							instance.positions.x,
 							instance.positions.y,
 							instance.positions.z, // Look at the story position
