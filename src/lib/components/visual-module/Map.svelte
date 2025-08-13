@@ -45,7 +45,8 @@
 	let instances: StoryInstance[] = $state([]);
 
 	const clusterSpread: number = 3;
-	const lineThickness: number = 0.025;
+	const lineThickness: number = 0.02;
+	const curviness: number = 0.35;
 
 	let noise = new SimplexNoise();
 
@@ -217,7 +218,35 @@
 						if (k !== j) {
 							// Skip the current story's position
 							// Create pair: [current story, other story]
-							const pairPositions = [currentStoryPos, allStoryPositions[k]];
+							const startPos = currentStoryPos;
+							const endPos = allStoryPositions[k];
+
+							// Calculate distance between the two points
+							const distance = startPos.distanceTo(endPos);
+							const offsetAmount = distance * curviness; // 25% of the distance
+
+							// Create midpoint at 50% between the two points
+							const midPoint = startPos.clone().lerp(endPos, 0.5);
+
+							// Randomly choose x, y, or z axis for offset and direction (up/down)
+							const randomAxis = Math.floor(Math.random() * 3);
+							const randomDirection = Math.random() < 0.5 ? -1 : 1;
+
+							// Apply offset to the chosen axis
+							switch (randomAxis) {
+								case 0:
+									midPoint.x += offsetAmount * randomDirection;
+									break;
+								case 1:
+									midPoint.y += offsetAmount * randomDirection;
+									break;
+								case 2:
+									midPoint.z += offsetAmount * randomDirection;
+									break;
+							}
+
+							// Create curve with the offset midpoint
+							const pairPositions = [startPos, midPoint, endPos];
 							const pairCurve = new CatmullRomCurve3(pairPositions);
 							const pairPoints = pairCurve.getPoints(100);
 							storyPairCurves.push(pairPoints);
