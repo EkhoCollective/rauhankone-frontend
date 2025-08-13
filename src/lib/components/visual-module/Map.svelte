@@ -340,7 +340,7 @@
 	// $inspect(instances[0]);
 </script>
 
-<PerfMonitor anchorY="bottom" />
+<!-- <PerfMonitor anchorY="bottom" /> -->
 
 <T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 	<CameraControls bind:ref={controls} />
