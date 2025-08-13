@@ -29,6 +29,8 @@
 	let selectedStoryLanguageText = $state(null);
 	let controls = $state.raw<CameraControlsRef>();
 	let currentPlayingSound: string | null = $state(null);
+	let navigateToClosestStory: (() => void) | undefined = $state();
+	let navigateToFurthestStory: (() => void) | undefined = $state();
 
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
@@ -97,6 +99,20 @@
 		}
 	});
 
+	// Handle navigation to closest story
+	function handleNavigateClosest() {
+		if (navigateToClosestStory) {
+			navigateToClosestStory();
+		}
+	}
+
+	// Handle navigation to furthest story
+	function handleNavigateFurthest() {
+		if (navigateToFurthestStory) {
+			navigateToFurthestStory();
+		}
+	}
+
 	onMount(() => {
 		fetchClusters();
 
@@ -138,13 +154,24 @@
 				in:blur={{ duration: 500 }}
 				out:blur={{ duration: 500 }}
 			>
-				<ModalStory story={selectedStoryLanguageText} closeModal={() => (selectedStory = null)} />
+				<ModalStory
+					story={selectedStoryLanguageText}
+					closeModal={() => (selectedStory = null)}
+					onNavigateClosest={handleNavigateClosest}
+					onNavigateFurthest={handleNavigateFurthest}
+				/>
 			</div>
 		{/if}
 	</div>
 	{#if response_clusters !== null}
 		<Canvas>
-			<Scene bind:controls data={response_clusters} bind:selectedStory />
+			<Scene
+				bind:controls
+				data={response_clusters}
+				bind:selectedStory
+				bind:navigateToClosestStory
+				bind:navigateToFurthestStory
+			/>
 		</Canvas>
 	{:else}
 		<div class="loader-container" in:fade={{ duration: 500 }} out:fade={{ duration: 500 }}>

@@ -36,11 +36,17 @@
 	let {
 		data,
 		selectedStory = $bindable(),
-		controls = $bindable()
+		controls = $bindable(),
+		onNavigateToStory,
+		navigateToClosestStory = $bindable(),
+		navigateToFurthestStory = $bindable()
 	}: {
 		data: any;
 		selectedStory: any;
 		controls?: CameraControlsRef;
+		onNavigateToStory?: (story: any) => void;
+		navigateToClosestStory?: () => void;
+		navigateToFurthestStory?: () => void;
 	} = $props();
 
 	// State
@@ -308,6 +314,57 @@
 		);
 	}
 
+	// Navigate to closest story
+	function navigateToClosest() {
+		if (selectedStory && selectedStory.closestStory) {
+			navigateToStory(selectedStory.closestStory);
+		}
+	}
+
+	// Navigate to furthest story
+	function navigateToFurthest() {
+		if (selectedStory && selectedStory.furthestStory) {
+			navigateToStory(selectedStory.furthestStory);
+		}
+	}
+
+	// Navigate to a specific story with camera transition
+	function navigateToStory(targetStory: any) {
+		if (!targetStory || !controls) return;
+
+		// Reset all instances' selected state
+		instances.forEach((inst) => (inst.selected = false));
+
+		// Set target story as selected
+		targetStory.selected = true;
+		targetStory.tw.set(1);
+
+		// Calculate distances for the new selected story
+		targetStory.calculateNearestAndFurthest(instances);
+
+		// Move camera to target story with smooth transition
+		controls.setLookAt(
+			targetStory.positions.x,
+			targetStory.positions.y,
+			targetStory.positions.z + cameraOffset,
+			targetStory.positions.x,
+			targetStory.positions.y,
+			targetStory.positions.z,
+			true
+		);
+
+		// Play sound effect for the new story
+		soundEffects.playEffect(targetStory.cluster_audio_id);
+
+		// Update selected story (this will trigger modal to update)
+		selectedStory = targetStory;
+
+		// Call external navigation callback if provided
+		if (onNavigateToStory) {
+			onNavigateToStory(targetStory);
+		}
+	}
+
 	// Effect to reset selected sphere when modal closes
 	$effect(() => {
 		if (selectedStory === null) {
@@ -336,6 +393,10 @@
 		// Clean up sound cache when component is destroyed
 		soundEffects.clearCache();
 	});
+
+	// Bind navigation functions to be accessible from parent
+	navigateToClosestStory = navigateToClosest;
+	navigateToFurthestStory = navigateToFurthest;
 
 	// $inspect(instances[0]);
 </script>
@@ -367,6 +428,10 @@
 					// Set this instance as selected and keep it highlighted
 					instance.selected = true;
 					instance.tw.set(1);
+
+					// Calculate nearest and furthest stories for this instance
+					instance.calculateNearestAndFurthest(instances);
+
 					selectedStory = instance;
 
 					// Center camera on the selected story

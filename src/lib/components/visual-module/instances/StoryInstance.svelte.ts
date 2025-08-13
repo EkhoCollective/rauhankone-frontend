@@ -17,9 +17,54 @@ export default class {
   // Track if this sphere is currently selected
   selected = $state(false)
   
+  // Store references to closest and furthest stories
+  closestStory: any = null
+  furthestStory: any = null
+  
   get scale() {
     return this.tw.current/5 + this.scale_init
     // fix this. put a minimum max size for every single point
+  }
+  
+  // Calculate distance to another story instance
+  getDistanceTo(otherStory: any): number {
+    const dx = this.positions.x - otherStory.positions.x
+    const dy = this.positions.y - otherStory.positions.y
+    const dz = this.positions.z - otherStory.positions.z
+    return Math.sqrt(dx * dx + dy * dy + dz * dz)
+  }
+  
+  // Find closest and furthest stories from all available instances
+  calculateNearestAndFurthest(allInstances: any[]): void {
+    if (allInstances.length <= 1) {
+      this.closestStory = null
+      this.furthestStory = null
+      return
+    }
+    
+    let minDistance = Infinity
+    let maxDistance = -1
+    let closest = null
+    let furthest = null
+    
+    for (const instance of allInstances) {
+      if (instance === this) continue // Skip self
+      
+      const distance = this.getDistanceTo(instance)
+      
+      if (distance < minDistance) {
+        minDistance = distance
+        closest = instance
+      }
+      
+      if (distance > maxDistance) {
+        maxDistance = distance
+        furthest = instance
+      }
+    }
+    
+    this.closestStory = closest
+    this.furthestStory = furthest
   }
   constructor(
     initialColor: Color,
