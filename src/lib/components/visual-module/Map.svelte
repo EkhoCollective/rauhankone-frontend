@@ -38,11 +38,14 @@
 	const worldScale: number = 10;
 	const minSphereScale: number = 1;
 	const minMapScale: number = 0.1;
-	const maxMapScale: number = 0.5;
+	const maxMapScale: number = 1;
 	const sphereResolution: number = 16;
 	const centroidCameraOffset: number = 15;
 	let centroid = $state(new THREE.Vector3());
 	let instances: StoryInstance[] = $state([]);
+
+	const clusterSpread: number = 3;
+	const lineThickness: number = 0.025;
 
 	let noise = new SimplexNoise();
 
@@ -126,22 +129,34 @@
 			// let clusterNoise = noise.noise3d(i, 0, 0);
 			// console.log(clusterNoise);
 
+			// Generate random offsets for each story (to be reused consistently)
+			const storyOffsets: { x: number; y: number; z: number }[] = [];
+			for (let j = 0; j < cluster.stories.length; j += 1) {
+				storyOffsets.push({
+					x: (Math.random() - 0.5) * clusterSpread,
+					y: (Math.random() - 0.5) * clusterSpread,
+					z: (Math.random() - 0.5) * clusterSpread
+				});
+			}
+
 			// Only create curves if there are multiple stories in the cluster
 			let allStoryPositions: Vector3[] = [];
 			if (cluster.stories.length > 1) {
-				// Collect all story positions in this cluster
+				// Collect all story positions in this cluster WITH the same random offsets
 				for (let j = 0; j < cluster.stories.length; j += 1) {
 					const story = cluster.stories[j];
+					const offset = storyOffsets[j];
+
 					const storyPos = new Vector3(
-						story[0].coordinates[0] * worldScale,
-						story[0].coordinates[1] * worldScale,
-						story[0].coordinates[2] * worldScale
+						story[0].coordinates[0] * worldScale + offset.x,
+						story[0].coordinates[1] * worldScale + offset.y,
+						story[0].coordinates[2] * worldScale + offset.z
 					);
 					allStoryPositions.push(storyPos);
 				}
 			}
 
-			console.log(allStoryPositions);
+			// console.log(allStoryPositions);
 
 			// Create curve from cluster positions (need at least 2 points)
 			// let points: Vector3[] = [];
@@ -164,11 +179,14 @@
 				const cluster_id = cluster.text;
 				const storyObject = story;
 
+				// Use the same offset that was generated earlier for this story
+				const offset = storyOffsets[j];
+
 				// Get coordinates from the first variant of the story
 				let story_positions = {
-					x: story[0].coordinates[0] * worldScale,
-					y: story[0].coordinates[1] * worldScale,
-					z: story[0].coordinates[2] * worldScale
+					x: story[0].coordinates[0] * worldScale + offset.x,
+					y: story[0].coordinates[1] * worldScale + offset.y,
+					z: story[0].coordinates[2] * worldScale + offset.z
 				};
 				let story_velocities = {
 					vx: (Math.random() - 0.5) * 0.1,
@@ -190,6 +208,9 @@
 						story_positions.y,
 						story_positions.z
 					);
+
+					//
+					// console.log(currentStoryPos);
 
 					// Create a separate curve for each pair (current story to each other story)
 					for (let k = 0; k < allStoryPositions.length; k += 1) {
@@ -342,16 +363,17 @@
 					<T.SphereGeometry args={[instance.scale * 0.375]} />
 					<FakeGlowMaterial glowColor="white" toneMapped={false} opacity={0.5} />
 				</T.Mesh>
-
-				{#if instance.curve && instance.curve.length > 0}
-					{#each instance.curve as pairCurvePoints}
-						<T.Mesh>
-							<MeshLineGeometry points={pairCurvePoints} />
-							<MeshLineMaterial color="white" width={0.1} />
-						</T.Mesh>
-					{/each}
-				{/if}
 			</MeshA>
+
+			<!-- Lines outside of MeshA so they don't get scaled/moved on hover -->
+			{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
+				{#each instance.curve as pairCurvePoints}
+					<T.Mesh>
+						<MeshLineGeometry points={pairCurvePoints} />
+						<MeshLineMaterial color="white" width={lineThickness} />
+					</T.Mesh>
+				{/each}
+			{/if}
 		{/each}
 	{/snippet}
 </InstancedMeshes>
