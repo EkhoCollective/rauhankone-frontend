@@ -70,5 +70,6 @@
 		border-radius: 0;
 		border: none;
 		box-shadow: none;
+		color: white;
 	}
 </style>

@@ -9,7 +9,7 @@
 	import NavIcons from '$lib/components/mini-components/NavIcons.svelte';
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
 	import Scene from '$lib/components/visual-module/Map.svelte';
-	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
+	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
 	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { error } from '@sveltejs/kit';
 	import { soundEffects } from '$lib/utils/soundEffects';
@@ -125,7 +125,7 @@
 	});
 
 	// $inspect(selectedStory);
-	$inspect(response_clusters);
+	// $inspect(response_clusters);
 </script>
 
 <!-- Error Card -->
@@ -178,10 +178,15 @@
 			<CardLoader />
 		</div>
 	{/if}
-
-	<div class="navigation-icons-container">
-		<NavIcons bind:value={navButtonValue} />
-	</div>
+	{#if selectedStory === null}
+		<div
+			class="navigation-icons-container"
+			in:fade={{ duration: 500 }}
+			out:fade={{ duration: 500 }}
+		>
+			<NavIcons bind:value={navButtonValue} />
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -193,7 +198,7 @@
 
 	.modal-story-container {
 		backdrop-filter: blur(10px);
-		background-color: rgba(0, 0, 0, 0.4);
+		background-color: rgba(0, 0, 0, 0.7);
 		position: absolute;
 		z-index: 100;
 		top: 0;

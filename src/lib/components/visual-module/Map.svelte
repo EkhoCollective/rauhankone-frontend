@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import StoryInstance from '$lib/components/visual-module/instances/StoryInstance.svelte';
+	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
 	import * as THREE from 'three';
 	import {
 		Mesh,
@@ -57,7 +57,7 @@
 	const maxMapScale: number = 1.5;
 	const sphereResolution: number = 32;
 	const cameraOffset: number = 5;
-	const centroidCameraOffset: number = 15;
+	const centroidCameraOffset: number = 40;
 	let centroid = $state(new THREE.Vector3());
 	let instances: StoryInstance[] = $state([]);
 

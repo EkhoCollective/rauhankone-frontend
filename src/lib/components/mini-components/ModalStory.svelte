@@ -79,7 +79,7 @@
 
 	.modal-story-actions {
 		display: flex;
-		justify-content: center;
+		justify-content: end;
 		align-items: center;
 		padding: 20px;
 		flex-shrink: 0;
@@ -103,6 +103,9 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		min-width: 0;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		color: white;
 	}
 
 	.btn-action {
@@ -110,6 +113,19 @@
 		min-width: 80px;
 		max-width: 150px;
 	}
+
+	/* .btn-explore {
+		background-color: black;
+		border-color: none;
+		border: none;
+		box-shadow: none;
+		width: 100%;
+		font-size: 16px;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		border-radius: 0px;
+		color: white;
+	} */
 
 	@media (max-width: 767px) {
 		.modal-story-content {
