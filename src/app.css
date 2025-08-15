@@ -1,3 +1,14 @@
 @import 'tailwindcss';
 @plugin "daisyui";
 @plugin '@tailwindcss/typography';
+
+.map-nav-button {
+  width: 40px;
+  height: auto;
+}
+
+.map-nav-button svg.lucide-icon.lucide {
+--size: 34px;
+  width: var(--size);
+  height: var(--size);
+}

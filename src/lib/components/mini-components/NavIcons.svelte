@@ -10,20 +10,20 @@
 
 <div class="map-navigation-icons-container">
 	<div>
-		<button class="icon-left-btn btn-container" onclick={() => handleNavButton('left')}>
+		<button class="icon-left-btn btn-container map-nav-button" onclick={() => handleNavButton('left')}>
 			<ArrowLeft color="#ffffff" />
 		</button>
 	</div>
 	<div class="sub-container">
-		<button class="icon-plus-btn btn-container" onclick={() => handleNavButton('plus')}>
+		<button class="icon-plus-btn btn-container map-nav-button" onclick={() => handleNavButton('plus')}>
 			<SquarePlus color="#ffffff" />
 		</button>
-		<button class="icon-minus-btn btn-container" onclick={() => handleNavButton('minus')}>
+		<button class="icon-minus-btn btn-container map-nav-button" onclick={() => handleNavButton('minus')}>
 			<SquareMinus color="#ffffff" />
 		</button>
 	</div>
 	<div>
-		<button class="icon-right-btn btn-container" onclick={() => handleNavButton('right')}>
+		<button class="icon-right-btn btn-container map-nav-button" onclick={() => handleNavButton('right')}>
 			<ArrowRight color="#ffffff" />
 		</button>
 	</div>
