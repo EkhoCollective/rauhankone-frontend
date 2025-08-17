@@ -20,7 +20,7 @@
 
 <div class="container">
 	<pre aria-hidden="true" style="min-height: {minHeight}">{textValue + '\n'}</pre>
-	<textarea onkeydown={debounce} bind:value={textValue} placeholder={$_('input_placeholder')}
+	<textarea onkeydown={debounce} bind:value={textValue} placeholder={$_('submit_input_placeholder')}
 	></textarea>
 </div>
 

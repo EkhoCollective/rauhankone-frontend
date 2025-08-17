@@ -128,6 +128,10 @@
 	// $inspect(response_clusters);
 </script>
 
+<svelte:head>
+	<title>{$_('main_title')} | {$_('main_subtitle')} | Oulu 2026</title>
+</svelte:head>
+
 <!-- Error Card -->
 <!-- {#if raiseError}
 	<div transition:blur>
@@ -137,13 +141,13 @@
 
 {#if triggeredFrom === 'submit' && toastEnabled}
 	<div transition:blur class="toast-container">
-		<p>{$_('toast_from_submit')}</p>
+		<p>{$_('explore_toast_from_submit')}</p>
 	</div>
 {/if}
 
 {#if triggeredFrom === 'main' && toastEnabled}
 	<div transition:blur class="toast-container">
-		<p>{$_('toast_from_home')}</p>
+		<p>{$_('explore_toast_from_home')}</p>
 	</div>
 {/if}
 

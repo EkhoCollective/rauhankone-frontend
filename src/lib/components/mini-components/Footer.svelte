@@ -5,15 +5,15 @@
 <!-- Footer -->
 <div class="footer-container">
 	<div>
-		<a href={$_('rk_link')} target="_blank">{$_('rk_title')}</a>
+		<a href={$_('main_link_rk')} target="_blank">{$_('main_title')}</a>
 	</div>
 	<div>
-		<a href={$_('oulu_link')} target="_blank">Oulu 2026</a>
+		<a href={$_('main_link_oulu')} target="_blank">Oulu 2026</a>
 	</div>
 	<div>
-		<a href={$_('ekho_link')} target="_blank">© Ekho Collective</a>
+		<a href={$_('main_link_ekho')} target="_blank">© Ekho Collective</a>
 	</div>
-	<div><a href={$_('gdpr_link')} target="_blank">GDPR</a></div>
+	<div><a href={$_('main_link_gdpr')} target="_blank">GDPR</a></div>
 </div>
 
 <style>

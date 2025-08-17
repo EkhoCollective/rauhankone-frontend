@@ -41,7 +41,7 @@
 		<div class="card-checkmark-container">
 			<Checkmark bind:checkValue={translate} />
 		</div>
-		<div>{$_('btn_translate_check')}</div>
+		<div>{$_('header_btn_translate_all')}</div>
 	</div>
 </div>
 

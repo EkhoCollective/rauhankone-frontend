@@ -17,7 +17,7 @@
 	{#if page.url.pathname === `${base}/explore`}
 		<div transition:blur class="back-btn-container">
 			<button class="btn" onclick={() => goto(`${base}/`)}
-				><ArrowLeft color="#ffffff" /> {$_('btn_exit')}</button
+				><ArrowLeft color="#ffffff" /> {$_('header_btn_exit')}</button
 			>
 		</div>
 	{/if}

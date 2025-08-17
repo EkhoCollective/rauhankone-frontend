@@ -13,7 +13,7 @@
 		<h1>{errorMessage}</h1>
 	</div>
 	<div class="button-container">
-		<button class="btn btn-home" onclick={() => reloadPage()}>{$_('btn_home')}</button>
+		<button class="btn btn-home" onclick={() => reloadPage()}>{$_('error_btn_home')}</button>
 	</div>
 </div>
 

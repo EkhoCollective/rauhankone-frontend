@@ -23,7 +23,7 @@
 </script>
 
 <svelte:head>
-	<title>{$_('rk_title')} | {$_('rk_layer')} | Oulu 2026</title>
+	<title>{$_('main_title')} | {$_('main_subtitle')} | Oulu 2026</title>
 </svelte:head>
 
 <div class="card-main-container" onmousemove={handleMouseMove} role="presentation">
@@ -33,23 +33,23 @@
 	<div class="card-main-container-inner">
 		<!-- Title -->
 		<div class="card-title-container">
-			<div>{$_('rk_title')}</div>
+			<div>{$_('main_title')}</div>
 		</div>
 		<!-- Subtitle -->
 		<div class="card-sub-title-container">
-			<div>{$_('rk_layer')}</div>
+			<div>{$_('main_subtitle')}</div>
 		</div>
 		<!-- Main Text -->
 		<div class="card-description-container">
-			<div>{splitA($_('description'))}<br /><br />{splitB($_('description'))}</div>
+			<div>{splitA($_('main_description'))}<br /><br />{splitB($_('main_description'))}</div>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<button class="btn btn-submit" onclick={() => goto(`${base}/submit`)}>
-				{$_('btn_take_part')}
+				{$_('main_btn_take_part')}
 			</button>
 			<button class="btn btn-explore" onclick={() => goto(`${base}/explore`)}>
-				{$_('btn_explore')}</button
+				{$_('main_btn_explore')}</button
 			>
 		</div>
 		<!-- Footer -->
