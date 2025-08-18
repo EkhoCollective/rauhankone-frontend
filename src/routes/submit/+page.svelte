@@ -12,13 +12,14 @@
 	import Loader from '$lib/components/mini-components/Loader.svelte';
 	import { error } from '@sveltejs/kit';
 	// import CardError from '$lib/components/cards/CardError.svelte';
-	import { blur } from 'svelte/transition';
-	import { setContext, getContext } from 'svelte';
+	import { blur, fade } from 'svelte/transition';
+	// import { setContext, getContext } from 'svelte';
 
 	// Get Questions Data from Parent Layout
-	const getQuestionsData = getContext('questions') as () => any;
+	// const getQuestionsData = getContext('questions') as () => any;
 
 	// States
+	let getQuestionsData = $state<any>(null);
 	let question = $state<string | null>(null);
 	let questionOriginalId = $state<string | null>(null);
 	let questionContainer = $state<any[] | null>(null);
@@ -32,9 +33,16 @@
 	let suggestionState = $state('off');
 	let suggestionFadeTimer = $state(3000);
 	let thankYouFadeTimer = $state(3000);
+	let transitionDuration: number = 500;
 	// let raiseError = $state(false);
 
 	// API Options
+	const API_QUESTIONS_OPTIONS = () => ({
+		API_ENDPOINT: '/get_questions',
+		API_METHOD: 'POST',
+		REQUEST_BODY: { question_type: 'starter' }
+	});
+
 	const API_SUGGESTION_OPTIONS = () => ({
 		API_ENDPOINT: '/suggestion',
 		API_METHOD: 'POST',
@@ -76,14 +84,27 @@
 		}
 	}
 
+	async function handleGetQuestions() {
+		await apiRequest(API_QUESTIONS_OPTIONS())
+			.then((response) => {
+				getQuestionsData = response;
+				handleGetQuestionContainer();
+			})
+			.catch((err) => {
+				// console.log('Error getting questions', error);
+				// raiseError = true;
+				throw error(500, 'Failed to get questions');
+			});
+	}
+
 	function handleGetQuestionContainer() {
-		const questionsData = getQuestionsData();
-		if (!questionsData) {
+		// const questionsData = getQuestionsData();
+		if (!getQuestionsData) {
 			throw error(500, 'Failed to get questions');
 			return;
 		}
-		const randomGroupIndex = Math.floor(Math.random() * questionsData.questions.length);
-		questionContainer = questionsData.questions[randomGroupIndex];
+		const randomGroupIndex = Math.floor(Math.random() * getQuestionsData.questions.length);
+		questionContainer = getQuestionsData.questions[randomGroupIndex];
 		handleGetQuestion();
 	}
 
@@ -165,14 +186,15 @@
 	$effect(() => {
 		$locale;
 		// console.log('locale changed', localStorage.getItem('locale'));
-		if (getQuestionsData()) {
+		if (getQuestionsData) {
 			handleGetQuestion();
 		}
 	});
 
 	// On Mount
 	onMount(() => {
-		handleGetQuestionContainer();
+		handleGetQuestions();
+		// handleGetQuestionContainer();
 		// raiseError = true;
 	});
 </script>
@@ -183,18 +205,25 @@
 
 <div class="card-submit-container">
 	<!-- Main Text -->
-	<div class="question-container">
-		<p>{question}</p>
-	</div>
-	<!-- Input Area -->
-	<div class="input-container">
-		<Textarea
-			bind:textValue={story}
-			minHeight="200px"
-			debounceTime={typingTimer}
-			bind:typingActive={isTyping}
-		/>
-	</div>
+	{#if question}
+		<div
+			in:fade={{ duration: transitionDuration }}
+			out:fade={{ duration: transitionDuration }}
+			class="question-container"
+		>
+			<p>{question}</p>
+		</div>
+
+		<!-- Input Area -->
+		<div class="input-container">
+			<Textarea
+				bind:textValue={story}
+				minHeight="200px"
+				debounceTime={typingTimer}
+				bind:typingActive={isTyping}
+			/>
+		</div>
+	{/if}
 	<!-- Suggestions -->
 	<div class="suggestions-container">
 		{#if suggestionState !== 'off'}
