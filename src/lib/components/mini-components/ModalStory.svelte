@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { X } from 'lucide-svelte';
+	import { _ } from 'svelte-i18n';
 	let { story = $bindable(), closeModal, onNavigateClosest, onNavigateFurthest } = $props();
 </script>
 
@@ -15,10 +16,10 @@
 
 		<div class="modal-story-actions">
 			<button class="btn btn-action" onclick={() => onNavigateClosest && onNavigateClosest()}>
-				Closest</button
+				{$_('modal-story-actions-closest')}</button
 			>
 			<button class="btn btn-action" onclick={() => onNavigateFurthest && onNavigateFurthest()}>
-				Farthest</button
+				{$_('modal-story-actions-furthest')}</button
 			>
 			<!-- <button class="btn btn-action"> Random</button> -->
 		</div>
