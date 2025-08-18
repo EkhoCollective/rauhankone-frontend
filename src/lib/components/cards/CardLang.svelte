@@ -42,12 +42,6 @@
 		{/each}
 	</div>
 	<!-- Extra Selector -->
-	<!-- <div class="card-extra-container">
-		<div class="card-checkmark-container">
-			<Checkmark bind:checkValue={translate} />
-		</div>
-		<p>{$_('btn_translate_check')}</p>
-	</div> -->
 
 	<!-- Accessable version -->
 	<div class="card-extra-container">

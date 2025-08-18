@@ -12,13 +12,14 @@
 	import Loader from '$lib/components/mini-components/Loader.svelte';
 	import { error } from '@sveltejs/kit';
 	// import CardError from '$lib/components/cards/CardError.svelte';
-	import { blur } from 'svelte/transition';
-	import { setContext, getContext } from 'svelte';
+	import { blur, fade } from 'svelte/transition';
+	// import { setContext, getContext } from 'svelte';
 
 	// Get Questions Data from Parent Layout
-	const getQuestionsData = getContext('questions') as () => any;
+	// const getQuestionsData = getContext('questions') as () => any;
 
 	// States
+	let getQuestionsData = $state<any>(null);
 	let question = $state<string | null>(null);
 	let questionOriginalId = $state<string | null>(null);
 	let questionContainer = $state<any[] | null>(null);
@@ -32,9 +33,16 @@
 	let suggestionState = $state('off');
 	let suggestionFadeTimer = $state(3000);
 	let thankYouFadeTimer = $state(3000);
+	let transitionDuration: number = 500;
 	// let raiseError = $state(false);
 
 	// API Options
+	const API_QUESTIONS_OPTIONS = () => ({
+		API_ENDPOINT: '/get_questions',
+		API_METHOD: 'POST',
+		REQUEST_BODY: { question_type: 'starter' }
+	});
+
 	const API_SUGGESTION_OPTIONS = () => ({
 		API_ENDPOINT: '/suggestion',
 		API_METHOD: 'POST',
@@ -76,14 +84,27 @@
 		}
 	}
 
+	async function handleGetQuestions() {
+		await apiRequest(API_QUESTIONS_OPTIONS())
+			.then((response) => {
+				getQuestionsData = response;
+				handleGetQuestionContainer();
+			})
+			.catch((err) => {
+				// console.log('Error getting questions', error);
+				// raiseError = true;
+				throw error(500, 'Failed to get questions');
+			});
+	}
+
 	function handleGetQuestionContainer() {
-		const questionsData = getQuestionsData();
-		if (!questionsData) {
+		// const questionsData = getQuestionsData();
+		if (!getQuestionsData) {
 			throw error(500, 'Failed to get questions');
 			return;
 		}
-		const randomGroupIndex = Math.floor(Math.random() * questionsData.questions.length);
-		questionContainer = questionsData.questions[randomGroupIndex];
+		const randomGroupIndex = Math.floor(Math.random() * getQuestionsData.questions.length);
+		questionContainer = getQuestionsData.questions[randomGroupIndex];
 		handleGetQuestion();
 	}
 
@@ -165,36 +186,44 @@
 	$effect(() => {
 		$locale;
 		// console.log('locale changed', localStorage.getItem('locale'));
-		if (getQuestionsData()) {
+		if (getQuestionsData) {
 			handleGetQuestion();
 		}
 	});
 
 	// On Mount
 	onMount(() => {
-		handleGetQuestionContainer();
+		handleGetQuestions();
+		// handleGetQuestionContainer();
 		// raiseError = true;
 	});
 </script>
 
 <svelte:head>
-	<title>{$_('rk_title')} | {$_('rk_layer')} | Oulu 2026 | Submit</title>
+	<title>{$_('main_title')} | {$_('main_subtitle')} | Oulu 2026</title>
 </svelte:head>
 
 <div class="card-submit-container">
 	<!-- Main Text -->
-	<div class="question-container">
-		<p>{question}</p>
-	</div>
-	<!-- Input Area -->
-	<div class="input-container">
-		<Textarea
-			bind:textValue={story}
-			minHeight="200px"
-			debounceTime={typingTimer}
-			bind:typingActive={isTyping}
-		/>
-	</div>
+	{#if question}
+		<div
+			in:fade={{ duration: transitionDuration }}
+			out:fade={{ duration: transitionDuration }}
+			class="question-container"
+		>
+			<p>{question}</p>
+		</div>
+
+		<!-- Input Area -->
+		<div class="input-container">
+			<Textarea
+				bind:textValue={story}
+				minHeight="200px"
+				debounceTime={typingTimer}
+				bind:typingActive={isTyping}
+			/>
+		</div>
+	{/if}
 	<!-- Suggestions -->
 	<div class="suggestions-container">
 		{#if suggestionState !== 'off'}
@@ -203,7 +232,7 @@
 		<!-- Show warning if story is too short -->
 		{#if suggestionState === 'warning'}
 			<div transition:blur class="warning-bubble bubble">
-				{$_('type_more')}
+				{$_('submit_type_more')}
 			</div>
 		{/if}
 		<!-- Show loader when waiting for suggestions -->
@@ -220,7 +249,7 @@
 				class="suggestions-bubble bubble"
 			>
 				<p>{suggestion}</p>
-				<p>{$_('please_extend')}</p>
+				<p>{$_('submit_please_extend')}</p>
 			</div>
 		{/if}
 		<!-- Show thank you message if user has finished the story -->
@@ -230,7 +259,7 @@
 				out:blur
 				class="thank-you-bubble bubble"
 			>
-				{$_('submit_ack')}
+				{$_('submit_acknowlegment')}
 			</p>
 		{/if}
 	</div>
@@ -245,14 +274,14 @@
 					<Checkmark bind:checkValue={userAgreed} />
 				</div>
 				<div class="disclaimer-text">
-					<p>{$_('disclaimer')}</p>
+					<p>{$_('submit_disclaimer')}</p>
 				</div>
 			</div>
 			<!-- Buttons Container -->
 			<div transition:blur class="disclaimer-btn-container">
 				<div>
 					<button disabled={!userAgreed} class="btn" onclick={handleSubmit}
-						>{$_('btn_submit')}</button
+						>{$_('submit_btn_submit')}</button
 					>
 				</div>
 			</div>

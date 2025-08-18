@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import '$lib/i18n';
-	import { onMount, setContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { fade } from 'svelte/transition';
 	import { error } from '@sveltejs/kit';
@@ -16,14 +16,14 @@
 
 	let { children } = $props();
 
-	let questions = $state(null);
+	// let questions = $state(null);
 	// let raiseError = getContext('raiseError') as () => boolean;
 	let showLang = $state(false);
 	let transitionDuration = 500;
 	let translateStories = $state(false);
 
 	// Set context at component initialization
-	setContext('questions', () => questions);
+	// setContext('questions', () => questions);
 
 	init({
 		fallbackLocale: 'en',
@@ -38,9 +38,9 @@
 
 	async function handleGetToken() {
 		await getAuthToken()
-			.then(() => {
-				handleGetQuestions();
-			})
+			// .then(() => {
+			// 	handleGetQuestions();
+			// })
 			.catch((err) => {
 				// console.log('Error getting token', error);
 				// raiseError = true;
@@ -48,17 +48,17 @@
 			});
 	}
 
-	async function handleGetQuestions() {
-		await apiRequest(API_QUESTIONS_OPTIONS())
-			.then((response) => {
-				questions = response;
-			})
-			.catch((err) => {
-				// console.log('Error getting questions', error);
-				// raiseError = true;
-				throw error(500, 'Failed to get questions');
-			});
-	}
+	// async function handleGetQuestions() {
+	// 	await apiRequest(API_QUESTIONS_OPTIONS())
+	// 		.then((response) => {
+	// 			questions = response;
+	// 		})
+	// 		.catch((err) => {
+	// 			// console.log('Error getting questions', error);
+	// 			// raiseError = true;
+	// 			throw error(500, 'Failed to get questions');
+	// 		});
+	// }
 
 
 	let handleToggleLangDialog = () => {
