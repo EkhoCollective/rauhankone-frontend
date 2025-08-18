@@ -34,11 +34,13 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		gap: 10px;
 	}
 
 	.sub-container {
 		display: flex;
 		flex-direction: column;
+		gap: 10px;
 	}
 
 	.btn-container {
