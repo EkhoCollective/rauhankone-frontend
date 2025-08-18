@@ -47,10 +47,10 @@
 		/* background-color: red; */
 		display: flex;
 		flex-direction: column;
-		min-height: 200px;
-		max-height: 80vh;
+		/* min-height: 200px; */
+		height: 50vh;
 		/* min-width: 90%; */
-		max-width: 90%;
+		width: 100%;
 		overflow: hidden;
 	}
 
