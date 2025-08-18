@@ -7,7 +7,7 @@
 	import { blur } from 'svelte/transition';
 	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
 
-	let { toggleLang } = $props();
+	let { toggleLang, showLang } = $props();
 	let audioVolume = $state(0.5);
 	let audioClusterVolume = $state(1);
 	let audioFadeTime = $state(500);
@@ -23,8 +23,14 @@
 	{/if}
 	<!-- Lang Button -->
 	<div class="lang-btn-container">
-		<button class="btn" onclick={() => toggleLang()}><Globe color="#ffffff" /></button>
-	</div>
+		<button 
+		class="btn" 
+		onclick={() => toggleLang()}
+		aria-label={$_('aria-lang-toggle')}
+		>
+		<Globe color="#ffffff" />
+		</button>
+	</div> 
 	<!-- Audio Control -->
 	<div class="audio-control-container">
 		<AudioControl
@@ -36,15 +42,6 @@
 </div>
 
 <style>
-	.card-header-container {
-		height: 100%;
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		grid-template-rows: 1fr 1fr;
-		justify-items: end;
-		background-color: transparent;
-	}
-
 	.back-btn-container {
 		grid-column-start: 1;
 		grid-row-start: 1;
