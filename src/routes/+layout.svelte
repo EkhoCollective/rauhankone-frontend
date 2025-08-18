@@ -124,20 +124,19 @@
 					</Dialog.Overlay>
 				</Dialog.Portal>
 			</Dialog.Root>
-		<!-- Header -->
-		<div class="header-container">
+		<header class="header-container">
 			<Header toggleLang={handleToggleLangDialog} showLang={showLang} />
-		</div>
+		</header>
 
 		<!-- Pages -->
 		{#key page.url.pathname}
-			<div
+			<main
 				class="page-container"
 				in:fade={{ duration: transitionDuration }}
 				out:fade={{ duration: transitionDuration }}
 			>
 				{@render children()}
-			</div>
+			</main>
 		{/key}
 	{/await}
 </div>
