@@ -12,6 +12,7 @@
 	import CardError from '$lib/components/cards/CardError.svelte';
 	import CardLoader from '$lib/components/cards/CardLoader.svelte';
 	import Header from '$lib/components/mini-components/Header.svelte';
+	import { Dialog } from "bits-ui";
 
 	let { children } = $props();
 
@@ -84,7 +85,7 @@
 	// 	}
 	// });
 
-	let handleToggleLang = () => {
+	let handleToggleLangDialog = () => {
 		showLang = !showLang;
 	};
 
@@ -112,18 +113,19 @@
 		</div>
 	{/if} -->
 		<!-- Lang Card -->
-		{#if showLang}
-			<div
-				in:fade={{ duration: transitionDuration }}
-				out:fade={{ duration: transitionDuration }}
-				class="lang-container"
-			>
-				<CardLang closeLangCard={handleToggleLang} bind:translate={translateStories} />
-			</div>
-		{/if}
+		<!-- onclose={() => (showLang = false)} -->
+		<!-- in:fade={{ duration: transitionDuration }} -->
+		<!-- out:fade={{ duration: transitionDuration }} -->
+		<!-- aria-modal={showLang} -->
+			<Dialog.Root bind:open={showLang}>	
+				<Dialog.Portal>
+					<Dialog.Overlay/>
+						<CardLang closeLangCard={handleToggleLangDialog} bind:translate={translateStories} />
+				</Dialog.Portal>
+			</Dialog.Root>
 		<!-- Header -->
 		<div class="header-container">
-			<Header toggleLang={handleToggleLang} />
+			<Header toggleLang={handleToggleLangDialog} showLang={showLang} />
 		</div>
 
 		<!-- Pages -->
@@ -155,14 +157,6 @@
 		right: 0;
 	}
 
-	.lang-container {
-		width: 100vw;
-		height: 100vh;
-		z-index: 2000;
-		position: absolute;
-		top: 0;
-		left: 0;
-	}
 	/* 
 	.error-container {
 		width: 100vw;

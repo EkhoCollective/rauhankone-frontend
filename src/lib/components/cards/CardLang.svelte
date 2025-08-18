@@ -2,7 +2,7 @@
 	import { _, locale, waitLocale } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
 	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
-
+	import { Dialog } from "bits-ui";
 	let { closeLangCard, translate = $bindable() } = $props();
 
 	const languages = [
@@ -21,57 +21,86 @@
 	}
 </script>
 
-<div class="card-lang-container">
-	<!-- Header/Language Selector -->
-	<div class="card-header-container">
-		<button class="btn btn-close" onclick={() => closeLangCard()}><X color="#ffffff" /></button>
-	</div>
+<!-- Header/Language Selector -->
+<Dialog.Content class="lang-container" trapFocus={true}>
+		<div class="card-header-container">
+			<Dialog.Close class="btn btn-close" onclick={() => closeLangCard()}>
+				<X color="#ffffff" size={35} />
+			</Dialog.Close>
+		</div>
+
 	<!-- Buttons Container -->
 	<div class="card-btn-container">
-		{#each languages as { code, name }}
+		{#each languages as { code, name }, i}
 			<button
 				class="btn btn-lang"
 				class:active-lang={$locale === code}
-				onclick={() => handleLocaleChange(code)}>{name}</button
+				onclick={() => handleLocaleChange(code)}
 			>
+				{name}
+			</button>
 		{/each}
 	</div>
 	<!-- Extra Selector -->
+
+	<!-- Accessable version -->
 	<div class="card-extra-container">
-		<div class="card-checkmark-container">
-			<Checkmark bind:checkValue={translate} />
-		</div>
-		<div>{$_('header_btn_translate_all')}</div>
+		<!-- <Checkmark bind:checkValue={translate} /> -->
+	<input 
+	type="checkbox"
+	value={translate}
+	id="translate-checkbox"
+	name="translate-checkbox"
+	onchange={() => translate = !translate}
+	/>
+		<label for="translate-checkbox">{$_('btn_translate_check')}</label>
 	</div>
-</div>
+</Dialog.Content>
 
 <style>
-	.card-lang-container {
-		width: 100vw;
-		height: 100vh;
-		background-color: black;
-		display: grid;
-		grid-template-rows: 50px 1fr 25%;
+	.card-extra-container input[type='checkbox'] {
+		width: 25px;
+		aspect-ratio: 1;
+		margin-right: 10px;
+		--accent-color-checkbox: white;
+		accent-color: var(--accent-color-checkbox); /* Match Checkmark color if possible */
+		border-radius: 3px;
+		border: 2px solid var(--accent-color-checkbox);
+		background: black;
+		appearance: none;
+		display: inline-block;
+		vertical-align: middle;
+		position: relative;
+		cursor: pointer;
+		transition: box-shadow 0.1s;
 	}
-	.card-header-container {
-		grid-row-start: 1;
-		display: flex;
-		justify-content: flex-end;
+	.card-extra-container input[type='checkbox']:checked {
+		/* background-color: var(--accent-color-checkbox);
+		border-color: var(--accent-color-checkbox); */
+	}
+	.card-extra-container input[type='checkbox']:checked::after {
+		content: '';
+		position: absolute;
+		left: 6px;
+		top: 2px;
+		width: 8px;
+		height: 14px;
+		border: solid white;
+		border-width: 0 3px 3px 0;
+		transform: rotate(45deg);
 	}
 
+
+	
+
 	.btn {
+		aspect-ratio: 1;
 		height: 50px;
+		width: auto;
 		color: white;
-	}
-	.btn-close {
-		background-color: transparent;
-		border-radius: 0;
-		border: none;
-		box-shadow: none;
 	}
 	.card-btn-container {
 		grid-row-start: 2;
-		padding-top: 30vh;
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
@@ -83,6 +112,7 @@
 		border: none;
 		box-shadow: none;
 		font-size: 18px;
+		font-weight: 200;
 		color: white;
 	}
 	.card-extra-container {
@@ -99,6 +129,7 @@
 	}
 	.active-lang {
 		text-decoration: underline;
+		font-weight: 400;
 		text-underline-offset: 2px;
 	}
 </style>
