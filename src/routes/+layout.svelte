@@ -60,30 +60,6 @@
 			});
 	}
 
-	// import type { LayoutLoad } from './$types';
-
-	// export const load: LayoutLoad = async () => {
-	// 	if (browser) {
-	// 		locale.set(window.navigator.language);
-	// 	}
-	// 	await waitLocale();
-	// };
-
-	// onMount(() => {
-	// 	if (browser) {
-	// 		const savedLocale = localStorage.getItem('locale');
-	// 		if (savedLocale) {
-	// 			locale.set(savedLocale);
-	// 		} else {
-	// 			// const navigatorLang = window.navigator.language.split('-')[0]; // Get base language code
-	// 			// FIX THIS BASED ON USER BROWSER LANGUAGE
-	// 			// console.log(navigatorLang);
-	// 			const lang_code = 'en';
-	// 			localStorage.setItem('locale', lang_code);
-	// 			locale.set(lang_code);
-	// 		}
-	// 	}
-	// });
 
 	let handleToggleLangDialog = () => {
 		showLang = !showLang;
@@ -102,21 +78,13 @@
 </svelte:head>
 
 <div class="app">
+
 	<!-- Loader -->
 	{#await waitLocale()}
 		<CardLoader />
 	{:then}
-		<!-- Error Card -->
-		<!-- {#if raiseError()}
-		<div transition:blur>
-			<CardError errorMessage={$_('error_map')} />
-		</div>
-	{/if} -->
-		<!-- Lang Card -->
-		<!-- onclose={() => (showLang = false)} -->
-		<!-- in:fade={{ duration: transitionDuration }} -->
-		<!-- out:fade={{ duration: transitionDuration }} -->
-		<!-- aria-modal={showLang} -->
+
+	 <!-- Lang Dialog -->
 			<Dialog.Root bind:open={showLang}>	
 				<Dialog.Portal>
 					<Dialog.Overlay>
@@ -124,6 +92,9 @@
 					</Dialog.Overlay>
 				</Dialog.Portal>
 			</Dialog.Root>
+		
+		
+			<!-- Header -->
 		<header class="header-container">
 			<Header toggleLang={handleToggleLangDialog} showLang={showLang} />
 		</header>
@@ -156,15 +127,4 @@
 		left: 0;
 		right: 0;
 	}
-
-	/* 
-	.error-container {
-		width: 100vw;
-		height: 100vh;
-		z-index: 3000;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-	} */
 </style>
