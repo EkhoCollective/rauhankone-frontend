@@ -21,5 +21,9 @@
 	"rk_link": "https://oulu2026.eu/en/programme/culture-programme/layers-in-the-peace-machine/",
 	"oulu_link": "https://oulu2026.eu/en/",
 	"ekho_link": "https://ekho.fi/",
-	"gdpr_link": "https://oulu2026.eu/en/gdpr/"
+	"gdpr_link": "https://oulu2026.eu/en/gdpr/",
+	
+	"modal-story-actions-closest": "Traslation for closest missing",
+	"modal-story-actions-furthest": "Traslation for furthest missing",
+	"aria-lang-toggle": "<Traslation for toggle language missing>"
 }
