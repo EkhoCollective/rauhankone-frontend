@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { _, locale, waitLocale } from 'svelte-i18n';
+	import CheckIcon from '../mini-components/CheckIcon.svelte';
 	import { X } from 'lucide-svelte';
-	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import { Dialog } from "bits-ui";
 	let { closeLangCard, translate = $bindable() } = $props();
 
@@ -44,51 +44,23 @@
 	<!-- Extra Selector -->
 
 	<!-- Accessable version -->
-	<div class="card-extra-container">
-		<!-- <Checkmark bind:checkValue={translate} /> -->
-	<input 
+	<!-- <input 
 	type="checkbox"
 	value={translate}
 	id="translate-checkbox"
 	name="translate-checkbox"
 	onchange={() => translate = !translate}
 	/>
-		<label for="translate-checkbox">{$_('btn_translate_check')}</label>
+	<label for="translate-checkbox">{$_('header_btn_translate_all')}</label> -->
+	<div class="card-extra-container">
+		<CheckIcon
+		translateIdForCheckbox="header_btn_translate_all"
+		bind:checkValue={translate}
+		/>
 	</div>
 </Dialog.Content>
 
 <style>
-	.card-extra-container input[type='checkbox'] {
-		width: 25px;
-		aspect-ratio: 1;
-		margin-right: 10px;
-		--accent-color-checkbox: white;
-		accent-color: var(--accent-color-checkbox); /* Match Checkmark color if possible */
-		border-radius: 3px;
-		border: 2px solid var(--accent-color-checkbox);
-		background: black;
-		appearance: none;
-		display: inline-block;
-		vertical-align: middle;
-		position: relative;
-		cursor: pointer;
-		transition: box-shadow 0.1s;
-	}
-	.card-extra-container input[type='checkbox']:checked {
-		/* background-color: var(--accent-color-checkbox);
-		border-color: var(--accent-color-checkbox); */
-	}
-	.card-extra-container input[type='checkbox']:checked::after {
-		content: '';
-		position: absolute;
-		left: 6px;
-		top: 2px;
-		width: 8px;
-		height: 14px;
-		border: solid white;
-		border-width: 0 3px 3px 0;
-		transform: rotate(45deg);
-	}
 
 
 	
@@ -124,9 +96,7 @@
 		justify-content: center;
 		max-width: 75%;
 	}
-	.card-checkmark-container {
-		margin-right: 10px;
-	}
+
 	.active-lang {
 		text-decoration: underline;
 		font-weight: 400;

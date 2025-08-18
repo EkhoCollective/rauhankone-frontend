@@ -96,8 +96,10 @@ input[type="checkbox"]:checked + label {
     outline-color: rgb(163, 180, 255);
     outline-offset: 3px;
     outline-style: solid;
-    outline-width: 2px;
+    outline-width: 1.4px;
+    border-radius: 2px;
   }
+
 
 
   input, 
@@ -106,3 +108,4 @@ input[type="checkbox"]:checked + label {
   select {
     border-radius: 2px;
   }
+
