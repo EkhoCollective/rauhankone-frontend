@@ -1,40 +1,29 @@
 <script lang="ts">
-	import '../app.css';
-	import '$lib/i18n';
-	import { onMount } from 'svelte';
 	import { page } from '$app/state';
-	import { fade } from 'svelte/transition';
-	import { error } from '@sveltejs/kit';
-	import { _, locale, waitLocale, init } from 'svelte-i18n';
-	import { getAuthToken } from '$lib/utils/api_token';
-	import { apiRequest } from '$lib/utils/api_request';
 	import CardLang from '$lib/components/cards/CardLang.svelte';
-	import CardError from '$lib/components/cards/CardError.svelte';
 	import CardLoader from '$lib/components/cards/CardLoader.svelte';
 	import Header from '$lib/components/mini-components/Header.svelte';
+	import '$lib/i18n';
+	import { getAuthToken } from '$lib/utils/api_token';
 	import { Dialog } from "bits-ui";
+	import { onMount } from 'svelte';
+	import { init, waitLocale, _ } from 'svelte-i18n';
+	import { fade } from 'svelte/transition';
+	import '../app.css';
+	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
 
 	let { children } = $props();
-
-	// let questions = $state(null);
-	// let raiseError = getContext('raiseError') as () => boolean;
 	let showLang = $state(false);
-	let transitionDuration = 500;
+	let transitionDuration = 100;
 	let translateStories = $state(false);
-
-	// Set context at component initialization
-	// setContext('questions', () => questions);
+	
+	
 
 	init({
 		fallbackLocale: 'en',
 		initialLocale: 'en'
 	});
 
-	const API_QUESTIONS_OPTIONS = () => ({
-		API_ENDPOINT: '/get_questions',
-		API_METHOD: 'POST',
-		REQUEST_BODY: { question_type: 'starter' }
-	});
 
 	async function handleGetToken() {
 		await getAuthToken()
