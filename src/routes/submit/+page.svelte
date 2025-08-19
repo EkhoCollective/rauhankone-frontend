@@ -248,8 +248,8 @@
 				out:blur={{ delay: suggestionFadeTimer, duration: 500 }}
 				class="suggestions-bubble bubble"
 			>
-				<p>{suggestion}</p>
-				<p>{$_('submit_please_extend')}</p>
+			<p>{$_('submit_please_extend')}</p><br />
+			<p>{suggestion}</p>
 			</div>
 		{/if}
 		<!-- Show thank you message if user has finished the story -->
