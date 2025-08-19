@@ -20,11 +20,10 @@
 			</button>
 		</div>
 	{/if}
-	
+
 	<!-- Lang Button -->
 	<div class="lang-btn-container">
-		<button 
-		class="btn" 
+		<button class="square-icon-button"
 		onclick={() => toggleLang()}
 		aria-label={$_('aria-lang-toggle')}
 		>
@@ -61,12 +60,5 @@
 		justify-self: end;
 		height: 100%;
 	}
-	.btn {
-		height: 100%;
-		background-color: transparent;
-		border-radius: 0;
-		border: none;
-		box-shadow: none;
-		color: white;
-	}
+
 </style>

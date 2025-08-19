@@ -332,13 +332,8 @@
 		flex-direction: column;
 		align-items: end;
 	}
-	.btn {
-		background-color: black;
-		border-color: white;
-		border-radius: 0px;
-		color: white;
-		min-width: 130px;
-	}
+	
+
 	.btn:disabled {
 		border-color: rgb(90, 90, 90);
 		color: rgb(90, 90, 90);
@@ -420,8 +415,6 @@
 			justify-self: end;
 		}
 
-		.btn {
-			width: 170px;
-		}
+
 	}
 </style>

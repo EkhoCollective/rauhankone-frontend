@@ -45,10 +45,10 @@
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
-			<button class="btn btn-submit" onclick={() => goto(`${base}/submit`)}>
+			<button class="btn-submit" onclick={() => goto(`${base}/submit`)}>
 				{$_('main_btn_take_part')}
 			</button>
-			<button class="btn btn-explore" onclick={() => goto(`${base}/explore`)}>
+			<button class="btn-explore" onclick={() => goto(`${base}/explore`)}>
 				{$_('main_btn_explore')}</button
 			>
 		</div>

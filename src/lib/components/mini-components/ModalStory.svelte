@@ -8,20 +8,20 @@
 	<div class="modal-story-content">
 		<div class="modal-story-header">
 			<!-- <h1>{story.cluster_id}</h1> -->
-			<button class="btn btn-close" onclick={() => closeModal()}><X color="#ffffff" /></button>
+			<button class="btn-close" onclick={() => closeModal()}><X color="#ffffff" /></button>
 		</div>
 		<div class="modal-story-body">
 			<h1>{story}</h1>
 		</div>
 
 		<div class="modal-story-actions">
-			<button class="btn btn-action" onclick={() => onNavigateClosest && onNavigateClosest()}>
+			<button class="btn-action" onclick={() => onNavigateClosest && onNavigateClosest()}>
 				{$_('explore_modal_btn_closest')}</button
 			>
-			<button class="btn btn-action" onclick={() => onNavigateFurthest && onNavigateFurthest()}>
+			<button class="btn-action" onclick={() => onNavigateFurthest && onNavigateFurthest()}>
 				{$_('explore_modal_btn_furthest')}</button
 			>
-			<!-- <button class="btn btn-action"> Random</button> -->
+			<!-- <button class="btn-action"> Random</button> -->
 		</div>
 	</div>
 </div>
@@ -88,26 +88,8 @@
 		flex-wrap: wrap;
 	}
 
-	.btn-close {
-		background-color: transparent;
-		border-radius: 0;
-		border: none;
-		box-shadow: none;
-	}
 
-	.btn {
-		background-color: transparent;
-		border-radius: 0;
-		border: none;
-		box-shadow: none;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		min-width: 0;
-		text-decoration: underline;
-		text-underline-offset: 2px;
-		color: white;
-	}
+
 
 	.btn-action {
 		padding: 8px 16px;
@@ -115,18 +97,6 @@
 		max-width: 150px;
 	}
 
-	/* .btn-explore {
-		background-color: black;
-		border-color: none;
-		border: none;
-		box-shadow: none;
-		width: 100%;
-		font-size: 16px;
-		text-decoration: underline;
-		text-underline-offset: 2px;
-		border-radius: 0px;
-		color: white;
-	} */
 
 	@media (max-width: 767px) {
 		.modal-story-content {

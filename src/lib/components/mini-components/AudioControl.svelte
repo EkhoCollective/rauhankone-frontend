@@ -200,7 +200,7 @@
 </script>
 
 <div class="audio-icon-container">
-	<button class="btn" onclick={() => togglePlaying()}>
+	<button class="square-icon-button" onclick={() => togglePlaying()}>
 		{#if $audioStore.isGloballyMuted}
 			<VolumeX color="#ffffff" />
 		{:else}
@@ -216,11 +216,5 @@
 		align-items: center;
 	}
 
-	.btn {
-		height: 100%;
-		background-color: transparent;
-		border-radius: 0;
-		border: none;
-		box-shadow: none;
-	}
+
 </style>
