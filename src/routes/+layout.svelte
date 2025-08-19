@@ -38,27 +38,12 @@
 
 	async function handleGetToken() {
 		await getAuthToken()
-			// .then(() => {
-			// 	handleGetQuestions();
-			// })
 			.catch((err) => {
-				// console.log('Error getting token', error);
-				// raiseError = true;
-				throw error(500, 'Failed to get token');
+				console.error('Error getting token:', err);
+				customErrorHandler($_("error.authFailed"), err.code);
 			});
 	}
 
-	// async function handleGetQuestions() {
-	// 	await apiRequest(API_QUESTIONS_OPTIONS())
-	// 		.then((response) => {
-	// 			questions = response;
-	// 		})
-	// 		.catch((err) => {
-	// 			// console.log('Error getting questions', error);
-	// 			// raiseError = true;
-	// 			throw error(500, 'Failed to get questions');
-	// 		});
-	// }
 
 
 	let handleToggleLangDialog = () => {
