@@ -9,7 +9,6 @@
 
 	let { toggleLang, showLang } = $props();
 	let audioVolume = $state(0.5);
-	let audioClusterVolume = $state(1);
 	let audioFadeTime = $state(500);
 </script>
 
@@ -23,21 +22,13 @@
 	{/if}
 	<!-- Lang Button -->
 	<div class="lang-btn-container">
-		<button 
-		class="btn" 
-		onclick={() => toggleLang()}
-		aria-label={$_('aria-lang-toggle')}
-		>
-		<Globe color="#ffffff" />
+		<button class="btn" onclick={() => toggleLang()} aria-label={$_('aria-lang-toggle')}>
+			<Globe color="#ffffff" />
 		</button>
-	</div> 
+	</div>
 	<!-- Audio Control -->
 	<div class="audio-control-container">
-		<AudioControl
-			bind:volume={audioVolume}
-			bind:fadeTime={audioFadeTime}
-			bind:clusterVolume={audioClusterVolume}
-		/>
+		<AudioControl bind:volume={audioVolume} bind:fadeTime={audioFadeTime} />
 	</div>
 </div>
 
