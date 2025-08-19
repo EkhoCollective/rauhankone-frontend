@@ -5,6 +5,7 @@
 	import { audioStore, audioActions } from '$lib/stores/audioStore';
 	import { soundEffects, audioConfig } from '$lib/utils/soundEffects';
 	import { audioFader } from '$lib/utils/audioFader';
+	import { mobileAudioHandler, isMobileDevice } from '$lib/utils/mobileAudioHandler';
 
 	// Props for configurable audio settings
 	let {
@@ -21,6 +22,16 @@
 	let currentLoadedSong = $state(-1);
 	let song = $state<HTMLAudioElement | null>(null);
 	let isToggling = false;
+
+	// Mobile detection
+	let isMobile = $state(false);
+
+	// Initialize mobile detection
+	$effect(() => {
+		if (typeof window !== 'undefined') {
+			isMobile = isMobileDevice();
+		}
+	});
 
 	async function togglePlaying() {
 		if (isToggling) return;
@@ -42,7 +53,18 @@
 				}
 				soundEffects.stopAllEffects();
 			} else {
-				// Unmuting - start playing
+				// Unmuting - enable audio context first on mobile
+				if (isMobile && !mobileAudioHandler.isAudioContextReady()) {
+					const enabled = await mobileAudioHandler.enableAudio();
+					if (!enabled) {
+						console.warn('Audio context could not be enabled');
+						// Reset mute state if audio couldn't be enabled
+						audioActions.setMuted(true);
+						return;
+					}
+				}
+
+				// Start playing
 				await startPlaying();
 			}
 		} finally {
@@ -56,25 +78,31 @@
 			return;
 		}
 
-		// Stop existing song
-		if (song) {
-			audioFader.cancelFade(song);
-			song.pause();
-			song = null;
-		}
-
 		try {
 			// Validate audio parameters from props
 			const safeVolume = isFinite(volume) ? volume : 0.3;
-			const safeDuration = isFinite(fadeTime) ? fadeTime : 500;
+			const mobileFadeDuration = isMobile
+				? (isFinite(fadeTime) ? fadeTime : 500) * 0.5
+				: isFinite(fadeTime)
+					? fadeTime
+					: 500;
 
-			// Create and play new song
-			song = new Audio(tracklist[songIdx].src);
-			song.loop = true;
+			// Reuse existing audio element or create new one
+			if (song && currentLoadedSong !== songIdx) {
+				// Stop current audio and change source
+				audioFader.cancelFade(song);
+				song.pause();
+				song.src = tracklist[songIdx].src;
+				song.load(); // Important: reload the audio with new source
+			} else if (!song) {
+				// Create new audio element only if none exists
+				song = new Audio(tracklist[songIdx].src);
+				song.loop = true;
+			}
+
 			song.volume = 0;
-
 			await song.play();
-			await audioFader.fadeIn(song, safeVolume, safeDuration);
+			await audioFader.fadeIn(song, safeVolume, mobileFadeDuration);
 
 			currentLoadedSong = songIdx;
 			audioActions.setCurrentSong(song);
@@ -83,8 +111,10 @@
 		} catch (error) {
 			console.error('Failed to start playing song:', error);
 			// Reset state on error
-			song = null;
-			currentLoadedSong = -1;
+			if (song) {
+				song.pause();
+				song.currentTime = 0;
+			}
 			audioActions.setPlayingState('paused');
 		}
 	}
@@ -94,18 +124,19 @@
 
 		// Validate audio parameters from props
 		const safeVolume = isFinite(volume) ? volume : 0.3;
-		const safeDuration = isFinite(fadeTime) ? fadeTime : 500;
+		const baseDuration = isFinite(fadeTime) ? fadeTime : 500;
+		const mobileFadeDuration = isMobile ? baseDuration * 0.3 : baseDuration * 0.5;
 
 		// Fade out current song
-		await audioFader.fadeOut(song, safeDuration * 0.5);
+		await audioFader.fadeOut(song, mobileFadeDuration);
 
-		// Load and fade in new song
-		song = new Audio(tracklist[songIdx].src);
-		song.loop = true;
+		// Reuse audio element: change source and reload
+		song.src = tracklist[songIdx].src;
+		song.load();
 		song.volume = 0;
 
 		await song.play();
-		await audioFader.fadeIn(song, safeVolume, safeDuration * 0.5);
+		await audioFader.fadeIn(song, safeVolume, mobileFadeDuration);
 
 		currentLoadedSong = songIdx;
 		audioActions.setCurrentSong(song);
@@ -119,31 +150,50 @@
 		isToggling = true;
 
 		try {
-			const oldSong = song;
-
 			// Validate audio parameters from props
 			const safeVolume = isFinite(volume) ? volume : 0.3;
-			const safeDuration = isFinite(fadeTime) ? fadeTime : 500;
+			const baseDuration = isFinite(fadeTime) ? fadeTime : 500;
+			const mobileFadeDuration = isMobile ? baseDuration * 0.3 : baseDuration * 0.7;
 
-			// Create new song
-			const newSong = new Audio(tracklist[songIdx].src);
-			newSong.loop = true;
-			newSong.volume = 0;
+			if (isMobile) {
+				// Mobile: Sequential fade (no concurrent audio)
+				// 1. Fade out current song
+				await audioFader.fadeOut(song, mobileFadeDuration);
 
-			// Start new song
-			await newSong.play();
+				// 2. Change source and reload
+				song.src = tracklist[songIdx].src;
+				song.load();
+				song.volume = 0;
 
-			// Cross-fade: fade out old song and fade in new song simultaneously
-			const fadeOutPromise = audioFader.fadeOut(oldSong, safeDuration * 0.7);
-			const fadeInPromise = audioFader.fadeIn(newSong, safeVolume, safeDuration * 0.7);
+				// 3. Play and fade in new song
+				await song.play();
+				await audioFader.fadeIn(song, safeVolume, mobileFadeDuration);
+			} else {
+				// Desktop: True cross-fade (concurrent audio)
+				const oldSong = song;
 
-			// Wait for both fades to complete
-			await Promise.all([fadeOutPromise, fadeInPromise]);
+				// Create new song
+				const newSong = new Audio(tracklist[songIdx].src);
+				newSong.loop = true;
+				newSong.volume = 0;
+
+				// Start new song
+				await newSong.play();
+
+				// Cross-fade: fade out old song and fade in new song simultaneously
+				const fadeOutPromise = audioFader.fadeOut(oldSong, mobileFadeDuration);
+				const fadeInPromise = audioFader.fadeIn(newSong, safeVolume, mobileFadeDuration);
+
+				// Wait for both fades to complete
+				await Promise.all([fadeOutPromise, fadeInPromise]);
+
+				// Update song reference
+				song = newSong;
+			}
 
 			// Update state
-			song = newSong;
 			currentLoadedSong = songIdx;
-			audioActions.setCurrentSong(newSong);
+			audioActions.setCurrentSong(song);
 			audioActions.setVolume(safeVolume);
 		} catch (error) {
 			console.error('Cross-fade failed:', error);

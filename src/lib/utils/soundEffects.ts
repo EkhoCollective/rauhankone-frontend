@@ -67,7 +67,10 @@ export class SoundEffects {
 			// Start at volume 0 and fade in
 			audio.volume = 0;
 			await audio.play();
-			await audioFader.fadeIn(audio, effectVolume, globalFadeDuration * 0.3); // Shorter fade for effects
+			
+			// Mobile-optimized fade duration
+			const mobileFadeDuration = isMobileDevice ? globalFadeDuration * 0.15 : globalFadeDuration * 0.3;
+			await audioFader.fadeIn(audio, effectVolume, mobileFadeDuration);
 		} catch (error) {
 			console.warn('Failed to play sound effect:', error);
 		}
@@ -80,7 +83,9 @@ export class SoundEffects {
 	async stopEffect(soundKey: string): Promise<void> {
 		const audio = this.soundCache.get(soundKey);
 		if (audio && this.playingSounds.has(audio)) {
-			await audioFader.fadeOut(audio, globalFadeDuration * 0.2); // Even faster fade out
+			// Mobile-optimized fade out duration
+			const mobileFadeOut = isMobileDevice ? globalFadeDuration * 0.1 : globalFadeDuration * 0.2;
+			await audioFader.fadeOut(audio, mobileFadeOut);
 			audio.currentTime = 0;
 			this.playingSounds.delete(audio);
 		}
@@ -146,6 +151,13 @@ export const FADE_PRESETS = {
 // Global configuration for sound effects (separate from audio control props)
 let globalFadeDuration = 500;
 let globalClusterVolume = 1.0;
+let isMobileDevice = false;
+
+// Mobile detection for sound effects
+if (typeof window !== 'undefined') {
+	isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+		(navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+}
 
 // Audio configuration utilities
 export const audioConfig = {
