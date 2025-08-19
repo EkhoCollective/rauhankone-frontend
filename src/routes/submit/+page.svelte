@@ -271,11 +271,9 @@
 			<div transition:blur class="disclaimer-container">
 				<!-- Checkmark -->
 				<div class="checkmark-container">
-					<Checkmark bind:checkValue={userAgreed} />
+					<Checkmark bind:checkValue={userAgreed} translateIdForCheckbox={"submit_disclaimer"}/>
 				</div>
-				<div class="disclaimer-text">
-					<p>{$_('submit_disclaimer')}</p>
-				</div>
+
 			</div>
 			<!-- Buttons Container -->
 			<div transition:blur class="disclaimer-btn-container">
