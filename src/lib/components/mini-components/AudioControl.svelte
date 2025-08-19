@@ -157,17 +157,71 @@
 
 			if (isMobile) {
 				// Mobile: Sequential fade (no concurrent audio)
+				console.log('Mobile cross-fade: from song', currentLoadedSong, 'to song', songIdx);
+
 				// 1. Fade out current song
 				await audioFader.fadeOut(song, mobileFadeDuration);
 
 				// 2. Change source and reload
-				song.src = tracklist[songIdx].src;
-				song.load();
+				const newSrc = tracklist[songIdx].src;
+				console.log('Mobile: Changing source to:', newSrc);
+
+				// Store old source for comparison
+				const oldSrc = song.src;
+
+				song.src = newSrc;
+
+				// Wait for load to complete with proper event handling
+				await new Promise((resolve, reject) => {
+					const handleCanPlay = () => {
+						song.removeEventListener('canplay', handleCanPlay);
+						song.removeEventListener('error', handleError);
+						console.log('Mobile: Audio loaded and ready to play');
+						resolve(undefined);
+					};
+
+					const handleError = (error: Event) => {
+						song.removeEventListener('canplay', handleCanPlay);
+						song.removeEventListener('error', handleError);
+						console.error('Mobile: Audio load error:', error);
+						reject(error);
+					};
+
+					song.addEventListener('canplay', handleCanPlay);
+					song.addEventListener('error', handleError);
+
+					song.load();
+
+					// Fallback timeout
+					setTimeout(() => {
+						song.removeEventListener('canplay', handleCanPlay);
+						song.removeEventListener('error', handleError);
+						console.log('Mobile: Load timeout, proceeding anyway');
+						resolve(undefined);
+					}, 1000);
+				});
+
 				song.volume = 0;
 
 				// 3. Play and fade in new song
-				await song.play();
-				await audioFader.fadeIn(song, safeVolume, mobileFadeDuration);
+				try {
+					await song.play();
+					console.log('Mobile: Song playing, starting fade in');
+					await audioFader.fadeIn(song, safeVolume, mobileFadeDuration);
+				} catch (playError) {
+					console.error('Mobile: Failed to play new song:', playError);
+
+					// Try to enable audio context again
+					try {
+						await mobileAudioHandler.enableAudio();
+						await song.play();
+						await audioFader.fadeIn(song, safeVolume, mobileFadeDuration);
+					} catch (retryError) {
+						console.error('Mobile: Retry failed, falling back to startPlaying:', retryError);
+						// Ultimate fallback - use startPlaying method
+						throw retryError;
+					}
+				}
 			} else {
 				// Desktop: True cross-fade (concurrent audio)
 				const oldSong = song;
@@ -208,6 +262,17 @@
 	$effect(() => {
 		const newSongIdx = page.url.pathname === '/explore' ? 1 : 0;
 
+		console.log('Page change effect:', {
+			currentPath: page.url.pathname,
+			newSongIdx,
+			currentSongIdx: songIdx,
+			isGloballyMuted: $audioStore.isGloballyMuted,
+			playingState: $audioStore.playingState,
+			hasSong: !!song,
+			isToggling,
+			isMobile
+		});
+
 		// If the song index is changing and we're currently playing
 		if (
 			newSongIdx !== songIdx &&
@@ -216,6 +281,7 @@
 			song &&
 			!isToggling
 		) {
+			console.log('Triggering cross-fade from', songIdx, 'to', newSongIdx);
 			// Update songIdx first
 			const oldSongIdx = songIdx;
 			songIdx = newSongIdx;
@@ -228,6 +294,7 @@
 			});
 		} else {
 			// Just update the index if not playing
+			console.log('Just updating song index without cross-fade');
 			songIdx = newSongIdx;
 		}
 	});
