@@ -72,9 +72,7 @@
 	 <!-- Lang Dialog -->
 			<Dialog.Root bind:open={showLang}>	
 				<Dialog.Portal>
-					<Dialog.Overlay>
 						<CardLang closeLangCard={handleToggleLangDialog} bind:translate={translateStories} />
-					</Dialog.Overlay>
 				</Dialog.Portal>
 			</Dialog.Root>
 		
