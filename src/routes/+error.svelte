@@ -1,19 +1,42 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import { page } from '$app/state';
+	import { fly } from 'svelte/transition';
 
 	const reloadPage = () => {
-		window.location.reload();
+		window.history.go(-1); // Go back
 	};
+	/* http://localhost:5173/error?message=Hi */
+	
+	/* We'll see if this is a 'fools 404' as in we're passing params in the url
+	because svelte won't trigger the error template otherwise
+	*/
+	let pathParams = new URLSearchParams(window.location.search);
+	let errorMessage = pathParams.get('message');
+	let errorCode = pathParams.get('code');
+	let finalError;
+	
+	if (!page.error?.message) {
+		finalError = {
+			message: errorMessage || 'An unexpected error occurred',
+			status: errorCode || 500
+		}
+	} else {
+		finalError = {
+			message: errorMessage || 'An unexpected error occurred',
+			status: errorCode || 500
+		};
+	}
+
 </script>
 
-<div class="loader-container">
+<div class="loader-container" in:fly={{ duration: 100 }}>
 	<div class="error-container">
-		<h1>{page.error?.message || 'An error occurred'}</h1>
-		<p>Status: {page.status}</p>
+		<h1>{finalError.message || 'An error occurred'}</h1>
+		<p>{finalError.status}</p>
 	</div>
 	<div class="button-container">
-		<button class="btn btn-home" onclick={() => reloadPage()}>{$_('btn_home')}</button>
+		<button class="btn btn-home" onclick={() => reloadPage()}>{$_('error_btn_home')}</button>
 	</div>
 </div>
 
