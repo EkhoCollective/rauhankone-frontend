@@ -3,6 +3,7 @@
 	import CheckIcon from '../mini-components/CheckIcon.svelte';
 	import { X } from 'lucide-svelte';
 	import { Dialog } from "bits-ui";
+	import DialogContent from '../DialogContent.svelte';
 	let { closeLangCard, translate = $bindable() } = $props();
 
 	const languages = [
@@ -22,7 +23,7 @@
 </script>
 
 <!-- Header/Language Selector -->
-<Dialog.Content class="lang-container" trapFocus={true}>
+<DialogContent class="lang-container" trapFocus={true}>
 		<div class="card-header-container">
 			<Dialog.Close class="btn btn-close" onclick={() => closeLangCard()}>
 				<X color="#ffffff" size={35} />
@@ -58,7 +59,7 @@
 		bind:checkValue={translate}
 		/>
 	</div>
-</Dialog.Content>
+</DialogContent>
 
 <style>
 
