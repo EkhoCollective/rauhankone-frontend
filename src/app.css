@@ -33,11 +33,39 @@ label {
 
 
 /* Label that's next to a checkbox that's checked should be bolded */
-input[type="checkbox"]:checked + label {
-  font-weight: 400;
-}
 
 
+	.app {
+		background-color: black;
+		color: white;
+		font-family: 'Roboto', sans-serif;
+	}
+
+	.header-container {
+		height: 100px;
+		z-index: 1000;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+	}
+
+
+
+
+
+  .btn-close {
+		background-color: transparent;
+    aspect-ratio: 1;
+    max-width: 40px;
+    padding: 0;
+    width: auto;
+    height: auto;
+		border: none;
+		box-shadow: none;
+    margin: 5px;
+  }
+  
 
 .lang-container {
   width: 100%;
@@ -52,27 +80,6 @@ input[type="checkbox"]:checked + label {
   display: grid;
 		grid-template-rows: 15% 1fr 15%;
 }
-
-
-  .btn-close {
-		background-color: transparent;
-    aspect-ratio: 1;
-    max-width: 40px;
-    padding: 0;
-    width: auto;
-    height: auto;
-		border: none;
-		box-shadow: none;
-    margin: 5px;
-  }
-
-  .card-header-container-dialog {
-		grid-row-start: 1;
-		display: flex;
-		justify-content: flex-end;
-    align-items: center;
-
-	}
 
 .card-header-container {
 		height: 100%;
@@ -96,7 +103,7 @@ input[type="checkbox"]:checked + label {
     outline-color: rgb(163, 180, 255);
     outline-offset: 3px;
     outline-style: solid;
-    outline-width: 1.4px;
+    outline-width: 1px;
     border-radius: 2px;
   }
 

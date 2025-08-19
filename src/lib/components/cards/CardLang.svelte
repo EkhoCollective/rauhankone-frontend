@@ -1,4 +1,6 @@
 <script lang="ts">
+
+
 	import { _, locale, waitLocale } from 'svelte-i18n';
 	import CheckIcon from '../mini-components/CheckIcon.svelte';
 	import { X } from 'lucide-svelte';
@@ -20,6 +22,7 @@
 			closeLangCard(false);
 		});
 	}
+
 </script>
 
 <!-- Header/Language Selector -->
@@ -42,17 +45,7 @@
 			</button>
 		{/each}
 	</div>
-	<!-- Extra Selector -->
 
-	<!-- Accessable version -->
-	<!-- <input 
-	type="checkbox"
-	value={translate}
-	id="translate-checkbox"
-	name="translate-checkbox"
-	onchange={() => translate = !translate}
-	/>
-	<label for="translate-checkbox">{$_('header_btn_translate_all')}</label> -->
 	<div class="card-extra-container">
 		<CheckIcon
 		translateIdForCheckbox="header_btn_translate_all"
@@ -63,15 +56,9 @@
 
 <style>
 
-
+	
 	
 
-	.btn {
-		aspect-ratio: 1;
-		height: 50px;
-		width: auto;
-		color: white;
-	}
 	.card-btn-container {
 		grid-row-start: 2;
 		display: flex;
