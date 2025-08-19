@@ -76,8 +76,15 @@
 
 					// Set navigation context before going to explore
 					navigationContext.setSource('submit');
-					if (response.story_id) {
-						navigationContext.setSubmittedStoryId(response.story_id);
+
+					// Check multiple possible field names for the story ID
+					let storyId = response.story_id || response.id || response.storyId || response.story?.id;
+					console.log('Extracted story ID:', storyId);
+
+					if (storyId) {
+						navigationContext.setSubmittedStoryId(storyId);
+					} else {
+						console.warn('No story ID found in response:', response);
 					}
 
 					goto(`${base}/explore`);

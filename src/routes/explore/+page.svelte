@@ -37,6 +37,7 @@
 	let navButtonValue = $state('');
 	// Get navigation data once on initialization, and handle it properly
 	const initialNavigationData = navigationContext.getNavigationData();
+	console.log('Initial navigation data on explore page:', initialNavigationData);
 	let navigationData = $state(initialNavigationData);
 	let hasHandledAutoModal = $state(false);
 	let selectedStory: StoryInstance | null = $state(null);
@@ -57,6 +58,7 @@
 			.then((response) => {
 				response_clusters = response;
 				console.log('Fetched clusters:', response_clusters);
+				// console.log('Navigation data at fetch time:', navigationData);
 				// responsefromDB = true;
 			})
 			.catch((err) => {
@@ -138,20 +140,27 @@
 		}
 	}
 
-	// Function to find story by ID in clusters and return as StoryInstance
-	function findStoryById(storyId: string) {
+	// Function to find story by ID in clusters and return the actual StoryInstance from Map
+	function findStoryInstanceById(storyId: string) {
 		if (!response_clusters?.clusters) return null;
 
+		// First, find the story data in the API response
 		for (const cluster of response_clusters.clusters) {
 			for (const story of cluster.stories) {
-				if (story[0]?.story_id === storyId) {
-					// Return the story in a format compatible with selectedStory
-					return {
-						story: story,
-						cluster_audio_id: cluster.text,
-						cluster_id: cluster.text,
-						text: story[0]?.text
-					};
+				// Story contains multiple arrays (different language versions)
+				// Check each element in the story array for the matching id
+				for (const storyElement of story) {
+					if (storyElement?.id === storyId) {
+						console.log('Found story:', storyElement);
+
+						// Found the story! Return the entire story array with cluster info
+						return {
+							story: story,
+							cluster_audio_id: cluster.text,
+							cluster_id: cluster.text,
+							text: story[0]?.text
+						};
+					}
 				}
 			}
 		}
@@ -187,8 +196,8 @@
 
 		if (navigationData.source === 'submit' && navigationData.storyId) {
 			// Find and select the submitted story
-			const submittedStory = findStoryById(navigationData.storyId);
-			console.log('Found submitted story:', submittedStory);
+			const submittedStory = findStoryInstanceById(navigationData.storyId);
+			// console.log('Found submitted story:', submittedStory);
 			if (submittedStory) {
 				selectedStory = submittedStory;
 				// Only play sound if audio is explicitly enabled AND playing
@@ -197,11 +206,13 @@
 				if (!audioState.isGloballyMuted && audioState.playingState === 'playing') {
 					soundEffects.playEffect(submittedStory.cluster_audio_id);
 				}
+			} else {
+				// console.log('Submitted story not found in clusters, opening map normally');
 			}
 		} else if (navigationData.source === 'main') {
 			// Select a random story
 			const randomStory = selectRandomStory();
-			console.log('Selected random story:', randomStory);
+			// console.log('Selected random story:', randomStory);
 			if (randomStory) {
 				selectedStory = randomStory;
 				// Only play sound if audio is explicitly enabled AND playing
@@ -221,7 +232,10 @@
 	}
 
 	onMount(() => {
-		fetchClusters();
+		// Add 5 second delay before fetching clusters to account for DB delay
+		setTimeout(() => {
+			fetchClusters();
+		}, 1000);
 
 		// Set timeout to hide toast after 3 seconds
 		if (navigationData.source) {
@@ -234,10 +248,11 @@
 	// Watch for response_clusters to be loaded, then handle auto modal
 	$effect(() => {
 		if (response_clusters && navigationData.source && !hasHandledAutoModal) {
-			// Use setTimeout to avoid reactive state conflicts
+			// console.log('Clusters loaded, checking for auto modal...');
+			// Use setTimeout to avoid reactive state conflicts and ensure Map is rendered
 			setTimeout(() => {
 				handleAutoModal();
-			}, 100);
+			}, 500); // Increased timeout to ensure Map is fully rendered
 		}
 	});
 
