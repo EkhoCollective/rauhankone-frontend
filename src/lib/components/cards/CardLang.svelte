@@ -28,7 +28,7 @@
 <!-- Header/Language Selector -->
 <DialogContent class="lang-container" trapFocus={true}>
 		<div class="card-header-container">
-			<Dialog.Close class="square-icon-button" onclick={() => closeLangCard()}>
+			<Dialog.Close class="square-button" onclick={() => closeLangCard()}>
 				<X color="#ffffff" size={35} />
 			</Dialog.Close>
 		</div>

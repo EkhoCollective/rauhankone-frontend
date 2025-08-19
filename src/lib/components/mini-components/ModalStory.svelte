@@ -8,7 +8,7 @@
 	<div class="modal-story-content">
 		<div class="modal-story-header">
 			<!-- <h1>{story.cluster_id}</h1> -->
-			<button class="btn-close" onclick={() => closeModal()}><X color="#ffffff" /></button>
+			<button class="square-button" onclick={() => closeModal()}><X color="#ffffff" /></button>
 		</div>
 		<div class="modal-story-body">
 			<h1>{story}</h1>
@@ -89,7 +89,19 @@
 	}
 
 
-
+	.btn {
+		background-color: transparent;
+		border-radius: 0;
+		border: none;
+		box-shadow: none;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		min-width: 0;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		color: white;
+	}
 
 	.btn-action {
 		padding: 8px 16px;

@@ -3,17 +3,18 @@
 @plugin '@tailwindcss/typography';
 
 :root {
-  --color-text: #ffffff;
-  --color-background: #000000;
+  --bg-color: #000000;
+  --text-color: #ffffff;
+  --border-radius: 0;
 }
 
 .html {
-  background-color: var(--color-background);
+  background-color: var(--bg-color);
 }
 
 
 body {
-  background-color: var(--color-background);
+  background-color: var(--bg-color);
   width: 100%;
   height: 100%;
   margin: 0;
@@ -68,17 +69,21 @@ label {
 
 
 
-  .square-icon-button {
+  .square-button {
 		background-color: transparent;
-    aspect-ratio: 1;
-    width: 40px;
     padding: 0;
-    width: auto;
+    width: 40px;
+    aspect-ratio: 1;
     height: auto;
 		border: none;
 		box-shadow: none;
-    margin: 5px;
+    margin: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+
+  
   
 
 .lang-container {
@@ -118,7 +123,7 @@ label {
     outline-offset: 3px;
     outline-style: solid;
     outline-width: 1px;
-    border-radius: 2px;
+    border-radius: var(--border-radius);
   }
 
 
@@ -127,6 +132,6 @@ label {
   button,
   textarea,
   select {
-    border-radius: 2px;
+    border-radius: var(--border-radius);  
   }
 
