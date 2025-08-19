@@ -13,7 +13,15 @@
 	import { error } from '@sveltejs/kit';
 	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { blur, fade } from 'svelte/transition';
-	// import { setContext, getContext } from 'svelte';
+	import { getContext } from 'svelte';
+
+	// Get navigation context from layout
+	const navigationContext = getContext('navigation') as {
+		setSource: (source: 'main' | 'submit') => void;
+		setSubmittedStoryId: (storyId: string) => void;
+		getNavigationData: () => { source: 'main' | 'submit' | null; storyId: string | null };
+		clearNavigation: () => void;
+	};
 
 	// Get Questions Data from Parent Layout
 	// const getQuestionsData = getContext('questions') as () => any;
@@ -65,6 +73,13 @@
 			await apiRequest(API_ADD_STORY_OPTIONS())
 				.then((response) => {
 					console.log('Add Story Response:', response);
+
+					// Set navigation context before going to explore
+					navigationContext.setSource('submit');
+					if (response.story_id) {
+						navigationContext.setSubmittedStoryId(response.story_id);
+					}
+
 					goto(`${base}/explore`);
 				})
 				.catch((err) => {

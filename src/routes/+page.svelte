@@ -2,8 +2,17 @@
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
+	import { getContext } from 'svelte';
 	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
 	import Footer from '$lib/components/mini-components/Footer.svelte';
+
+	// Get navigation context from layout
+	const navigationContext = getContext('navigation') as {
+		setSource: (source: 'main' | 'submit') => void;
+		setSubmittedStoryId: (storyId: string) => void;
+		getNavigationData: () => { source: 'main' | 'submit' | null; storyId: string | null };
+		clearNavigation: () => void;
+	};
 
 	let backgroundRef: BackgroundMouse | undefined = $state();
 
@@ -48,7 +57,13 @@
 			<button class="btn btn-submit" onclick={() => goto(`${base}/submit`)}>
 				{$_('main_btn_take_part')}
 			</button>
-			<button class="btn btn-explore" onclick={() => goto(`${base}/explore`)}>
+			<button
+				class="btn btn-explore"
+				onclick={() => {
+					navigationContext.setSource('main');
+					goto(`${base}/explore`);
+				}}
+			>
 				{$_('main_btn_explore')}</button
 			>
 		</div>

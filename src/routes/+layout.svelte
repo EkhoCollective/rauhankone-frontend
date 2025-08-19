@@ -12,7 +12,8 @@
 	import CardError from '$lib/components/cards/CardError.svelte';
 	import CardLoader from '$lib/components/cards/CardLoader.svelte';
 	import Header from '$lib/components/mini-components/Header.svelte';
-	import { Dialog } from "bits-ui";
+	import { Dialog } from 'bits-ui';
+	import { setContext } from 'svelte';
 
 	let { children } = $props();
 
@@ -21,6 +22,28 @@
 	let showLang = $state(false);
 	let transitionDuration = 500;
 	let translateStories = $state(false);
+
+	// Navigation context state
+	let navigationSource = $state<'main' | 'submit' | null>(null);
+	let submittedStoryId = $state<string | null>(null);
+
+	// Set navigation context
+	setContext('navigation', {
+		setSource: (source: 'main' | 'submit') => {
+			navigationSource = source;
+		},
+		setSubmittedStoryId: (storyId: string) => {
+			submittedStoryId = storyId;
+		},
+		getNavigationData: () => ({
+			source: navigationSource,
+			storyId: submittedStoryId
+		}),
+		clearNavigation: () => {
+			navigationSource = null;
+			submittedStoryId = null;
+		}
+	});
 
 	// Set context at component initialization
 	// setContext('questions', () => questions);
@@ -60,7 +83,6 @@
 	// 		});
 	// }
 
-
 	let handleToggleLangDialog = () => {
 		showLang = !showLang;
 	};
@@ -78,25 +100,22 @@
 </svelte:head>
 
 <div class="app">
-
 	<!-- Loader -->
 	{#await waitLocale()}
 		<CardLoader />
 	{:then}
+		<!-- Lang Dialog -->
+		<Dialog.Root bind:open={showLang}>
+			<Dialog.Portal>
+				<Dialog.Overlay>
+					<CardLang closeLangCard={handleToggleLangDialog} bind:translate={translateStories} />
+				</Dialog.Overlay>
+			</Dialog.Portal>
+		</Dialog.Root>
 
-	 <!-- Lang Dialog -->
-			<Dialog.Root bind:open={showLang}>	
-				<Dialog.Portal>
-					<Dialog.Overlay>
-						<CardLang closeLangCard={handleToggleLangDialog} bind:translate={translateStories} />
-					</Dialog.Overlay>
-				</Dialog.Portal>
-			</Dialog.Root>
-		
-		
-			<!-- Header -->
+		<!-- Header -->
 		<header class="header-container">
-			<Header toggleLang={handleToggleLangDialog} showLang={showLang} />
+			<Header toggleLang={handleToggleLangDialog} {showLang} />
 		</header>
 
 		<!-- Pages -->
