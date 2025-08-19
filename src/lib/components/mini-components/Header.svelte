@@ -2,8 +2,7 @@
 	import { _ } from 'svelte-i18n';
 	import { Globe, ArrowLeft } from 'lucide-svelte';
 	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { blur } from 'svelte/transition';
 	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
 
@@ -14,13 +13,14 @@
 </script>
 
 <div class="card-header-container">
-	{#if page.url.pathname === `${base}/explore`}
+	{#if page.url.pathname === `${resolve('/explore')}`}
 		<div transition:blur class="back-btn-container">
-			<button class="btn" onclick={() => goto(`${base}/`)}
-				><ArrowLeft color="#ffffff" /> {$_('header_btn_exit')}</button
-			>
+			<button class="btn" onclick={() => resolve('/explore')}>
+				<ArrowLeft color="#ffffff" /> {$_('header_btn_exit')}
+			</button>
 		</div>
 	{/if}
+	
 	<!-- Lang Button -->
 	<div class="lang-btn-container">
 		<button 
