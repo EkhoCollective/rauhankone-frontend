@@ -15,7 +15,7 @@
 <div class="card-header-container">
 	{#if page.url.pathname === `${resolve('/explore')}`}
 		<div transition:blur class="back-btn-container">
-			<button class="btn" onclick={() => resolve('/explore')}>
+			<button class="btn" onclick={() => window.history.back()}>
 				<ArrowLeft color="#ffffff" /> {$_('header_btn_exit')}
 			</button>
 		</div>
@@ -24,7 +24,7 @@
 	<!-- Lang Button -->
 	<div class="lang-btn-container">
 		<button 
-		class="btn" 
+		class="square-button" 
 		onclick={() => toggleLang()}
 		aria-label={$_('aria-lang-toggle')}
 		>
