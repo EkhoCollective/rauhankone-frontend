@@ -2,19 +2,33 @@
 @plugin "daisyui";
 @plugin '@tailwindcss/typography';
 
+:root {
+  --color-text: #ffffff;
+  --color-background: #000000;
+}
+
 .html {
-  background-color: #000000;
+  background-color: var(--color-background);
 }
 
 
 body {
-  background-color: #000000;
+  background-color: var(--color-background);
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
+button {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--color-text);
+  white-space: nowrap;
+  /* overflow: hidden; */
+  text-overflow: ellipsis;
+}
 
 .map-nav-button {
   width: 40px;
@@ -54,10 +68,10 @@ label {
 
 
 
-  .btn-close {
+  .square-icon-button {
 		background-color: transparent;
     aspect-ratio: 1;
-    max-width: 40px;
+    width: 40px;
     padding: 0;
     width: auto;
     height: auto;

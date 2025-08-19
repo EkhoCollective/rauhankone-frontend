@@ -28,7 +28,7 @@
 <!-- Header/Language Selector -->
 <DialogContent class="lang-container" trapFocus={true}>
 		<div class="card-header-container">
-			<Dialog.Close class="btn btn-close" onclick={() => closeLangCard()}>
+			<Dialog.Close class="square-icon-button" onclick={() => closeLangCard()}>
 				<X color="#ffffff" size={35} />
 			</Dialog.Close>
 		</div>
@@ -37,7 +37,7 @@
 	<div class="card-btn-container">
 		{#each languages as { code, name }, i}
 			<button
-				class="btn btn-lang"
+				class="btn-lang"
 				class:active-lang={$locale === code}
 				onclick={() => handleLocaleChange(code)}
 			>
@@ -67,14 +67,7 @@
 		align-items: center;
 		justify-items: center;
 	}
-	.btn-lang {
-		background-color: black;
-		border: none;
-		box-shadow: none;
-		font-size: 18px;
-		font-weight: 200;
-		color: white;
-	}
+
 	.card-extra-container {
 		grid-row-start: 3;
 		font-size: 18px;
