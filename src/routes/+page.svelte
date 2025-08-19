@@ -113,6 +113,8 @@
 	.btn-submit {
 		background-color: black;
 		border-color: white;
+		border: 1px solid;
+		padding: 10px 20px;
 		box-shadow: none;
 		width: 100%;
 		font-size: 16px;
@@ -124,6 +126,7 @@
 		background-color: black;
 		border-color: none;
 		border: none;
+		padding: 10px 20px;
 		box-shadow: none;
 		width: 100%;
 		font-size: 16px;
@@ -178,7 +181,6 @@
 			display: flex;
 			flex-direction: column;
 			gap: 20px;
-			/* width: 170px; */
 			align-items: center;
 			justify-content: center;
 		}
