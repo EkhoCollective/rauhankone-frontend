@@ -5,6 +5,9 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
+	esbuild: {
+		drop: ['console', 'debugger'],
+	},
 	test: {
 		workspace: [
 			{
