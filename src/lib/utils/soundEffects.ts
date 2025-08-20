@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 import { audioStore, audioActions } from '$lib/stores/audioStore';
 import { tracklist } from '$lib/components/media/audio/tracklist';
 import { audioFader } from '$lib/utils/audioFader';
+import { mobileAudioHandler } from '$lib/utils/mobileAudioHandler';
 
 export class SoundEffects {
 	private static instance: SoundEffects;
@@ -47,11 +48,12 @@ export class SoundEffects {
 			if (!audio) {
 				audio = new Audio(audioSrc);
 				audio.preload = 'auto';
+				mobileAudioHandler.prepareAudioElement(audio);
 				this.soundCache.set(soundKey, audio);
 			}
 
-					// Set target volume (use cluster volume for effects, not background music volume)
-		const effectVolume = volume !== undefined ? volume : globalClusterVolume;
+					// Set target volume (use global volume for effects)
+		const effectVolume = volume !== undefined ? volume : audioState.globalVolume;
 
 			// Reset audio to beginning
 			audio.currentTime = 0;
@@ -67,7 +69,10 @@ export class SoundEffects {
 			// Start at volume 0 and fade in
 			audio.volume = 0;
 			await audio.play();
-			await audioFader.fadeIn(audio, effectVolume, globalFadeDuration * 0.3); // Shorter fade for effects
+			
+			// Use mobile-optimized fade duration
+			const optimizedFadeDuration = mobileAudioHandler.getOptimizedFadeDuration(globalFadeDuration * 0.3);
+			await audioFader.fadeIn(audio, effectVolume, optimizedFadeDuration);
 		} catch (error) {
 			console.warn('Failed to play sound effect:', error);
 		}
@@ -80,7 +85,9 @@ export class SoundEffects {
 	async stopEffect(soundKey: string): Promise<void> {
 		const audio = this.soundCache.get(soundKey);
 		if (audio && this.playingSounds.has(audio)) {
-			await audioFader.fadeOut(audio, globalFadeDuration * 0.2); // Even faster fade out
+			// Use mobile-optimized fade out duration
+			const optimizedFadeOut = mobileAudioHandler.getOptimizedFadeDuration(globalFadeDuration * 0.2, true);
+			await audioFader.fadeOut(audio, optimizedFadeOut);
 			audio.currentTime = 0;
 			this.playingSounds.delete(audio);
 		}
@@ -107,6 +114,7 @@ export class SoundEffects {
 			if (trackIndex !== -1) {
 				const audio = new Audio(tracklist[trackIndex].src);
 				audio.preload = 'auto';
+				mobileAudioHandler.prepareAudioElement(audio);
 				this.soundCache.set(key, audio);
 			}
 		});
@@ -145,7 +153,6 @@ export const FADE_PRESETS = {
 
 // Global configuration for sound effects (separate from audio control props)
 let globalFadeDuration = 500;
-let globalClusterVolume = 1.0;
 
 // Audio configuration utilities
 export const audioConfig = {
@@ -158,15 +165,5 @@ export const audioConfig = {
 		globalFadeDuration = actualDuration;
 	},
 	
-	getFadeDuration: () => globalFadeDuration,
-	
-	/**
-	 * Set global cluster volume for sound effects
-	 * @param volume - Volume level (0-1)
-	 */
-	setClusterVolume: (volume: number) => {
-		globalClusterVolume = Math.max(0, Math.min(1, volume));
-	},
-	
-	getClusterVolume: () => globalClusterVolume
+	getFadeDuration: () => globalFadeDuration
 };
