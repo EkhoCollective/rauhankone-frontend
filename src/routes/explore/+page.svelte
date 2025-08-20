@@ -56,6 +56,11 @@
 	// Mobile detection state - determined once on mount
 	let isMobileDevice = $state(false);
 
+	// Continuous button press state (mobile only)
+	let continuousInterval: number | null = $state(null);
+	let continuousButtonValue = $state('');
+	let isInContinuousPress = $state(false);
+
 	// Mobile detection utility
 	function detectMobile(): boolean {
 		return (
@@ -110,6 +115,33 @@
 			controls?.dolly(-zoomValue, true);
 			navButtonValue = 'idle';
 		}
+	}
+
+	// Continuous button press functions (all devices)
+	function startContinuousPress(buttonValue: string) {
+		// Clear any existing interval
+		stopContinuousPress();
+
+		// Set the current button value and flag
+		continuousButtonValue = buttonValue;
+		isInContinuousPress = true;
+
+		// Execute the action immediately
+		handleNavButton(buttonValue);
+
+		// Start the continuous interval (repeat every 100ms)
+		continuousInterval = setInterval(() => {
+			handleNavButton(continuousButtonValue);
+		}, 100);
+	}
+
+	function stopContinuousPress() {
+		if (continuousInterval) {
+			clearInterval(continuousInterval);
+			continuousInterval = null;
+		}
+		continuousButtonValue = '';
+		isInContinuousPress = false;
 	}
 
 	$effect(() => {
@@ -268,6 +300,11 @@
 				toastEnabled = false;
 			}, 3000);
 		}
+
+		// Cleanup function to clear intervals when component unmounts
+		return () => {
+			stopContinuousPress();
+		};
 	});
 
 	// Watch for response_clusters to be loaded, then handle auto modal
@@ -345,7 +382,13 @@
 			in:fade={{ duration: 500 }}
 			out:fade={{ duration: 500 }}
 		>
-			<NavIcons bind:value={navButtonValue} />
+			<NavIcons
+				bind:value={navButtonValue}
+				{isMobileDevice}
+				{isInContinuousPress}
+				onTouchStart={startContinuousPress}
+				onTouchEnd={stopContinuousPress}
+			/>
 		</div>
 	{/if}
 </div>
