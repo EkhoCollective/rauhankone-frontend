@@ -37,7 +37,7 @@
 	let navButtonValue = $state('');
 	// Get navigation data once on initialization, and handle it properly
 	const initialNavigationData = navigationContext.getNavigationData();
-	console.log('Initial navigation data on explore page:', initialNavigationData);
+	// console.log('Initial navigation data on explore page:', initialNavigationData);
 	let navigationData = $state(initialNavigationData);
 	let hasHandledAutoModal = $state(false);
 	let selectedStory: StoryInstance | any | null = $state(null);
@@ -46,6 +46,23 @@
 	let currentPlayingSound: string | null = $state(null);
 	let navigateToClosestStory: (() => void) | undefined = $state();
 	let navigateToFurthestStory: (() => void) | undefined = $state();
+
+	// Camera control values for different devices
+	const camRotDesktop = 45;
+	const camZoomDesktop = 10;
+	const camRotMobile = 20;
+	const camZoomMobile = 5;
+
+	// Mobile detection state - determined once on mount
+	let isMobileDevice = $state(false);
+
+	// Mobile detection utility
+	function detectMobile(): boolean {
+		return (
+			/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+			window.innerWidth <= 768
+		);
+	}
 
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
@@ -57,7 +74,7 @@
 		await apiRequest(API_CLUSTERS_OPTIONS)
 			.then((response) => {
 				response_clusters = response;
-				console.log('Fetched clusters:', response_clusters);
+				// console.log('Fetched clusters:', response_clusters);
 				// console.log('Navigation data at fetch time:', navigationData);
 				// responsefromDB = true;
 			})
@@ -77,17 +94,20 @@
 	}
 
 	function handleNavButton(buttonValue: string) {
+		const rotationValue = isMobileDevice ? camRotMobile : camRotDesktop;
+		const zoomValue = isMobileDevice ? camZoomMobile : camZoomDesktop;
+
 		if (buttonValue === 'left') {
-			controls?.rotate(-45 * MathUtils.DEG2RAD, 0, true);
+			controls?.rotate(-rotationValue * MathUtils.DEG2RAD, 0, true);
 			navButtonValue = 'idle';
 		} else if (buttonValue === 'right') {
-			controls?.rotate(45 * MathUtils.DEG2RAD, 0, true);
+			controls?.rotate(rotationValue * MathUtils.DEG2RAD, 0, true);
 			navButtonValue = 'idle';
 		} else if (buttonValue === 'plus') {
-			controls?.dolly(10, true);
+			controls?.dolly(zoomValue, true);
 			navButtonValue = 'idle';
 		} else if (buttonValue === 'minus') {
-			controls?.dolly(-10, true);
+			controls?.dolly(-zoomValue, true);
 			navButtonValue = 'idle';
 		}
 	}
@@ -151,7 +171,7 @@
 				// Check each element in the story array for the matching id
 				for (const storyElement of story) {
 					if (storyElement?.id === storyId) {
-						console.log('Found story:', storyElement);
+						// console.log('Found story:', storyElement);
 
 						// Found the story! Return the entire story array with cluster info
 						return {
@@ -192,7 +212,7 @@
 	function handleAutoModal() {
 		if (!navigationData.source || hasHandledAutoModal) return;
 
-		console.log('handleAutoModal triggered:', navigationData);
+		// console.log('handleAutoModal triggered:', navigationData);
 
 		if (navigationData.source === 'submit' && navigationData.storyId) {
 			// Find and select the submitted story
@@ -209,20 +229,22 @@
 			} else {
 				// console.log('Submitted story not found in clusters, opening map normally');
 			}
-		} else if (navigationData.source === 'main') {
-			// Select a random story
-			const randomStory = selectRandomStory();
-			// console.log('Selected random story:', randomStory);
-			if (randomStory) {
-				selectedStory = randomStory;
-				// Only play sound if audio is explicitly enabled AND playing
-				// This prevents AudioContext creation without user gesture
-				const audioState = $audioStore;
-				if (!audioState.isGloballyMuted && audioState.playingState === 'playing') {
-					soundEffects.playEffect(randomStory.cluster_audio_id);
-				}
-			}
 		}
+
+		// else if (navigationData.source === 'main') {
+		// 	// Select a random story
+		// 	const randomStory = selectRandomStory();
+		// 	// console.log('Selected random story:', randomStory);
+		// 	if (randomStory) {
+		// 		selectedStory = randomStory;
+		// 		// Only play sound if audio is explicitly enabled AND playing
+		// 		// This prevents AudioContext creation without user gesture
+		// 		const audioState = $audioStore;
+		// 		if (!audioState.isGloballyMuted && audioState.playingState === 'playing') {
+		// 			soundEffects.playEffect(randomStory.cluster_audio_id);
+		// 		}
+		// 	}
+		// }
 
 		// Mark as handled and clear navigation context
 		hasHandledAutoModal = true;
@@ -232,6 +254,9 @@
 	}
 
 	onMount(() => {
+		// Detect mobile device once on mount
+		isMobileDevice = detectMobile();
+
 		// Add 5 second delay before fetching clusters to account for DB delay
 		setTimeout(() => {
 			fetchClusters();
