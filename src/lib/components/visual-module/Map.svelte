@@ -51,17 +51,17 @@
 	} = $props();
 
 	// State
-	const worldScale: number = 50;
+	const worldScale: number = 20;
 	const minSphereScale: number = 1;
 	const minMapScale: number = 0.1;
 	const maxMapScale: number = 1.5;
 	const sphereResolution: number = 32;
-	const cameraOffset: number = 5;
+	const cameraOffset: number = 10;
 	const centroidCameraOffset: number = 40;
 	let centroid = $state(new THREE.Vector3());
 	let instances: StoryInstance[] = $state([]);
 
-	const clusterSpread: number = 3;
+	const clusterSpread: number = 4;
 	const lineThickness: number = 0.035;
 	const pointSize: number = 0.025;
 	const curviness: number = 0.35;
@@ -572,121 +572,3 @@
 		{/each}
 	{/snippet}
 </InstancedMeshes>
-<!-- </World> -->
-
-<!-- <World gravity={[0, 0, 0]}>
-<InstancedMesh {instances} range={instances.length}>
-	<T.Mesh>
-	<T.SphereGeometry />
-	<T.MeshBasicMaterial color="white" toneMapped={false} />
-
-	</T.Mesh>
-	{#each instances as instance}
-		<T.Mesh position={[instance.positions.x, instance.positions.y, instance.positions.z]}>
-			<T.SphereGeometry args={[instance.scale, sphereResolution, sphereResolution]} />
-			<T.MeshBasicMaterial color="white" toneMapped={false} />
-		</T.Mesh>
-		<T.Mesh position={[instance.positions.x, instance.positions.y, instance.positions.z]}>
-			<T.SphereGeometry args={[instance.scale * 2, sphereResolution, sphereResolution]} />
-			<FakeGlowMaterial glowColor="white" toneMapped={false} glowInternalRadius={5} />
-		</T.Mesh>
-		<T.Mesh position={[instance.positions.x, instance.positions.y, instance.positions.z]}>
-			<T.SphereGeometry args={[instance.scale * 10, sphereResolution, sphereResolution]} />
-			<FakeGlowMaterial glowColor="#404040" opacity={0.01} />
-		</T.Mesh>
-
-		<Instance
-			position.x={instance.positions.x}
-			position.y={instance.positions.y}
-			position.z={instance.positions.z}
-			scale={instance.scale}
-			onclick={() => {
-				// Reset all other instances' selected state
-				instances.forEach((inst) => (inst.selected = false));
-				// Set this instance as selected and keep it highlighted
-				instance.selected = true;
-				instance.tw.set(1);
-				selectedStory = instance;
-
-				// Center camera on the selected story
-				if (controls) {
-					// Move camera to look at the story with smooth transition
-					controls.setLookAt(
-						instance.positions.x,
-						instance.positions.y,
-						instance.positions.z + 20, // Camera position (offset from story)
-						instance.positions.x,
-						instance.positions.y,
-						instance.positions.z, // Look at the story position
-						true // Enable smooth transition
-					);
-				}
-
-				// Play sound effect when modal opens using cluster-specific sound
-				soundEffects.playEffect(instance.cluster_audio_id);
-			}}
-			onpointerenter={() => {
-				// Only animate if not selected
-				if (!instance.selected) {
-					instance.tw.set(1);
-				}
-			}}
-			onpointerleave={() => {
-				// Only reset if not selected
-				if (!instance.selected) {
-					instance.tw.set(0);
-				}
-			}}
-		/>
-		<Attractor
-					range={50}
-					strength={5}
-					position={[
-						instance.positions.x + (Math.random() - 0.5) * 0.001,
-						instance.positions.y + (Math.random() - 0.5) * 0.001,
-						instance.positions.z + (Math.random() - 0.5) * 0.001
-					]}
-				/>
-				<Attractor
-					range={6}
-					strength={-5}
-					position={[
-						instance.positions.x + (Math.random() - 0.5) * 0.001,
-						instance.positions.y + (Math.random() - 0.5) * 0.001,
-						instance.positions.z + (Math.random() - 0.5) * 0.001
-					]}
-				/>
-				<Collider shape="ball" args={[5]} mass={Infinity} />
-		<T.Mesh>
-					<T.SphereGeometry args={[instance.scale, sphereResolution, sphereResolution]} />
-					<T.MeshBasicMaterial color="white" toneMapped={false} />
-				</T.Mesh>
-		<T.Mesh>
-					<T.SphereGeometry args={[instance.scale * 2, sphereResolution, sphereResolution]} />
-					<FakeGlowMaterial glowColor="white" toneMapped={false} glowInternalRadius={5} />
-				</T.Mesh>
-				<T.Mesh>
-					<T.SphereGeometry args={[instance.scale * 10, sphereResolution, sphereResolution]} />
-					<FakeGlowMaterial glowColor="#404040" opacity={0.01} />
-				</T.Mesh>
-		{#if instance.text_instances && instance.text_instances.length > 0}
-					<InstancedMesh instances={instance.text_instances} range={instance.text_instances.length}>
-						{#each instance.text_instances as text_instance}
-							{#if text_instance && text_instance.char && text_instance.position}
-								<Instance>
-									<RigidBody>
-										<Collider shape="ball" args={[0.1]} mass={1} />
-										<T.Mesh position={text_instance.position}>
-											<Text3DGeometry text="a" size={0.25} depth={0.1} curveSegments={2} />
-											<T.MeshBasicMaterial color="#ff0000" toneMapped={false} />
-										</T.Mesh>
-									</RigidBody>
-								</Instance>
-							{/if}
-						{/each}
-					</InstancedMesh>
-				{/if}
-		</Instance>
-	{/each}
-</InstancedMesh>
-</World> -->
