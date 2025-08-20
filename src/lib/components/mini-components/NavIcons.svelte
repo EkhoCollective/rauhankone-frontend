@@ -1,29 +1,57 @@
 <script lang="ts">
 	import { ArrowLeft, ArrowRight, SquarePlus, SquareMinus } from 'lucide-svelte';
-
+	import { soundEffects } from '$lib/utils/soundEffects';
 	let { value = $bindable() } = $props();
 
 	function handleNavButton(button: string) {
 		value = button;
 	}
+
+	function playUISound() {
+		soundEffects.playEffect('Blip_UI');
+	}
 </script>
 
 <div class="map-navigation-icons-container">
 	<div>
-		<button class="icon-left-btn btn-container map-nav-button" onclick={() => handleNavButton('left')}>
+		<button
+			class="icon-left-btn btn-container map-nav-button"
+			onclick={() => {
+				playUISound();
+				handleNavButton('left');
+			}}
+		>
 			<ArrowLeft color="#ffffff" />
 		</button>
 	</div>
 	<div class="sub-container">
-		<button class="icon-plus-btn btn-container map-nav-button" onclick={() => handleNavButton('plus')}>
+		<button
+			class="icon-plus-btn btn-container map-nav-button"
+			onclick={() => {
+				playUISound();
+				handleNavButton('plus');
+			}}
+		>
 			<SquarePlus color="#ffffff" />
 		</button>
-		<button class="icon-minus-btn btn-container map-nav-button" onclick={() => handleNavButton('minus')}>
+		<button
+			class="icon-minus-btn btn-container map-nav-button"
+			onclick={() => {
+				playUISound();
+				handleNavButton('minus');
+			}}
+		>
 			<SquareMinus color="#ffffff" />
 		</button>
 	</div>
 	<div>
-		<button class="icon-right-btn btn-container map-nav-button" onclick={() => handleNavButton('right')}>
+		<button
+			class="icon-right-btn btn-container map-nav-button"
+			onclick={() => {
+				playUISound();
+				handleNavButton('right');
+			}}
+		>
 			<ArrowRight color="#ffffff" />
 		</button>
 	</div>

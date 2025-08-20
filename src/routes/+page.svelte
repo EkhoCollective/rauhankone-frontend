@@ -5,6 +5,8 @@
 	import { getContext } from 'svelte';
 	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
 	import Footer from '$lib/components/mini-components/Footer.svelte';
+	import { soundEffects } from '$lib/utils/soundEffects';
+	// import { audioStore } from '$lib/stores/audioStore';
 
 	// Get navigation context from layout
 	const navigationContext = getContext('navigation') as {
@@ -28,6 +30,10 @@
 
 	function splitB(text: string): string {
 		return text.slice(text.indexOf('.') + 1);
+	}
+
+	function playUISound() {
+		soundEffects.playEffect('Blip_UI');
 	}
 </script>
 
@@ -54,12 +60,19 @@
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
-			<button class="btn btn-submit" onclick={() => goto(`${base}/submit`)}>
+			<button
+				class="btn btn-submit"
+				onclick={() => {
+					playUISound();
+					goto(`${base}/submit`);
+				}}
+			>
 				{$_('main_btn_take_part')}
 			</button>
 			<button
 				class="btn btn-explore"
 				onclick={() => {
+					playUISound();
 					navigationContext.setSource('main');
 					goto(`${base}/explore`);
 				}}

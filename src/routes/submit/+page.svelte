@@ -14,6 +14,7 @@
 	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { blur, fade } from 'svelte/transition';
 	import { getContext } from 'svelte';
+	import { soundEffects } from '$lib/utils/soundEffects';
 
 	// Get navigation context from layout
 	const navigationContext = getContext('navigation') as {
@@ -199,6 +200,10 @@
 		}
 	}
 
+	function playUISound() {
+		soundEffects.playEffect('Blip_UI');
+	}
+
 	// Watch for changes in the story text
 	$effect(() => {
 		handleTyping();
@@ -302,8 +307,13 @@
 			<!-- Buttons Container -->
 			<div transition:blur class="disclaimer-btn-container">
 				<div>
-					<button disabled={!userAgreed} class="btn" onclick={handleSubmit}
-						>{$_('submit_btn_submit')}</button
+					<button
+						disabled={!userAgreed}
+						class="btn"
+						onclick={() => {
+							playUISound();
+							handleSubmit();
+						}}>{$_('submit_btn_submit')}</button
 					>
 				</div>
 			</div>

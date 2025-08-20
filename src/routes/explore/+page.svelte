@@ -40,7 +40,7 @@
 	console.log('Initial navigation data on explore page:', initialNavigationData);
 	let navigationData = $state(initialNavigationData);
 	let hasHandledAutoModal = $state(false);
-	let selectedStory: StoryInstance | null = $state(null);
+	let selectedStory: StoryInstance | any | null = $state(null);
 	let selectedStoryLanguageText = $state(null);
 	let controls = $state.raw<CameraControlsRef>();
 	let currentPlayingSound: string | null = $state(null);
