@@ -45,11 +45,7 @@
 	</div>
 	<!-- Audio Control -->
 	<div class="audio-control-container">
-		<AudioControl
-			bind:volume={audioVolume}
-			bind:fadeTime={audioFadeTime}
-			bind:clusterVolume={audioClusterVolume}
-		/>
+		<AudioControl bind:volume={audioVolume} bind:fadeTime={audioFadeTime} />
 	</div>
 </div>
 

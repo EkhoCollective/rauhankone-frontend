@@ -2,7 +2,6 @@
 	import { _ } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
 	import { soundEffects } from '$lib/utils/soundEffects';
-	// import { _ } from 'svelte-i18n';
 	let { story = $bindable(), closeModal, onNavigateClosest, onNavigateFurthest } = $props();
 
 	function playUISound() {

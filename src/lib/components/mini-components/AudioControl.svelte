@@ -3,18 +3,16 @@
 	import { tracklist } from '$lib/components/media/audio/tracklist';
 	import { page } from '$app/state';
 	import { audioStore, audioActions } from '$lib/stores/audioStore';
-	import { soundEffects, audioConfig } from '$lib/utils/soundEffects';
+	import { soundEffects } from '$lib/utils/soundEffects';
 	import { audioFader } from '$lib/utils/audioFader';
 	import { mobileAudioHandler, isMobileDevice } from '$lib/utils/mobileAudioHandler';
 
 	// Props for configurable audio settings
 	let {
 		volume = $bindable(0.3),
-		clusterVolume = $bindable(1),
 		fadeTime = $bindable(500)
 	}: {
 		volume?: number;
-		clusterVolume?: number;
 		fadeTime?: number;
 	} = $props();
 
@@ -22,8 +20,6 @@
 	let currentLoadedSong = $state(-1);
 	let song = $state<HTMLAudioElement | null>(null);
 	let isToggling = false;
-
-	// Mobile detection
 	let isMobile = $state(false);
 
 	// Initialize mobile detection
@@ -48,7 +44,8 @@
 				// Muting - fade out and stop
 				if (song) {
 					const duration = isFinite(fadeTime) ? fadeTime : 500;
-					await audioFader.fadeOut(song, duration);
+					const optimizedDuration = mobileAudioHandler.getOptimizedFadeDuration(duration, true);
+					await audioFader.fadeOut(song, optimizedDuration);
 					audioActions.setPlayingState('paused');
 				}
 				soundEffects.stopAllEffects();
@@ -81,13 +78,10 @@
 		try {
 			// Validate audio parameters from props
 			const safeVolume = isFinite(volume) ? volume : 0.3;
-			const mobileFadeDuration = isMobile
-				? (isFinite(fadeTime) ? fadeTime : 500) * 0.5
-				: isFinite(fadeTime)
-					? fadeTime
-					: 500;
+			const baseDuration = isFinite(fadeTime) ? fadeTime : 500;
+			const optimizedDuration = mobileAudioHandler.getOptimizedFadeDuration(baseDuration);
 
-			// Reuse existing audio element or create new one
+			// Mobile optimization: Reuse existing audio element when possible
 			if (song && currentLoadedSong !== songIdx) {
 				// Stop current audio and change source
 				audioFader.cancelFade(song);
@@ -98,11 +92,12 @@
 				// Create new audio element only if none exists
 				song = new Audio(tracklist[songIdx].src);
 				song.loop = true;
+				mobileAudioHandler.prepareAudioElement(song);
 			}
 
 			song.volume = 0;
 			await song.play();
-			await audioFader.fadeIn(song, safeVolume, mobileFadeDuration);
+			await audioFader.fadeIn(song, safeVolume, optimizedDuration);
 
 			currentLoadedSong = songIdx;
 			audioActions.setCurrentSong(song);
@@ -125,18 +120,19 @@
 		// Validate audio parameters from props
 		const safeVolume = isFinite(volume) ? volume : 0.3;
 		const baseDuration = isFinite(fadeTime) ? fadeTime : 500;
-		const mobileFadeDuration = isMobile ? baseDuration * 0.3 : baseDuration * 0.5;
+		const fadeOutDuration = mobileAudioHandler.getOptimizedFadeDuration(baseDuration * 0.5, true);
+		const fadeInDuration = mobileAudioHandler.getOptimizedFadeDuration(baseDuration * 0.5);
 
 		// Fade out current song
-		await audioFader.fadeOut(song, mobileFadeDuration);
+		await audioFader.fadeOut(song, fadeOutDuration);
 
-		// Reuse audio element: change source and reload
+		// Reuse audio element: change source and reload (mobile-friendly)
 		song.src = tracklist[songIdx].src;
 		song.load();
 		song.volume = 0;
 
 		await song.play();
-		await audioFader.fadeIn(song, safeVolume, mobileFadeDuration);
+		await audioFader.fadeIn(song, safeVolume, fadeInDuration);
 
 		currentLoadedSong = songIdx;
 		audioActions.setCurrentSong(song);
@@ -153,21 +149,20 @@
 			// Validate audio parameters from props
 			const safeVolume = isFinite(volume) ? volume : 0.3;
 			const baseDuration = isFinite(fadeTime) ? fadeTime : 500;
-			const mobileFadeDuration = isMobile ? baseDuration * 0.3 : baseDuration * 0.7;
+			const optimizedDuration = mobileAudioHandler.getOptimizedFadeDuration(baseDuration * 0.7);
 
-			if (isMobile) {
-				// Mobile: Sequential fade (no concurrent audio)
-				// 1. Fade out current song
-				await audioFader.fadeOut(song, mobileFadeDuration);
+			if (isMobile || !mobileAudioHandler.supportsMultipleAudioStreams()) {
+				// Mobile/Limited: Use sequential fade instead of concurrent audio
+				// This avoids audio context and loading issues on mobile
+				await audioFader.fadeOut(song, optimizedDuration);
 
-				// 2. Change source and reload
+				// Reuse the same audio element
 				song.src = tracklist[songIdx].src;
 				song.load();
 				song.volume = 0;
 
-				// 3. Play and fade in new song
 				await song.play();
-				await audioFader.fadeIn(song, safeVolume, mobileFadeDuration);
+				await audioFader.fadeIn(song, safeVolume, optimizedDuration);
 			} else {
 				// Desktop: True cross-fade (concurrent audio)
 				const oldSong = song;
@@ -176,13 +171,14 @@
 				const newSong = new Audio(tracklist[songIdx].src);
 				newSong.loop = true;
 				newSong.volume = 0;
+				mobileAudioHandler.prepareAudioElement(newSong);
 
 				// Start new song
 				await newSong.play();
 
 				// Cross-fade: fade out old song and fade in new song simultaneously
-				const fadeOutPromise = audioFader.fadeOut(oldSong, mobileFadeDuration);
-				const fadeInPromise = audioFader.fadeIn(newSong, safeVolume, mobileFadeDuration);
+				const fadeOutPromise = audioFader.fadeOut(oldSong, optimizedDuration);
+				const fadeInPromise = audioFader.fadeIn(newSong, safeVolume, optimizedDuration);
 
 				// Wait for both fades to complete
 				await Promise.all([fadeOutPromise, fadeInPromise]);
@@ -230,12 +226,6 @@
 			// Just update the index if not playing
 			songIdx = newSongIdx;
 		}
-	});
-
-	// Effect to update cluster volume in sound effects system
-	$effect(() => {
-		const safeClusterVolume = isFinite(clusterVolume) ? clusterVolume : 1.0;
-		audioConfig.setClusterVolume(safeClusterVolume);
 	});
 
 	// $inspect('AudioControl state:', {
