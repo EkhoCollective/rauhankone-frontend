@@ -16,8 +16,18 @@
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
+	import { getContext } from 'svelte';
+	import { audioStore } from '$lib/stores/audioStore';
 
-	let { getOnlyTranslated = $bindable(), triggeredFrom } = $props();
+	let { getOnlyTranslated = $bindable() } = $props();
+
+	// Get navigation context from layout
+	const navigationContext = getContext('navigation') as {
+		setSource: (source: 'main' | 'submit') => void;
+		setSubmittedStoryId: (storyId: string) => void;
+		getNavigationData: () => { source: 'main' | 'submit' | null; storyId: string | null };
+		clearNavigation: () => void;
+	};
 
 	let response_clusters: any = $state(null);
 	// let responsefromDB = $state(false);
@@ -25,12 +35,39 @@
 	// let raiseError = $state(false);
 	let toastEnabled = $state(true);
 	let navButtonValue = $state('');
-	let selectedStory: StoryInstance | null = $state(null);
+	// Get navigation data once on initialization, and handle it properly
+	const initialNavigationData = navigationContext.getNavigationData();
+	// console.log('Initial navigation data on explore page:', initialNavigationData);
+	let navigationData = $state(initialNavigationData);
+	let hasHandledAutoModal = $state(false);
+	let selectedStory: StoryInstance | any | null = $state(null);
 	let selectedStoryLanguageText = $state(null);
 	let controls = $state.raw<CameraControlsRef>();
 	let currentPlayingSound: string | null = $state(null);
 	let navigateToClosestStory: (() => void) | undefined = $state();
 	let navigateToFurthestStory: (() => void) | undefined = $state();
+
+	// Camera control values for different devices
+	const camRotDesktop = 45;
+	const camZoomDesktop = 10;
+	const camRotMobile = 20;
+	const camZoomMobile = 5;
+
+	// Mobile detection state - determined once on mount
+	let isMobileDevice = $state(false);
+
+	// Continuous button press state (mobile only)
+	let continuousInterval: number | null = $state(null);
+	let continuousButtonValue = $state('');
+	let isInContinuousPress = $state(false);
+
+	// Mobile detection utility
+	function detectMobile(): boolean {
+		return (
+			/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+			window.innerWidth <= 768
+		);
+	}
 
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
@@ -42,6 +79,8 @@
 		await apiRequest(API_CLUSTERS_OPTIONS)
 			.then((response) => {
 				response_clusters = response;
+				// console.log('Fetched clusters:', response_clusters);
+				// console.log('Navigation data at fetch time:', navigationData);
 				// responsefromDB = true;
 			})
 			.catch((err) => {
@@ -60,19 +99,49 @@
 	}
 
 	function handleNavButton(buttonValue: string) {
+		const rotationValue = isMobileDevice ? camRotMobile : camRotDesktop;
+		const zoomValue = isMobileDevice ? camZoomMobile : camZoomDesktop;
+
 		if (buttonValue === 'left') {
-			controls?.rotate(-45 * MathUtils.DEG2RAD, 0, true);
+			controls?.rotate(-rotationValue * MathUtils.DEG2RAD, 0, true);
 			navButtonValue = 'idle';
 		} else if (buttonValue === 'right') {
-			controls?.rotate(45 * MathUtils.DEG2RAD, 0, true);
+			controls?.rotate(rotationValue * MathUtils.DEG2RAD, 0, true);
 			navButtonValue = 'idle';
 		} else if (buttonValue === 'plus') {
-			controls?.dolly(10, true);
+			controls?.dolly(zoomValue, true);
 			navButtonValue = 'idle';
 		} else if (buttonValue === 'minus') {
-			controls?.dolly(-10, true);
+			controls?.dolly(-zoomValue, true);
 			navButtonValue = 'idle';
 		}
+	}
+
+	// Continuous button press functions (all devices)
+	function startContinuousPress(buttonValue: string) {
+		// Clear any existing interval
+		stopContinuousPress();
+
+		// Set the current button value and flag
+		continuousButtonValue = buttonValue;
+		isInContinuousPress = true;
+
+		// Execute the action immediately
+		handleNavButton(buttonValue);
+
+		// Start the continuous interval (repeat every 100ms)
+		continuousInterval = setInterval(() => {
+			handleNavButton(continuousButtonValue);
+		}, 100);
+	}
+
+	function stopContinuousPress() {
+		if (continuousInterval) {
+			clearInterval(continuousInterval);
+			continuousInterval = null;
+		}
+		continuousButtonValue = '';
+		isInContinuousPress = false;
 	}
 
 	$effect(() => {
@@ -88,14 +157,24 @@
 				currentPlayingSound = null;
 			}
 		} else {
-			// Modal opened, track the current sound
+			// Modal opened, track the current sound (but don't auto-play)
 			currentPlayingSound = selectedStory.cluster_audio_id;
 		}
 	});
 
 	$effect(() => {
 		if (selectedStory !== null) {
-			selectedStoryLanguageText = selectedStory.story[0]?.text;
+			// Handle different story structures - selectedStory might be a StoryInstance or raw story data
+			if (selectedStory.story && Array.isArray(selectedStory.story)) {
+				// StoryInstance - story is an array
+				selectedStoryLanguageText = selectedStory.story[0]?.text;
+			} else if (Array.isArray(selectedStory)) {
+				// Raw story data - selectedStory itself is an array
+				selectedStoryLanguageText = selectedStory[0]?.text;
+			} else {
+				// Fallback - might be a single story object
+				selectedStoryLanguageText = selectedStory.text || null;
+			}
 		}
 	});
 
@@ -113,14 +192,129 @@
 		}
 	}
 
+	// Function to find story by ID in clusters and return the actual StoryInstance from Map
+	function findStoryInstanceById(storyId: string) {
+		if (!response_clusters?.clusters) return null;
+
+		// First, find the story data in the API response
+		for (const cluster of response_clusters.clusters) {
+			for (const story of cluster.stories) {
+				// Story contains multiple arrays (different language versions)
+				// Check each element in the story array for the matching id
+				for (const storyElement of story) {
+					if (storyElement?.id === storyId) {
+						// console.log('Found story:', storyElement);
+
+						// Found the story! Return the entire story array with cluster info
+						return {
+							story: story,
+							cluster_audio_id: cluster.text,
+							cluster_id: cluster.text,
+							text: story[0]?.text
+						};
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	// Function to select random story from clusters and return as StoryInstance
+	function selectRandomStory() {
+		if (!response_clusters?.clusters) return null;
+
+		const allStories = response_clusters.clusters.flatMap((cluster: any) =>
+			cluster.stories.map((story: any) => ({ story, cluster }))
+		);
+		if (allStories.length === 0) return null;
+
+		const randomIndex = Math.floor(Math.random() * allStories.length);
+		const randomStoryWithCluster = allStories[randomIndex];
+
+		// Return the story in a format compatible with selectedStory
+		return {
+			story: randomStoryWithCluster.story,
+			cluster_audio_id: randomStoryWithCluster.cluster.text,
+			cluster_id: randomStoryWithCluster.cluster.text,
+			text: randomStoryWithCluster.story[0]?.text
+		};
+	}
+
+	// Function to handle automatic modal opening based on navigation context
+	function handleAutoModal() {
+		if (!navigationData.source || hasHandledAutoModal) return;
+
+		// console.log('handleAutoModal triggered:', navigationData);
+
+		if (navigationData.source === 'submit' && navigationData.storyId) {
+			// Find and select the submitted story
+			const submittedStory = findStoryInstanceById(navigationData.storyId);
+			// console.log('Found submitted story:', submittedStory);
+			if (submittedStory) {
+				selectedStory = submittedStory;
+				// Only play sound if audio is explicitly enabled AND playing
+				// This prevents AudioContext creation without user gesture
+				const audioState = $audioStore;
+				if (!audioState.isGloballyMuted && audioState.playingState === 'playing') {
+					soundEffects.playEffect(submittedStory.cluster_audio_id);
+				}
+			} else {
+				// console.log('Submitted story not found in clusters, opening map normally');
+			}
+		}
+
+		// else if (navigationData.source === 'main') {
+		// 	// Select a random story
+		// 	const randomStory = selectRandomStory();
+		// 	// console.log('Selected random story:', randomStory);
+		// 	if (randomStory) {
+		// 		selectedStory = randomStory;
+		// 		// Only play sound if audio is explicitly enabled AND playing
+		// 		// This prevents AudioContext creation without user gesture
+		// 		const audioState = $audioStore;
+		// 		if (!audioState.isGloballyMuted && audioState.playingState === 'playing') {
+		// 			soundEffects.playEffect(randomStory.cluster_audio_id);
+		// 		}
+		// 	}
+		// }
+
+		// Mark as handled and clear navigation context
+		hasHandledAutoModal = true;
+		navigationContext.clearNavigation();
+		// Clear navigation data to prevent re-triggering
+		navigationData = { source: null, storyId: null };
+	}
+
 	onMount(() => {
-		fetchClusters();
+		// Detect mobile device once on mount
+		isMobileDevice = detectMobile();
+
+		// Add 5 second delay before fetching clusters to account for DB delay
+		setTimeout(() => {
+			fetchClusters();
+		}, 1000);
 
 		// Set timeout to hide toast after 3 seconds
-		if (triggeredFrom) {
+		if (navigationData.source) {
 			setTimeout(() => {
 				toastEnabled = false;
 			}, 3000);
+		}
+
+		// Cleanup function to clear intervals when component unmounts
+		return () => {
+			stopContinuousPress();
+		};
+	});
+
+	// Watch for response_clusters to be loaded, then handle auto modal
+	$effect(() => {
+		if (response_clusters && navigationData.source && !hasHandledAutoModal) {
+			// console.log('Clusters loaded, checking for auto modal...');
+			// Use setTimeout to avoid reactive state conflicts and ensure Map is rendered
+			setTimeout(() => {
+				handleAutoModal();
+			}, 500); // Increased timeout to ensure Map is fully rendered
 		}
 	});
 
@@ -139,13 +333,13 @@
 	</div>
 {/if} -->
 
-{#if triggeredFrom === 'submit' && toastEnabled}
+{#if navigationData.source === 'submit' && toastEnabled}
 	<div transition:blur class="toast-container">
 		<p>{$_('explore_toast_from_submit')}</p>
 	</div>
 {/if}
 
-{#if triggeredFrom === 'main' && toastEnabled}
+{#if navigationData.source === 'main' && toastEnabled}
 	<div transition:blur class="toast-container">
 		<p>{$_('explore_toast_from_home')}</p>
 	</div>
@@ -188,7 +382,13 @@
 			in:fade={{ duration: 500 }}
 			out:fade={{ duration: 500 }}
 		>
-			<NavIcons bind:value={navButtonValue} />
+			<NavIcons
+				bind:value={navButtonValue}
+				{isMobileDevice}
+				{isInContinuousPress}
+				onTouchStart={startContinuousPress}
+				onTouchEnd={stopContinuousPress}
+			/>
 		</div>
 	{/if}
 </div>

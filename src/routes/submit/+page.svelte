@@ -13,7 +13,16 @@
 	import { error } from '@sveltejs/kit';
 	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { blur, fade } from 'svelte/transition';
-	// import { setContext, getContext } from 'svelte';
+	import { getContext } from 'svelte';
+	import { soundEffects } from '$lib/utils/soundEffects';
+
+	// Get navigation context from layout
+	const navigationContext = getContext('navigation') as {
+		setSource: (source: 'main' | 'submit') => void;
+		setSubmittedStoryId: (storyId: string) => void;
+		getNavigationData: () => { source: 'main' | 'submit' | null; storyId: string | null };
+		clearNavigation: () => void;
+	};
 
 	// Get Questions Data from Parent Layout
 	// const getQuestionsData = getContext('questions') as () => any;
@@ -65,6 +74,20 @@
 			await apiRequest(API_ADD_STORY_OPTIONS())
 				.then((response) => {
 					console.log('Add Story Response:', response);
+
+					// Set navigation context before going to explore
+					navigationContext.setSource('submit');
+
+					// Check multiple possible field names for the story ID
+					let storyId = response.story_id || response.id || response.storyId || response.story?.id;
+					console.log('Extracted story ID:', storyId);
+
+					if (storyId) {
+						navigationContext.setSubmittedStoryId(storyId);
+					} else {
+						console.warn('No story ID found in response:', response);
+					}
+
 					goto(`${base}/explore`);
 				})
 				.catch((err) => {
@@ -177,6 +200,10 @@
 		}
 	}
 
+	function playUISound() {
+		soundEffects.playEffect('Blip_UI');
+	}
+
 	// Watch for changes in the story text
 	$effect(() => {
 		handleTyping();
@@ -280,8 +307,13 @@
 			<!-- Buttons Container -->
 			<div transition:blur class="disclaimer-btn-container">
 				<div>
-					<button disabled={!userAgreed} class="btn" onclick={handleSubmit}
-						>{$_('submit_btn_submit')}</button
+					<button
+						disabled={!userAgreed}
+						class="btn"
+						onclick={() => {
+							playUISound();
+							handleSubmit();
+						}}>{$_('submit_btn_submit')}</button
 					>
 				</div>
 			</div>

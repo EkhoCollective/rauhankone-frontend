@@ -2,7 +2,8 @@
 	import { _, locale, waitLocale } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
 	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
-	import { Dialog } from "bits-ui";
+	import { Dialog } from 'bits-ui';
+	import { soundEffects } from '$lib/utils/soundEffects';
 	let { closeLangCard, translate = $bindable() } = $props();
 
 	const languages = [
@@ -19,15 +20,25 @@
 			closeLangCard(false);
 		});
 	}
+
+	function playUISound() {
+		soundEffects.playEffect('Blip_UI');
+	}
 </script>
 
 <!-- Header/Language Selector -->
 <Dialog.Content class="lang-container" trapFocus={true}>
-		<div class="card-header-container">
-			<Dialog.Close class="btn btn-close" onclick={() => closeLangCard()}>
-				<X color="#ffffff" size={35} />
-			</Dialog.Close>
-		</div>
+	<div class="card-header-container">
+		<Dialog.Close
+			class="btn btn-close"
+			onclick={() => {
+				playUISound();
+				closeLangCard();
+			}}
+		>
+			<X color="#ffffff" size={35} />
+		</Dialog.Close>
+	</div>
 
 	<!-- Buttons Container -->
 	<div class="card-btn-container">
@@ -35,7 +46,10 @@
 			<button
 				class="btn btn-lang"
 				class:active-lang={$locale === code}
-				onclick={() => handleLocaleChange(code)}
+				onclick={() => {
+					playUISound();
+					handleLocaleChange(code);
+				}}
 			>
 				{name}
 			</button>
@@ -46,13 +60,13 @@
 	<!-- Accessable version -->
 	<div class="card-extra-container">
 		<!-- <Checkmark bind:checkValue={translate} /> -->
-	<input 
-	type="checkbox"
-	value={translate}
-	id="translate-checkbox"
-	name="translate-checkbox"
-	onchange={() => translate = !translate}
-	/>
+		<input
+			type="checkbox"
+			value={translate}
+			id="translate-checkbox"
+			name="translate-checkbox"
+			onchange={() => (translate = !translate)}
+		/>
 		<label for="translate-checkbox">{$_('btn_translate_check')}</label>
 	</div>
 </Dialog.Content>
@@ -89,9 +103,6 @@
 		border-width: 0 3px 3px 0;
 		transform: rotate(45deg);
 	}
-
-
-	
 
 	.btn {
 		aspect-ratio: 1;

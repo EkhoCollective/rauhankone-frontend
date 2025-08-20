@@ -6,23 +6,40 @@
 	import { base } from '$app/paths';
 	import { blur } from 'svelte/transition';
 	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
+	import { soundEffects } from '$lib/utils/soundEffects';
 
 	let { toggleLang, showLang } = $props();
-	let audioVolume = $state(0.5);
+	let audioVolume = $state(1);
+	let audioClusterVolume = $state(1);
 	let audioFadeTime = $state(500);
+
+	function playUISound() {
+		soundEffects.playEffect('Blip_UI');
+	}
 </script>
 
 <div class="card-header-container">
 	{#if page.url.pathname === `${base}/explore`}
 		<div transition:blur class="back-btn-container">
-			<button class="btn" onclick={() => goto(`${base}/`)}
-				><ArrowLeft color="#ffffff" /> {$_('header_btn_exit')}</button
+			<button
+				class="btn"
+				onclick={() => {
+					playUISound();
+					goto(`${base}/`);
+				}}><ArrowLeft color="#ffffff" /> {$_('header_btn_exit')}</button
 			>
 		</div>
 	{/if}
 	<!-- Lang Button -->
 	<div class="lang-btn-container">
-		<button class="btn" onclick={() => toggleLang()} aria-label={$_('aria-lang-toggle')}>
+		<button
+			class="btn"
+			onclick={() => {
+				playUISound();
+				toggleLang();
+			}}
+			aria-label={$_('aria-lang-toggle')}
+		>
 			<Globe color="#ffffff" />
 		</button>
 	</div>
