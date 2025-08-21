@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ArrowLeft, ArrowRight, SquarePlus, SquareMinus } from 'lucide-svelte';
-	import { soundEffects } from '$lib/utils/soundEffects';
+	import { playBlip } from '$lib/composables/useAudio';
 
 	let {
 		value = $bindable(),
@@ -15,7 +15,7 @@
 	}
 
 	function playUISound() {
-		soundEffects.playEffect('Blip_UI');
+		playBlip();
 	}
 
 	function handleTouchStart(button: string) {

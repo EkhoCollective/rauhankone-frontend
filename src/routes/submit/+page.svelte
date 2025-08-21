@@ -14,7 +14,7 @@
 	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { blur, fade } from 'svelte/transition';
 	import { getContext } from 'svelte';
-	import { soundEffects } from '$lib/utils/soundEffects';
+	import { useAudio } from '$lib/composables/useAudio';
 
 	// Get navigation context from layout
 	const navigationContext = getContext('navigation') as {
@@ -23,6 +23,8 @@
 		getNavigationData: () => { source: 'main' | 'submit' | null; storyId: string | null };
 		clearNavigation: () => void;
 	};
+
+	const { playBlip, switchToPage } = useAudio();
 
 	// Get Questions Data from Parent Layout
 	// const getQuestionsData = getContext('questions') as () => any;
@@ -201,7 +203,7 @@
 	}
 
 	function playUISound() {
-		soundEffects.playEffect('Blip_UI');
+		playBlip();
 	}
 
 	// Watch for changes in the story text
@@ -220,6 +222,7 @@
 
 	// On Mount
 	onMount(() => {
+		switchToPage('submit');
 		handleGetQuestions();
 		// handleGetQuestionContainer();
 		// raiseError = true;

@@ -30,8 +30,11 @@
 		MeshLineMaterial
 	} from '@threlte/extras';
 	import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
-	import { tracklist } from '$lib/components/media/audio/tracklist';
-	import { soundEffects } from '$lib/utils/soundEffects';
+	// TODO: Implement cluster sounds with new audio system if needed
+	// import { tracklist } from '$lib/components/media/audio/tracklist';
+	import { useAudio } from '$lib/composables/useAudio';
+
+	const { playBlip, playClusterSound } = useAudio();
 
 	// Props
 	let {
@@ -55,7 +58,7 @@
 	const minSphereScale: number = 1;
 	const minMapScale: number = 0.1;
 	const maxMapScale: number = 1.5;
-	const sphereResolution: number = 32;
+	const sphereResolution: number = 12;
 	const cameraOffset: number = 10;
 	const centroidCameraOffset: number = 40;
 	let centroid = $state(new THREE.Vector3());
@@ -94,9 +97,11 @@
 
 	// Helper function to get random song for cluster
 	function getRandomSongForCluster(): string {
-		const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
-		const randomIndex = Math.floor(Math.random() * clusterTracks.length);
-		return clusterTracks[randomIndex].title;
+		// TODO: Implement with new audio system if cluster sounds are needed
+		// const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
+		// const randomIndex = Math.floor(Math.random() * clusterTracks.length);
+		// return clusterTracks[randomIndex].title;
+		return 'placeholder';
 	}
 
 	// Function to map text length to a range from 1 to 5
@@ -358,8 +363,8 @@
 			true
 		);
 
-		// Play sound effect for the new story
-		soundEffects.playEffect(targetStory.cluster_audio_id);
+		// TODO: Play cluster sound effect with new audio system
+		// soundEffects.playEffect(targetStory.cluster_audio_id);
 
 		// Update selected story (this will trigger modal to update)
 		selectedStory = targetStory;
@@ -387,16 +392,16 @@
 		// Preload sound effects for better performance
 		populateFromData();
 
-		// Preload all cluster sounds
-		const clusterSounds = tracklist
-			.filter((track) => track.type === 'cluster')
-			.map((track) => track.title);
-		soundEffects.preloadSounds(clusterSounds);
+		// TODO: Preload cluster sounds with new audio system if needed
+		// const clusterSounds = tracklist
+		// 	.filter((track) => track.type === 'cluster')
+		// 	.map((track) => track.title);
+		// soundEffects.preloadSounds(clusterSounds);
 	});
 
 	onDestroy(() => {
-		// Clean up sound cache when component is destroyed
-		soundEffects.clearCache();
+		// TODO: Clean up audio resources with new audio system if needed
+		// soundEffects.clearCache();
 	});
 
 	// Bind navigation functions to be accessible from parent
@@ -502,6 +507,11 @@
 
 					selectedStory = instance;
 
+					// Play blip sound for UI interaction
+					playBlip();
+					// Play cluster-specific sound for the story
+					playClusterSound(instance.cluster_id);
+
 					// Center camera on the selected story
 					if (controls) {
 						// Move camera to look at the story with smooth transition
@@ -515,8 +525,8 @@
 							true // Enable smooth transition
 						);
 					}
-					// Play sound effect when modal opens using cluster-specific sound
-					soundEffects.playEffect(instance.cluster_audio_id);
+					// TODO: Play cluster sound effect with new audio system
+					// soundEffects.playEffect(instance.cluster_audio_id);
 				}}
 				onpointerenter={() => {
 					// Only animate if not selected
@@ -547,7 +557,7 @@
 				{/each}
 			{/if}
 
-			<!-- Text instance points - outside MeshA for proper radial scaling -->
+			<!-- Text instance points - outside MeshA for proper radial scaling
 			{#if instance.text_instances && instance.text_instances.length > 0}
 				<T.Points>
 					{@const scaledPoints = instance.text_instances.map((point) => {
@@ -567,7 +577,7 @@
 					<T is={geometry} />
 					<T.PointsMaterial size={pointSize} color="white" />
 				</T.Points>
-			{/if}
+			{/if} -->
 		{/each}
 	{/snippet}
 </InstancedMeshes>

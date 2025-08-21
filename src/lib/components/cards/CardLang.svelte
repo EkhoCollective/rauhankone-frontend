@@ -3,7 +3,7 @@
 	import { X } from 'lucide-svelte';
 	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import { Dialog } from 'bits-ui';
-	import { soundEffects } from '$lib/utils/soundEffects';
+	import { playBlip } from '$lib/composables/useAudio';
 	let { closeLangCard, translate = $bindable() } = $props();
 
 	const languages = [
@@ -22,7 +22,7 @@
 	}
 
 	function playUISound() {
-		soundEffects.playEffect('Blip_UI');
+		playBlip();
 	}
 </script>
 
@@ -89,8 +89,8 @@
 		transition: box-shadow 0.1s;
 	}
 	.card-extra-container input[type='checkbox']:checked {
-		/* background-color: var(--accent-color-checkbox);
-		border-color: var(--accent-color-checkbox); */
+		background-color: var(--accent-color-checkbox);
+		border-color: var(--accent-color-checkbox);
 	}
 	.card-extra-container input[type='checkbox']:checked::after {
 		content: '';
@@ -135,9 +135,7 @@
 		justify-content: center;
 		max-width: 75%;
 	}
-	.card-checkmark-container {
-		margin-right: 10px;
-	}
+
 	.active-lang {
 		text-decoration: underline;
 		font-weight: 400;

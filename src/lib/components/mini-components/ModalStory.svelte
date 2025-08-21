@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
-	import { soundEffects } from '$lib/utils/soundEffects';
+	import { playBlip } from '$lib/composables/useAudio';
 	let { story = $bindable(), closeModal, onNavigateClosest, onNavigateFurthest } = $props();
 
 	function playUISound() {
-		soundEffects.playEffect('Blip_UI');
+		playBlip();
 	}
 </script>
 
