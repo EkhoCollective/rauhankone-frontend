@@ -32,14 +32,12 @@
 	};
 
 	let response_clusters: any = $state(null);
-	// let responsefromDB = $state(false);
 	let requestLanguage = $state('Any');
-	// let raiseError = $state(false);
 	let toastEnabled = $state(true);
 	let navButtonValue = $state('');
+
 	// Get navigation data once on initialization, and handle it properly
 	const initialNavigationData = navigationContext.getNavigationData();
-	// console.log('Initial navigation data on explore page:', initialNavigationData);
 	let navigationData = $state(initialNavigationData);
 	let hasHandledAutoModal = $state(false);
 	let selectedStory: StoryInstance | any | null = $state(null);
@@ -54,6 +52,9 @@
 	const camZoomDesktop = 10;
 	const camRotMobile = 20;
 	const camZoomMobile = 5;
+
+	const minDimensionalValue: number = 2;
+	const maxDimensionalValue: number = 10;
 
 	// Mobile detection state - determined once on mount
 	let isMobileDevice = $state(false);
@@ -78,7 +79,7 @@
 			language: handleGetTranslate(),
 			max_stories: 400,
 			story: null,
-			grid_size: [5, 5, 5]
+			grid_size: [dimValue(), dimValue(), dimValue()]
 		}
 	};
 
@@ -122,6 +123,13 @@
 			controls?.dolly(-zoomValue, true);
 			navButtonValue = 'idle';
 		}
+	}
+
+	function dimValue() {
+		return (
+			Math.floor(Math.random() * (maxDimensionalValue - minDimensionalValue + 1)) +
+			minDimensionalValue
+		);
 	}
 
 	// Continuous button press functions (all devices)

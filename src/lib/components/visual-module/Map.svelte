@@ -56,23 +56,24 @@
 	// State
 	const worldScale: number = 20;
 	const minSphereScale: number = 1;
-	const minMapScale: number = 0.1;
+	const minMapScale: number = 0.075;
 	const maxMapScale: number = 1.5;
 	const sphereResolution: number = 12;
 	const cameraOffset: number = 10;
 	const centroidCameraOffset: number = 40;
 	let centroid = $state(new THREE.Vector3());
 	let instances: StoryInstance[] = $state([]);
+	let previousSelectedStory: StoryInstance | null = $state(null);
 
-	const clusterSpread: number = 4;
-	const lineThickness: number = 0.035;
-	const pointSize: number = 0.025;
+	const clusterSpread: number = 5;
+	const lineThickness: number = 0.025;
+	const pointSize: number = 0.05;
 	const curviness: number = 0.35;
 	const pointCloudShrink: number = 0.5;
 
 	// Jiggle movement variables
-	const storyJiggleIntensity: number = 0.02; // How much stories move
-	const pointJiggleIntensity: number = 0.1; // How much points move
+	const storyJiggleIntensity: number = 0.05; // How much stories move
+	const pointJiggleIntensity: number = 0.2; // How much points move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
 	const pointJiggleTime: number = 1000; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
@@ -95,13 +96,43 @@
 		}
 	});
 
-	// Helper function to get random song for cluster
-	function getRandomSongForCluster(): string {
-		// TODO: Implement with new audio system if cluster sounds are needed
-		// const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
-		// const randomIndex = Math.floor(Math.random() * clusterTracks.length);
-		// return clusterTracks[randomIndex].title;
-		return 'placeholder';
+	// // Helper function to get random song for cluster
+	// function getRandomSongForCluster(): string {
+	// 	// TODO: Implement with new audio system if cluster sounds are needed
+	// 	// const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
+	// 	// const randomIndex = Math.floor(Math.random() * clusterTracks.length);
+	// 	// return clusterTracks[randomIndex].title;
+	// 	return 'placeholder';
+	// }
+
+	// Simple optimization: reuse BufferGeometry instead of creating new ones
+	const geometryCache = new Map<string, BufferGeometry>();
+
+	// Function to get or create geometry for points
+	function getPointGeometry(instance: StoryInstance): BufferGeometry {
+		// Calculate scaled points
+		const scaledPoints = instance.text_instances.map((point) => {
+			// Calculate direction vector from sphere center to point
+			const direction = point
+				.clone()
+				.sub(new Vector3(instance.positions.x, instance.positions.y, instance.positions.z));
+			// Scale the direction vector based on tween value and add back to center
+			// const scaleFactor = 1 - instance.tw.current * pointCloudShrink; // Scale from 0.5 to 1.0
+			return new Vector3(instance.positions.x, instance.positions.y, instance.positions.z).add(
+				direction.multiplyScalar(1)
+			);
+		});
+
+		const cacheKey = `${instance.cluster_id}_${instance.positions.x}_${instance.positions.y}_${instance.positions.z}`;
+		let geometry = geometryCache.get(cacheKey);
+
+		if (!geometry) {
+			geometry = new BufferGeometry();
+			geometryCache.set(cacheKey, geometry);
+		}
+
+		geometry.setFromPoints(scaledPoints);
+		return geometry;
 	}
 
 	// Function to map text length to a range from 1 to 5
@@ -162,7 +193,7 @@
 
 		for (let i = 0; i < data.clusters.length; i += 1) {
 			const cluster = data.clusters[i];
-			const cluster_audio_id = getRandomSongForCluster();
+			const cluster_audio_id = '';
 
 			// Get the color of the cluster
 			const initialColor = new Color(Math.random(), Math.random(), Math.random());
@@ -375,16 +406,14 @@
 		}
 	}
 
-	// Effect to reset selected sphere when modal closes
+	// Effect to handle modal closing - show points for previous story
 	$effect(() => {
 		if (selectedStory === null) {
-			// Modal closed, reset all selected states
-			instances.forEach((instance) => {
-				if (instance.selected) {
-					instance.selected = false;
-					instance.tw.set(0);
-				}
-			});
+			// Modal closed, show points for the previous selected story
+			if (previousSelectedStory) {
+				previousSelectedStory.selected = true;
+				previousSelectedStory.tw.set(1);
+			}
 		}
 	});
 
@@ -472,7 +501,15 @@
 		});
 	});
 
-	// $inspect(time);
+	// Cleanup geometry cache on component destroy
+	onDestroy(() => {
+		geometryCache.forEach((geometry) => {
+			geometry.dispose();
+		});
+		geometryCache.clear();
+	});
+
+	$inspect(selectedStory);
 </script>
 
 <!-- <PerfMonitor anchorY="bottom" /> -->
@@ -496,8 +533,17 @@
 				position.z={instance.positions.z}
 				scale={instance.scale}
 				onclick={() => {
-					// Reset all other instances' selected state
-					instances.forEach((inst) => (inst.selected = false));
+					// Store the previous selected story before changing
+					if (selectedStory) {
+						previousSelectedStory = selectedStory;
+					}
+
+					// Reset all other instances' selected state (including previous story)
+					instances.forEach((inst) => {
+						inst.selected = false;
+						inst.tw.set(0);
+					});
+
 					// Set this instance as selected and keep it highlighted
 					instance.selected = true;
 					instance.tw.set(1);
@@ -557,27 +603,13 @@
 				{/each}
 			{/if}
 
-			<!-- Text instance points - outside MeshA for proper radial scaling
-			{#if instance.text_instances && instance.text_instances.length > 0}
+			<!-- Text instance points - outside MeshA for proper radial scaling -->
+			{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
 				<T.Points>
-					{@const scaledPoints = instance.text_instances.map((point) => {
-						// Calculate direction vector from sphere center to point
-						const direction = point
-							.clone()
-							.sub(new Vector3(instance.positions.x, instance.positions.y, instance.positions.z));
-						// Scale the direction vector based on tween value and add back to center
-						const scaleFactor = 1 - instance.tw.current * pointCloudShrink; // Scale from 0.5 to 1.0
-						return new Vector3(
-							instance.positions.x,
-							instance.positions.y,
-							instance.positions.z
-						).add(direction.multiplyScalar(scaleFactor));
-					})}
-					{@const geometry = new BufferGeometry().setFromPoints(scaledPoints)}
-					<T is={geometry} />
+					<T is={getPointGeometry(instance)} />
 					<T.PointsMaterial size={pointSize} color="white" />
 				</T.Points>
-			{/if} -->
+			{/if}
 		{/each}
 	{/snippet}
 </InstancedMeshes>
