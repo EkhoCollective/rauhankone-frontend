@@ -1,5 +1,5 @@
 import { writable, get } from 'svelte/store';
-import { Sound } from 'svelte-sound';
+import {Howl, Howler} from 'howler';
 import { browser } from '$app/environment';
 
 // Audio file imports
@@ -14,10 +14,10 @@ interface GlobalAudioState {
 	isGloballyMuted: boolean;
 	currentPage: AudioPage | null;
 	previousPage: AudioPage | null;
-	drone1Sound: Sound | null;
-	drone2Sound: Sound | null;
-	blipSound: Sound | null;
-	clusterSounds: Map<string, Sound>;
+	drone1Sound: Howl | null;
+	drone2Sound: Howl | null;
+	blipSound: Howl | null;
+	clusterSounds: Map<string, Howl>;
 	isInitialized: boolean;
 	crossFading: boolean;
 }
@@ -29,7 +29,7 @@ const initialState: GlobalAudioState = {
 	drone1Sound: null,
 	drone2Sound: null,
 	blipSound: null,
-	clusterSounds: new Map(),
+	clusterSounds: new Map<string, Howl>(),
 	isInitialized: false,
 	crossFading: false
 };
@@ -57,22 +57,25 @@ class GlobalAudioManager {
 		if (state.isInitialized) return;
 
 		try {
-			// Initialize sounds with svelte-sound (which uses howler.js)
-			const drone1 = new Sound(Drone1, {
+			// Initialize sounds with howler.js directly
+			const drone1 = new Howl({
+				src: [Drone1],
 				loop: true,
 				volume: 1,
 				html5: false, // Use Web Audio API
 				preload: true
 			});
 
-			const drone2 = new Sound(Drone2, {
+			const drone2 = new Howl({
+				src: [Drone2],
 				loop: true,
 				volume: 1,
 				html5: false, // Use Web Audio API
 				preload: true
 			});
 
-			const blip = new Sound(blipUI1, {
+			const blip = new Howl({
+				src: [blipUI1],
 				loop: false,
 				volume: 0.5,
 				html5: false, // Use Web Audio API
@@ -80,11 +83,12 @@ class GlobalAudioManager {
 			});
 
 			// Initialize cluster sounds
-			const clusterSounds = new Map<string, Sound>();
+			const clusterSounds = new Map<string, Howl>();
 			const clusterTracks = tracklist.filter(track => track.type === 'cluster');
 			
 			for (const track of clusterTracks) {
-				const clusterSound = new Sound(track.src, {
+				const clusterSound = new Howl({
+					src: [track.src],
 					loop: false,
 					volume: 0.7,
 					html5: false,
@@ -164,16 +168,16 @@ class GlobalAudioManager {
 			const otherDrone = page === 'explore' ? state.drone1Sound : state.drone2Sound;
 
 			// Fade out the other drone if it's playing
-			if (otherDrone && (otherDrone as any).howl.playing()) {
-				(otherDrone as any).howl.fade((otherDrone as any).howl.volume(), 0, 1000);
+			if (otherDrone && otherDrone.playing()) {
+				otherDrone.fade(otherDrone.volume(), 0, 1000);
 				setTimeout(() => otherDrone.stop(), 1000);
 			}
 
 			// Start the target drone and fade it in
 			if (targetDrone) {
-				(targetDrone as any).howl.volume(0);
+				targetDrone.volume(0);
 				targetDrone.play();
-				(targetDrone as any).howl.fade(0, 0.3, 1000);
+				targetDrone.fade(0, 0.3, 1000);
 			}
 		} catch (error) {
 			console.error('Error switching audio page:', error);
