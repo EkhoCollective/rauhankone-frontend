@@ -2,9 +2,10 @@
 	import { _ } from 'svelte-i18n';
 	import { Globe, ArrowLeft } from 'lucide-svelte';
 	import { page } from '$app/state';
-	import { resolve } from '$app/paths';
+	import { base, resolve } from '$app/paths';
 	import { blur } from 'svelte/transition';
 	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
+	import { goto } from '$app/navigation';
 
 	let { toggleLang, showLang } = $props();
 	let audioVolume = $state(0.5);
@@ -14,7 +15,7 @@
 <div class="card-header-container">
 	{#if page.url.pathname === `${resolve('/explore')}`}
 		<div transition:blur class="back-btn-container">
-			<button class="btn" onclick={() => resolve('/explore')}>
+			<button class="btn" onclick={() => goto(resolve('/'))} aria-label={$_('aria-back')}>
 				<ArrowLeft color="#ffffff" /> {$_('header_btn_exit')}
 			</button>
 		</div>
