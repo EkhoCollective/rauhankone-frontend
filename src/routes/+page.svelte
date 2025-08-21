@@ -2,11 +2,10 @@
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
 	import Footer from '$lib/components/mini-components/Footer.svelte';
-	import { soundEffects } from '$lib/utils/soundEffects';
-	// import { audioStore } from '$lib/stores/audioStore';
+	import { useAudio } from '$lib/composables/useAudio';
 
 	// Get navigation context from layout
 	const navigationContext = getContext('navigation') as {
@@ -16,7 +15,14 @@
 		clearNavigation: () => void;
 	};
 
+	const { playBlip, switchToPage } = useAudio();
+
 	let backgroundRef: BackgroundMouse | undefined = $state();
+
+	// Set audio context when component mounts
+	onMount(() => {
+		switchToPage('main');
+	});
 
 	function handleMouseMove(e: MouseEvent) {
 		if (backgroundRef) {
@@ -33,7 +39,7 @@
 	}
 
 	function playUISound() {
-		soundEffects.playEffect('Blip_UI');
+		playBlip();
 	}
 </script>
 

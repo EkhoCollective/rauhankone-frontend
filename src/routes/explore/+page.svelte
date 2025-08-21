@@ -12,14 +12,16 @@
 	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
 	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { error } from '@sveltejs/kit';
-	import { soundEffects } from '$lib/utils/soundEffects';
+	import { useAudio } from '$lib/composables/useAudio';
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
 	import { getContext } from 'svelte';
-	import { audioStore } from '$lib/stores/audioStore';
+	import { globalAudioStore } from '$lib/stores/globalAudioStore';
 
 	let { getOnlyTranslated = $bindable() } = $props();
+
+	const { switchToPage } = useAudio();
 
 	// Get navigation context from layout
 	const navigationContext = getContext('navigation') as {
@@ -72,7 +74,12 @@
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { language: handleGetTranslate(), max_stories: 400, story: null }
+		REQUEST_BODY: {
+			language: handleGetTranslate(),
+			max_stories: 400,
+			story: null,
+			grid_size: [5, 5, 5]
+		}
 	};
 
 	async function fetchClusters() {
@@ -153,7 +160,8 @@
 		if (selectedStory === null) {
 			// Modal closed, stop the current playing sound
 			if (currentPlayingSound) {
-				soundEffects.stopEffect(currentPlayingSound);
+				// TODO: Implement cluster sound stopping with new audio system
+				// soundEffects.stopEffect(currentPlayingSound);
 				currentPlayingSound = null;
 			}
 		} else {
@@ -252,12 +260,11 @@
 			// console.log('Found submitted story:', submittedStory);
 			if (submittedStory) {
 				selectedStory = submittedStory;
-				// Only play sound if audio is explicitly enabled AND playing
-				// This prevents AudioContext creation without user gesture
-				const audioState = $audioStore;
-				if (!audioState.isGloballyMuted && audioState.playingState === 'playing') {
-					soundEffects.playEffect(submittedStory.cluster_audio_id);
-				}
+				// TODO: Implement cluster audio effects with new audio system
+				// const audioState = $globalAudioStore;
+				// if (!audioState.isGloballyMuted) {
+				// 	// Play cluster audio effect here
+				// }
 			} else {
 				// console.log('Submitted story not found in clusters, opening map normally');
 			}
@@ -286,6 +293,9 @@
 	}
 
 	onMount(() => {
+		// Set audio context for explore page
+		switchToPage('explore');
+
 		// Detect mobile device once on mount
 		isMobileDevice = detectMobile();
 

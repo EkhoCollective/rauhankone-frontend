@@ -6,15 +6,12 @@
 	import { base } from '$app/paths';
 	import { blur } from 'svelte/transition';
 	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
-	import { soundEffects } from '$lib/utils/soundEffects';
+	import { playBlip } from '$lib/composables/useAudio';
 
 	let { toggleLang, showLang } = $props();
-	let audioVolume = $state(1);
-	let audioClusterVolume = $state(1);
-	let audioFadeTime = $state(500);
 
 	function playUISound() {
-		soundEffects.playEffect('Blip_UI');
+		playBlip();
 	}
 </script>
 
@@ -45,7 +42,7 @@
 	</div>
 	<!-- Audio Control -->
 	<div class="audio-control-container">
-		<AudioControl bind:volume={audioVolume} bind:fadeTime={audioFadeTime} />
+		<AudioControl />
 	</div>
 </div>
 
