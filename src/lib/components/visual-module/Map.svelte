@@ -4,7 +4,6 @@
 	import * as THREE from 'three';
 	import {
 		Mesh,
-		BoxGeometry,
 		SphereGeometry,
 		MeshBasicMaterial,
 		CatmullRomCurve3,
@@ -12,26 +11,19 @@
 		Vector3,
 		Color
 	} from 'three';
-	// import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-	// import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
-	import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
-	import { T, useTask, useThrelte } from '@threlte/core';
+	import { T, useTask } from '@threlte/core';
 	import {
 		interactivity,
-		Instance,
 		InstancedMeshes,
 		CameraControls,
 		type CameraControlsRef,
-		Text3DGeometry,
 		PerfMonitor,
 		FakeGlowMaterial,
 		MeshLineGeometry,
 		MeshLineMaterial
 	} from '@threlte/extras';
-	import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
-	// TODO: Implement cluster sounds with new audio system if needed
-	// import { tracklist } from '$lib/components/media/audio/tracklist';
 	import { useAudio } from '$lib/composables/useAudio';
 
 	const { playBlip, playClusterSound } = useAudio();
@@ -99,16 +91,6 @@
 			return items.slice(0, 1);
 		}
 	});
-
-	// // Helper function to get random song for cluster
-	// function getRandomSongForCluster(): string {
-	// 	// TODO: Implement with new audio system if cluster sounds are needed
-	// 	// const clusterTracks = tracklist.filter((track) => track.type === 'cluster');
-	// 	// const randomIndex = Math.floor(Math.random() * clusterTracks.length);
-	// 	// return clusterTracks[randomIndex].title;
-	// 	return 'placeholder';
-	// }
-
 	// Simple optimization: reuse BufferGeometry instead of creating new ones
 	const geometryCache = new Map<string, BufferGeometry>();
 
@@ -203,9 +185,6 @@
 			const initialColor = new Color(Math.random(), Math.random(), Math.random());
 			const selectedColor = new Color('white');
 
-			// let clusterNoise = noise.noise3d(i, 0, 0);
-			// console.log(clusterNoise);
-
 			// Generate random offsets for each story (to be reused consistently)
 			const storyOffsets: { x: number; y: number; z: number }[] = [];
 			for (let j = 0; j < cluster.stories.length; j += 1) {
@@ -270,9 +249,6 @@
 						story_positions.y,
 						story_positions.z
 					);
-
-					//
-					// console.log(currentStoryPos);
 
 					// Create a separate curve for each pair (current story to each other story)
 					for (let k = 0; k < allStoryPositions.length; k += 1) {
@@ -398,9 +374,6 @@
 			true
 		);
 
-		// TODO: Play cluster sound effect with new audio system
-		// soundEffects.playEffect(targetStory.cluster_audio_id);
-
 		// Update selected story (this will trigger modal to update)
 		selectedStory = targetStory;
 
@@ -424,17 +397,6 @@
 	onMount(() => {
 		// Preload sound effects for better performance
 		populateFromData();
-
-		// TODO: Preload cluster sounds with new audio system if needed
-		// const clusterSounds = tracklist
-		// 	.filter((track) => track.type === 'cluster')
-		// 	.map((track) => track.title);
-		// soundEffects.preloadSounds(clusterSounds);
-	});
-
-	onDestroy(() => {
-		// TODO: Clean up audio resources with new audio system if needed
-		// soundEffects.clearCache();
 	});
 
 	// Function to find StoryInstance by story ID
@@ -528,7 +490,7 @@
 		geometryCache.clear();
 	});
 
-	$inspect(selectedStory);
+	// $inspect(selectedStory);
 </script>
 
 <!-- <PerfMonitor anchorY="bottom" /> -->
