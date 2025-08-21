@@ -46,6 +46,8 @@
 	let currentPlayingSound: string | null = $state(null);
 	let navigateToClosestStory: (() => void) | undefined = $state();
 	let navigateToFurthestStory: (() => void) | undefined = $state();
+	let navigateToStoryProp: ((story: any) => void) | undefined = $state();
+	let findStoryInstanceByStoryIdProp: ((storyId: string) => any) | undefined = $state();
 
 	// Camera control values for different devices
 	const camRotDesktop = 45;
@@ -235,27 +237,6 @@
 		return null;
 	}
 
-	// Function to select random story from clusters and return as StoryInstance
-	function selectRandomStory() {
-		if (!response_clusters?.clusters) return null;
-
-		const allStories = response_clusters.clusters.flatMap((cluster: any) =>
-			cluster.stories.map((story: any) => ({ story, cluster }))
-		);
-		if (allStories.length === 0) return null;
-
-		const randomIndex = Math.floor(Math.random() * allStories.length);
-		const randomStoryWithCluster = allStories[randomIndex];
-
-		// Return the story in a format compatible with selectedStory
-		return {
-			story: randomStoryWithCluster.story,
-			cluster_audio_id: randomStoryWithCluster.cluster.text,
-			cluster_id: randomStoryWithCluster.cluster.text,
-			text: randomStoryWithCluster.story[0]?.text
-		};
-	}
-
 	// Function to handle automatic modal opening based on navigation context
 	function handleAutoModal() {
 		if (!navigationData.source || hasHandledAutoModal) return;
@@ -263,35 +244,24 @@
 		// console.log('handleAutoModal triggered:', navigationData);
 
 		if (navigationData.source === 'submit' && navigationData.storyId) {
-			// Find and select the submitted story
-			const submittedStory = findStoryInstanceById(navigationData.storyId);
-			// console.log('Found submitted story:', submittedStory);
-			if (submittedStory) {
-				selectedStory = submittedStory;
-				// TODO: Implement cluster audio effects with new audio system
-				// const audioState = $globalAudioStore;
-				// if (!audioState.isGloballyMuted) {
-				// 	// Play cluster audio effect here
-				// }
-			} else {
-				// console.log('Submitted story not found in clusters, opening map normally');
+			// Find the corresponding StoryInstance from the Map component
+			if (findStoryInstanceByStoryIdProp) {
+				const storyInstance = findStoryInstanceByStoryIdProp(navigationData.storyId);
+				// console.log('Found story instance:', storyInstance);
+				if (storyInstance) {
+					// Set the StoryInstance as selected (this will open the modal)
+					selectedStory = storyInstance;
+
+					// Also navigate to the story using the Map component's navigation
+					// We need to wait for the Map component to be ready
+					setTimeout(() => {
+						if (navigateToStoryProp) {
+							navigateToStoryProp(storyInstance);
+						}
+					}, 100);
+				}
 			}
 		}
-
-		// else if (navigationData.source === 'main') {
-		// 	// Select a random story
-		// 	const randomStory = selectRandomStory();
-		// 	// console.log('Selected random story:', randomStory);
-		// 	if (randomStory) {
-		// 		selectedStory = randomStory;
-		// 		// Only play sound if audio is explicitly enabled AND playing
-		// 		// This prevents AudioContext creation without user gesture
-		// 		const audioState = $audioStore;
-		// 		if (!audioState.isGloballyMuted && audioState.playingState === 'playing') {
-		// 			soundEffects.playEffect(randomStory.cluster_audio_id);
-		// 		}
-		// 	}
-		// }
 
 		// Mark as handled and clear navigation context
 		hasHandledAutoModal = true;
@@ -328,7 +298,6 @@
 	// Watch for response_clusters to be loaded, then handle auto modal
 	$effect(() => {
 		if (response_clusters && navigationData.source && !hasHandledAutoModal) {
-			// console.log('Clusters loaded, checking for auto modal...');
 			// Use setTimeout to avoid reactive state conflicts and ensure Map is rendered
 			setTimeout(() => {
 				handleAutoModal();
@@ -343,13 +312,6 @@
 <svelte:head>
 	<title>{$_('main_title')} | {$_('main_subtitle')} | Oulu 2026</title>
 </svelte:head>
-
-<!-- Error Card -->
-<!-- {#if raiseError}
-	<div transition:blur>
-		<CardError errorMessage={$_('error_map')} />
-	</div>
-{/if} -->
 
 {#if navigationData.source === 'submit' && toastEnabled}
 	<div transition:blur class="toast-container">
@@ -387,6 +349,8 @@
 				bind:selectedStory
 				bind:navigateToClosestStory
 				bind:navigateToFurthestStory
+				bind:navigateToStoryProp
+				bind:findStoryInstanceByStoryIdProp
 			/>
 		</Canvas>
 	{:else}
@@ -428,13 +392,6 @@
 		width: 100vw;
 		height: 100vh;
 	}
-
-	/* .audio-icon-container {
-		position: absolute;
-		z-index: 100;
-		bottom: 20px;
-		left: 20px;
-	} */
 
 	.navigation-icons-container {
 		position: absolute;

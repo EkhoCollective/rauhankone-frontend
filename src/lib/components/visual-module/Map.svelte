@@ -43,7 +43,9 @@
 		controls = $bindable(),
 		onNavigateToStory,
 		navigateToClosestStory = $bindable(),
-		navigateToFurthestStory = $bindable()
+		navigateToFurthestStory = $bindable(),
+		navigateToStoryProp = $bindable(),
+		findStoryInstanceByStoryIdProp = $bindable()
 	}: {
 		data: any;
 		selectedStory: any;
@@ -51,6 +53,8 @@
 		onNavigateToStory?: (story: any) => void;
 		navigateToClosestStory?: () => void;
 		navigateToFurthestStory?: () => void;
+		navigateToStoryProp?: (story: any) => void;
+		findStoryInstanceByStoryIdProp?: (storyId: string) => StoryInstance | null;
 	} = $props();
 
 	// State
@@ -433,9 +437,24 @@
 		// soundEffects.clearCache();
 	});
 
+	// Function to find StoryInstance by story ID
+	function findStoryInstanceByStoryId(storyId: string): StoryInstance | null {
+		for (const instance of instances) {
+			// Check if any story in the instance's story array has the matching ID
+			for (const storyElement of instance.story) {
+				if (storyElement?.id === storyId) {
+					return instance;
+				}
+			}
+		}
+		return null;
+	}
+
 	// Bind navigation functions to be accessible from parent
 	navigateToClosestStory = navigateToClosest;
 	navigateToFurthestStory = navigateToFurthest;
+	navigateToStoryProp = navigateToStory;
+	findStoryInstanceByStoryIdProp = findStoryInstanceByStoryId;
 
 	// Animation loop for jiggle movement
 	useTask((delta) => {
