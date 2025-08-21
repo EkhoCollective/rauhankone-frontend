@@ -72,7 +72,12 @@
 	const API_CLUSTERS_OPTIONS = {
 		API_ENDPOINT: '/get_clusters',
 		API_METHOD: 'POST',
-		REQUEST_BODY: { language: handleGetTranslate(), max_stories: 400, story: null }
+		REQUEST_BODY: {
+			language: handleGetTranslate(),
+			max_stories: 400,
+			story: null,
+			grid_size: [5, 5, 5]
+		}
 	};
 
 	async function fetchClusters() {

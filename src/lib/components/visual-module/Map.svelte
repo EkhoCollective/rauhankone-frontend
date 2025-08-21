@@ -470,19 +470,18 @@
 	// $inspect(time);
 </script>
 
-<!-- <PerfMonitor anchorY="bottom" /> -->
+<PerfMonitor anchorY="bottom" />
 
 <T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 	<CameraControls bind:ref={controls} />
 </T.PerspectiveCamera>
 
 <!-- Centroid -->
-<!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
+<T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
 	<T.BoxGeometry />
 	<T.MeshBasicMaterial color="red" />
-</T.Mesh> -->
+</T.Mesh>
 
-<!-- <World gravity={[0, 0, 0]}> -->
 <InstancedMeshes {meshes}>
 	{#snippet children({ components: [MeshA, MeshB, MeshC, MeshD] })}
 		{#each instances as instance}

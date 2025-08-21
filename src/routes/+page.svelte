@@ -5,8 +5,10 @@
 	import { getContext } from 'svelte';
 	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
 	import Footer from '$lib/components/mini-components/Footer.svelte';
-	import { soundEffects } from '$lib/utils/soundEffects';
+	// import { soundEffects } from '$lib/utils/soundEffects';
 	// import { audioStore } from '$lib/stores/audioStore';
+	import { Sound } from 'svelte-sound';
+	import blipUI1 from '$lib/components/media/audio/ui/Blip_UI_click.mp3';
 
 	// Get navigation context from layout
 	const navigationContext = getContext('navigation') as {
@@ -32,8 +34,10 @@
 		return text.slice(text.indexOf('.') + 1);
 	}
 
+	const click_sound = new Sound(blipUI1);
+
 	function playUISound() {
-		soundEffects.playEffect('Blip_UI');
+		click_sound.play();
 	}
 </script>
 
