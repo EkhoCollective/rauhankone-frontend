@@ -14,7 +14,7 @@
 		<div class="modal-story-header">
 			<!-- <h1>{story.cluster_id}</h1> -->
 			<button
-				class="btn btn-close"
+				class="btn btn-corner"
 				onclick={() => {
 					playUISound();
 					closeModal();
@@ -113,12 +113,7 @@
 		flex-wrap: wrap;
 	}
 
-	.btn-close {
-		background-color: transparent;
-		border-radius: 0;
-		border: none;
-		box-shadow: none;
-	}
+	
 
 	.btn {
 		background-color: transparent;

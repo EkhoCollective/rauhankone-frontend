@@ -207,15 +207,7 @@
 			grid-area: text;
 		}
 
-		.card-btn-container {
-			grid-area: btn-container;
-			display: flex;
-			flex-direction: column;
-			gap: 20px;
-			/* width: 170px; */
-			align-items: center;
-			justify-content: center;
-		}
+
 
 		.btn-submit,
 		.btn-explore {

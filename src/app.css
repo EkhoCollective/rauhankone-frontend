@@ -2,8 +2,23 @@
 @plugin "daisyui";
 @plugin '@tailwindcss/typography';
 
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  /* outline: 0.1px dotted rgba(255, 0, 0, 0.469); */
+}
+
+
+button, p, label {
+  font-weight: 400;
+}
+
 .html {
   background-color: #000000;
+}
+
+:root {
+  --base-margin: 8px;
 }
 
 
@@ -28,7 +43,7 @@ body {
 }
 
 label {
-  font-weight: 200;
+  font-weight: 400;
 }
 
 
@@ -39,60 +54,10 @@ label {
 		background-color: black;
 		color: white;
 		font-family: 'Roboto', sans-serif;
+    width: 100%;
+    height: 100%;
 	}
 
-	.header-container {
-		height: 100px;
-		z-index: 1000;
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-	}
-
-
-
-
-
-  .btn-close {
-		background-color: transparent;
-    aspect-ratio: 1;
-    max-width: 40px;
-    padding: 0;
-    width: auto;
-    height: auto;
-		border: none;
-		box-shadow: none;
-    margin: 5px;
-  }
-  
-
-.lang-container {
-  width: 100%;
-  height: 100%;
-  z-index: 2000;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-color: black;
-  display: grid;
-		grid-template-rows: 15% 1fr 15%;
-}
-
-.card-header-container {
-		height: 100%;
-		display: grid;
-		grid-template-columns: 1fr 0.1fr;
-		grid-template-rows: 1fr 1fr;
-		justify-items: end;
-		background-color: transparent;
-
-    & > * {
-      grid-column-start: 2;
-    }
-	}
 
 
 
@@ -116,3 +81,72 @@ label {
     border-radius: 2px;
   }
 
+
+
+
+
+/* Header buttons for language selection and audio control */
+  .top-right-buttons {
+    position: absolute;
+		z-index: 1000;
+    width: 100px;
+    height: auto;
+    right: 0;
+    top: 0;
+
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		justify-content: flex-start;
+		gap: 10px;
+		/* padding-bottom: 20px; */
+	}
+
+
+  .top-left-buttons {
+    position: absolute;
+    z-index: 1000;
+    width: 100px;
+    height: auto;
+    left: 0;
+    top: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .square-button {
+		background-color: transparent;
+    aspect-ratio: 1;
+    max-width: 40px;
+    padding: 0;
+    width: 40px;
+    height: auto;
+		border: none;
+		box-shadow: none;
+    margin: var(--base-margin);
+  }
+
+  .square-button > * {
+    margin: auto;
+  }
+
+
+
+  	
+.lang-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+	display: grid;
+	width: 100%;
+	height: 100%;
+	z-index: 3000;
+	background-color: black;
+	grid-template-rows: 0.2fr 1fr 1fr;
+}

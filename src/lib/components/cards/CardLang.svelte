@@ -32,9 +32,9 @@
 
 <!-- Header/Language Selector -->
 <DialogContent class="lang-container" trapFocus={true}>
-	<div class="card-header-container">
+	<div class="top-right-buttons">
 		<Dialog.Close
-			class="btn btn-close"
+			class="square-button"
 			onclick={() => {
 				playUISound();
 				closeLangCard();
@@ -46,11 +46,11 @@
 
 
 	<!-- Buttons Container -->
-	<div class="card-btn-container">
+	<div class="lang-card-langbuttons">
 		{#each languages as { code, name }, i}
 			<button
-				class="btn btn-lang"
-				class:active-lang={$locale === code}
+				class="btn-lang"
+				data-selected={$locale === code}
 				onclick={() => {
 					playUISound();
 					handleLocaleChange(code);
@@ -63,7 +63,7 @@
 
 	<div class="card-extra-container">
 		<CheckIcon
-		translateIdForCheckbox="btn_translate_check"
+		translateIdForCheckbox="header_btn_translate_all"
 		bind:checkValue={translate}
 		hideLabel={false}
 		/>
@@ -72,25 +72,33 @@
 
 <style>
 
-	
-	
 
-	.card-btn-container {
-		grid-row-start: 2;
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-		align-items: center;
-		justify-items: center;
-	}
+.lang-card-langbuttons {
+	grid-row-start: 2;
+	display: flex;
+	height: 100%;
+	width: 100%;
+	flex-direction: column;
+	gap: 30px;
+	align-items: center;
+	justify-content: center;
+	padding-bottom: 10%;
+}
+
 	.btn-lang {
 		background-color: black;
 		border: none;
 		box-shadow: none;
 		font-size: 18px;
-		font-weight: 200;
 		color: white;
 	}
+
+
+	.btn-lang[data-selected='true'] {
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+
 	.card-extra-container {
 		grid-row-start: 3;
 		font-size: 18px;
@@ -102,9 +110,5 @@
 	}
 
 
-	.active-lang {
-		text-decoration: underline;
-		font-weight: 400;
-		text-underline-offset: 2px;
-	}
+
 </style>

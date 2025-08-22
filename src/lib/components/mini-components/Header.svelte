@@ -15,23 +15,25 @@
 	}
 </script>
 
-<div class="card-header-container">
+<header>
 	{#if page.url.pathname === `${resolve('/explore')}`}
-		<div transition:blur class="back-btn-container">
+	<div class="top-left-buttons">
+		<div transition:blur>
 			<button
-				class="btn"
+				class="back-button"
 				onclick={() => {
 					playUISound();
 					goto(`${base}/`);
 				}}><ArrowLeft color="#ffffff" /> {$_('header_btn_exit')}</button
 			>
 		</div>
+		</div>
 	{/if}
+<div class="top-right-buttons">
 	
 	<!-- Lang Button -->
-	<div class="lang-btn-container">
 		<button
-			class="btn"
+			class="square-button"
 			onclick={() => {
 				playUISound();
 				toggleLang();
@@ -40,26 +42,27 @@
 		>
 			<Globe color="#ffffff" />
 		</button>
-	</div>
 	<!-- Audio Control -->
 	<div class="audio-control-container">
 		<AudioControl />
 	</div>
 </div>
+</header>
 
 <style>
-	.back-btn-container {
-		grid-column-start: 1;
-		grid-row-start: 1;
-		justify-self: start;
+	.back-button {
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		white-space: nowrap;
+		gap: 0.5rem;
+		min-height: 40px;
+		margin: var(--base-margin);
+		justify-content: center;
+		align-items: center;
 	}
 
-	.lang-btn-container {
-		grid-column-start: 2;
-		grid-row-start: 1;
-		justify-self: end;
-		height: 100%;
-	}
+
 
 	.audio-control-container {
 		grid-column-start: 2;
@@ -67,12 +70,5 @@
 		justify-self: end;
 		height: 100%;
 	}
-	.btn {
-		height: 100%;
-		background-color: transparent;
-		border-radius: 0;
-		border: none;
-		box-shadow: none;
-		color: white;
-	}
+
 </style>

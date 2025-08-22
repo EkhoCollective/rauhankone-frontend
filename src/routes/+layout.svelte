@@ -90,9 +90,7 @@
 		
 		
 			<!-- Header -->
-		<header class="header-container">
 			<Header toggleLang={handleToggleLangDialog} {showLang} />
-		</header>
 
 		<!-- Pages -->
 		{#key page.url.pathname}
@@ -114,12 +112,4 @@
 		font-family: 'Roboto', sans-serif;
 	}
 
-	.header-container {
-		height: 100px;
-		z-index: 1000;
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-	}
 </style>
