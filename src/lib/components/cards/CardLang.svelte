@@ -4,7 +4,6 @@
 	import { _, locale, waitLocale } from 'svelte-i18n';
 	import CheckIcon from '../mini-components/CheckIcon.svelte';
 	import { X } from 'lucide-svelte';
-	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import { Dialog } from 'bits-ui';
 	import { playBlip } from '$lib/composables/useAudio';
 	import DialogContent from '../DialogContent.svelte';
