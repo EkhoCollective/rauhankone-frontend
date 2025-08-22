@@ -50,7 +50,6 @@
 		"@testing-library/svelte": "^5.2.8",
 		"@types/howler": "^2.2.12",
 		"@types/three": "^0.176.0",
-		"daisyui": "^5.0.50",
 		"eslint": "^9.33.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.11.0",
