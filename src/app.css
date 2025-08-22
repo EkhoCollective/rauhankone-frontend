@@ -101,6 +101,9 @@ label {
 		/* padding-bottom: 20px; */
 	}
 
+  .top-right-buttons:nth-child(1) > .square-button {
+    margin-bottom: 0;
+  }
 
   .top-left-buttons {
     position: absolute;
