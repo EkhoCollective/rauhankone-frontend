@@ -1,14 +1,20 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
+	import { useAudio } from '$lib/composables/useAudio';
 
-	let { checkValue = $bindable(false), translateIdForCheckbox } = $props();
+	const { playBlip } = useAudio();
+
+	function playUISound() {
+		playBlip();
+	}
+
+	let { checkValue = $bindable(false), translateIdForCheckbox, hideLabel } = $props();
 
 	function handleCheckmark() {
 		console.debug("Checkbox clicked");
 		checkValue = !checkValue;
 	}
 </script>
-<!-- bind:checked={checkValue} -->
 
 <div class="checkmark-container">
 	<input 
@@ -20,11 +26,14 @@
 	onkeypress={(e) => {
 		if (e.key === 'Enter') {
 			handleCheckmark();
+			playUISound();
 		}
 	}}
+	aria-label={$_(translateIdForCheckbox)}
 	/>
-
-	<label for={`${translateIdForCheckbox}-id`}>{$_(translateIdForCheckbox)}</label>
+	{#if !hideLabel}
+		<label for={`${translateIdForCheckbox}-id`}>{$_(translateIdForCheckbox)}</label>
+	{/if}
 </div>
 
 <style>

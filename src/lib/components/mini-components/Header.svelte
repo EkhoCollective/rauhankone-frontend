@@ -5,31 +5,45 @@
 	import { base, resolve } from '$app/paths';
 	import { blur } from 'svelte/transition';
 	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
+	import { playBlip } from '$lib/composables/useAudio';
 	import { goto } from '$app/navigation';
 
 	let { toggleLang, showLang } = $props();
-	let audioVolume = $state(0.5);
-	let audioFadeTime = $state(500);
+
+	function playUISound() {
+		playBlip();
+	}
 </script>
 
 <div class="card-header-container">
 	{#if page.url.pathname === `${resolve('/explore')}`}
 		<div transition:blur class="back-btn-container">
-			<button class="btn" onclick={() => goto(resolve('/'))} aria-label={$_('aria-back')}>
-				<ArrowLeft color="#ffffff" /> {$_('header_btn_exit')}
-			</button>
+			<button
+				class="btn"
+				onclick={() => {
+					playUISound();
+					goto(`${base}/`);
+				}}><ArrowLeft color="#ffffff" /> {$_('header_btn_exit')}</button
+			>
 		</div>
 	{/if}
 	
 	<!-- Lang Button -->
 	<div class="lang-btn-container">
-		<button class="btn" onclick={() => toggleLang()} aria-label={$_('aria-lang-toggle')}>
+		<button
+			class="btn"
+			onclick={() => {
+				playUISound();
+				toggleLang();
+			}}
+			aria-label={$_('aria-lang-toggle')}
+		>
 			<Globe color="#ffffff" />
 		</button>
 	</div>
 	<!-- Audio Control -->
 	<div class="audio-control-container">
-		<AudioControl bind:volume={audioVolume} bind:fadeTime={audioFadeTime} />
+		<AudioControl />
 	</div>
 </div>
 

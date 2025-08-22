@@ -2,10 +2,27 @@
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
+	import { getContext, onMount } from 'svelte';
 	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
 	import Footer from '$lib/components/mini-components/Footer.svelte';
+	import { useAudio } from '$lib/composables/useAudio';
+
+	// Get navigation context from layout
+	const navigationContext = getContext('navigation') as {
+		setSource: (source: 'main' | 'submit') => void;
+		setSubmittedStoryId: (storyId: string) => void;
+		getNavigationData: () => { source: 'main' | 'submit' | null; storyId: string | null };
+		clearNavigation: () => void;
+	};
+
+	const { playBlip, switchToPage } = useAudio();
 
 	let backgroundRef: BackgroundMouse | undefined = $state();
+
+	// Set audio context when component mounts
+	onMount(() => {
+		switchToPage('main');
+	});
 
 	function handleMouseMove(e: MouseEvent) {
 		if (backgroundRef) {
@@ -19,6 +36,10 @@
 
 	function splitB(text: string): string {
 		return text.slice(text.indexOf('.') + 1);
+	}
+
+	function playUISound() {
+		playBlip();
 	}
 </script>
 
@@ -45,10 +66,23 @@
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
-			<button class="btn btn-submit" onclick={() => goto(`${base}/submit`)}>
+			<button
+				class="btn btn-submit"
+				onclick={() => {
+					playUISound();
+					goto(`${base}/submit`);
+				}}
+			>
 				{$_('main_btn_take_part')}
 			</button>
-			<button class="btn btn-explore" onclick={() => goto(`${base}/explore`)}>
+			<button
+				class="btn btn-explore"
+				onclick={() => {
+					playUISound();
+					navigationContext.setSource('main');
+					goto(`${base}/explore`);
+				}}
+			>
 				{$_('main_btn_explore')}</button
 			>
 		</div>

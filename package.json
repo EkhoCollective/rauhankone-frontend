@@ -48,6 +48,7 @@
 		"@tailwindcss/vite": "^4.0.0",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/svelte": "^5.2.4",
+		"@types/howler": "^2.2.12",
 		"@types/three": "^0.176.0",
 		"daisyui": "^5.0.28",
 		"eslint": "^9.18.0",
@@ -84,9 +85,11 @@
 		"dompurify": "^3.2.6",
 		"esbuild": "^0.25.3",
 		"esm-env": "^1.2.2",
+		"howler": "^2.2.4",
 		"install": "^0.13.0",
 		"lucide-svelte": "^0.503.0",
 		"svelte-i18n": "^4.0.1",
+		"svelte-sound": "^0.6.0",
 		"three": "^0.176.0"
 	}
 }

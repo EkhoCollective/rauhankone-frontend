@@ -11,7 +11,7 @@ const initialState: AudioState = {
 	isGloballyMuted: true,
 	playingState: 'paused',
 	currentSong: null,
-	globalVolume: 0.3
+	globalVolume: 1
 };
 
 export const audioStore = writable<AudioState>(initialState);

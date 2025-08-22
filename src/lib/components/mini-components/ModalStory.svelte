@@ -1,24 +1,49 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
+	import { playBlip } from '$lib/composables/useAudio';
 	let { story = $bindable(), closeModal, onNavigateClosest, onNavigateFurthest } = $props();
+
+	function playUISound() {
+		playBlip();
+	}
 </script>
 
 <div class="modal-story-container">
 	<div class="modal-story-content">
 		<div class="modal-story-header">
 			<!-- <h1>{story.cluster_id}</h1> -->
-			<button class="btn btn-close" onclick={() => closeModal()}><X color="#ffffff" /></button>
+			<button
+				class="btn btn-close"
+				onclick={() => {
+					playUISound();
+					closeModal();
+				}}
+			>
+				<X color="#ffffff" />
+			</button>
 		</div>
 		<div class="modal-story-body">
 			<h1>{story}</h1>
 		</div>
 
 		<div class="modal-story-actions">
-			<button class="btn btn-action" onclick={() => onNavigateClosest && onNavigateClosest()}>
+			<button
+				class="btn btn-action"
+				onclick={() => {
+					playUISound();
+					onNavigateClosest && onNavigateClosest();
+				}}
+			>
 				{$_('explore_modal_btn_closest')}</button
 			>
-			<button class="btn btn-action" onclick={() => onNavigateFurthest && onNavigateFurthest()}>
+			<button
+				class="btn btn-action"
+				onclick={() => {
+					playUISound();
+					onNavigateFurthest && onNavigateFurthest();
+				}}
+			>
 				{$_('explore_modal_btn_furthest')}</button
 			>
 			<!-- <button class="btn btn-action"> Random</button> -->

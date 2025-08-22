@@ -5,7 +5,8 @@
 	import Header from '$lib/components/mini-components/Header.svelte';
 	import '$lib/i18n';
 	import { getAuthToken } from '$lib/utils/api_token';
-	import { Dialog } from "bits-ui";
+	import { Dialog } from 'bits-ui';
+	import { setContext } from 'svelte';
 	import { onMount } from 'svelte';
 	import { init, waitLocale, _ } from 'svelte-i18n';
 	import { fade } from 'svelte/transition';
@@ -16,8 +17,31 @@
 	let showLang = $state(false);
 	let transitionDuration = 100;
 	let translateStories = $state(false);
-	
-	
+
+	// Navigation context state
+	let navigationSource = $state<'main' | 'submit' | null>(null);
+	let submittedStoryId = $state<string | null>(null);
+
+	// Set navigation context
+	setContext('navigation', {
+		setSource: (source: 'main' | 'submit') => {
+			navigationSource = source;
+		},
+		setSubmittedStoryId: (storyId: string) => {
+			submittedStoryId = storyId;
+		},
+		getNavigationData: () => ({
+			source: navigationSource,
+			storyId: submittedStoryId
+		}),
+		clearNavigation: () => {
+			navigationSource = null;
+			submittedStoryId = null;
+		}
+	});
+
+	// Set context at component initialization
+	// setContext('questions', () => questions);
 
 	init({
 		fallbackLocale: 'en',
@@ -52,7 +76,6 @@
 </svelte:head>
 
 <div class="app">
-
 	<!-- Loader -->
 	{#await waitLocale()}
 		<CardLoader />
@@ -68,7 +91,7 @@
 		
 			<!-- Header -->
 		<header class="header-container">
-			<Header toggleLang={handleToggleLangDialog} showLang={showLang} />
+			<Header toggleLang={handleToggleLangDialog} {showLang} />
 		</header>
 
 		<!-- Pages -->
