@@ -1,8 +1,11 @@
 <script lang="ts">
+
+
 	import { _, locale, waitLocale } from 'svelte-i18n';
 	import CheckIcon from '../mini-components/CheckIcon.svelte';
 	import { X } from 'lucide-svelte';
 	import { Dialog } from "bits-ui";
+	import DialogContent from '../DialogContent.svelte';
 	let { closeLangCard, translate = $bindable() } = $props();
 
 	const languages = [
@@ -19,10 +22,11 @@
 			closeLangCard(false);
 		});
 	}
+
 </script>
 
 <!-- Header/Language Selector -->
-<Dialog.Content class="lang-container" trapFocus={true}>
+<DialogContent class="lang-container" trapFocus={true}>
 		<div class="card-header-container">
 			<Dialog.Close class="btn btn-close" onclick={() => closeLangCard()}>
 				<X color="#ffffff" size={35} />
@@ -41,36 +45,20 @@
 			</button>
 		{/each}
 	</div>
-	<!-- Extra Selector -->
 
-	<!-- Accessable version -->
-	<!-- <input 
-	type="checkbox"
-	value={translate}
-	id="translate-checkbox"
-	name="translate-checkbox"
-	onchange={() => translate = !translate}
-	/>
-	<label for="translate-checkbox">{$_('header_btn_translate_all')}</label> -->
 	<div class="card-extra-container">
 		<CheckIcon
 		translateIdForCheckbox="header_btn_translate_all"
 		bind:checkValue={translate}
 		/>
 	</div>
-</Dialog.Content>
+</DialogContent>
 
 <style>
 
-
+	
 	
 
-	.btn {
-		aspect-ratio: 1;
-		height: 50px;
-		width: auto;
-		color: white;
-	}
 	.card-btn-container {
 		grid-row-start: 2;
 		display: flex;

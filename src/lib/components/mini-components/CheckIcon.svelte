@@ -33,6 +33,11 @@
 	--checkbox-color: #ffffff;
 	--checkbox-bg-color: #000000;
 }
+
+input[type="checkbox"] + label {
+  transform: translateY(-2px);
+
+}
 	  
 input[type="checkbox"] {
   /* Add if not using autoprefixer */
@@ -43,28 +48,41 @@ input[type="checkbox"] {
   /* Not removed via appearance */
   margin: 0;
 
-   font: inherit;
+  font: inherit;
   color: currentColor;
   width: 1.15em;
   height: 1.15em;
-  border: 0.15em solid currentColor;
-  border-radius: 0.15em;
+  border: 1px solid currentColor;
+  border-radius: 2px;
   transform: translateY(-0.075em);
-    display: grid;
+  display: grid;
   place-content: center;
+  position: relative;
 }
 
 input[type="checkbox"]::before {
-  content: "";
+  content: "✓";
+  position: absolute;
+  line-height: 0;
+
   width: 0.65em;
   height: 0.65em;
   transform: scale(0);
-  transition: 120ms transform ease-in-out;
-  box-shadow: inset 1em 1em var(--checkbox-color);
+  top: 50%;
+  left: 12%;
+  right: auto;
+  bottom: auto;
+  transition: 60ms transform ease-in-out;
 }
 
 input[type="checkbox"]:checked::before {
   transform: scale(1);
+}
+
+.checkmark-container {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
 }
 
 </style>

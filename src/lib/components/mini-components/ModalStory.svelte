@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
-	import { _ } from 'svelte-i18n';
 	let { story = $bindable(), closeModal, onNavigateClosest, onNavigateFurthest } = $props();
 </script>
 
