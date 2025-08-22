@@ -13,8 +13,8 @@
 	const languages = [
 		{ code: 'en', name: 'English' },
 		{ code: 'fi', name: 'Suomi' },
-		{ code: 'sv', name: 'Svenska' },
-		{ code: 'sa', name: 'Sámegiella' }
+		/* { code: 'sv', name: 'Svenska' },
+		{ code: 'sa', name: 'Sámegiella' } */
 	];
 
 	async function handleLocaleChange(lang_code: string) {
