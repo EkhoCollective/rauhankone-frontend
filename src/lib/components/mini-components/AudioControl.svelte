@@ -11,28 +11,13 @@
 	}
 </script>
 
-<div class="audio-icon-container">
-	<button class="btn" onclick={handleToggleMute}>
+	<button class="square-button" onclick={handleToggleMute}>
 		{#if $globalAudioStore.isGloballyMuted}
 			<VolumeX color="#ffffff" />
 		{:else}
 			<Volume2 color="#ffffff" />
 		{/if}
 	</button>
-</div>
 
 <style>
-	.audio-icon-container {
-		height: 100%;
-		display: flex;
-		align-items: center;
-	}
-
-	.btn {
-		height: 100%;
-		background-color: transparent;
-		border-radius: 0;
-		border: none;
-		box-shadow: none;
-	}
 </style>

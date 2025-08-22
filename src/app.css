@@ -1,9 +1,27 @@
 @import 'tailwindcss';
-@plugin "daisyui";
-@plugin '@tailwindcss/typography';
+
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  /* outline: 0.1px dotted rgba(255, 0, 0, 0.469); */
+}
+
+
+button {
+  cursor: pointer;
+}
+
+button, p, label {
+  font-weight: 400;
+}
 
 .html {
   background-color: #000000;
+}
+
+:root {
+  --base-margin: 8px;
+  --base-margin-2: calc(var(--base-margin) * 2);
 }
 
 
@@ -28,81 +46,115 @@ body {
 }
 
 label {
-  font-weight: 200;
-}
-
-
-/* Label that's next to a checkbox that's checked should be bolded */
-input[type="checkbox"]:checked + label {
   font-weight: 400;
 }
 
 
-
-.lang-container {
-  width: 100%;
-  height: 100%;
-  z-index: 2000;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-color: black;
-  display: grid;
-		grid-template-rows: 15% 1fr 15%;
-}
+/* Label that's next to a checkbox that's checked should be bolded */
 
 
-  .btn-close {
-		background-color: transparent;
-    aspect-ratio: 1;
-    max-width: 40px;
-    padding: 0;
-    width: auto;
-    height: auto;
-		border: none;
-		box-shadow: none;
-    margin: 5px;
-  }
-
-  .card-header-container-dialog {
-		grid-row-start: 1;
-		display: flex;
-		justify-content: flex-end;
-    align-items: center;
-
+	.app {
+		background-color: black;
+		color: white;
+		font-family: 'Roboto', sans-serif;
+    width: 100%;
+    height: 100%;
 	}
 
-.card-header-container {
-		height: 100%;
-		display: grid;
-		grid-template-columns: 1fr 0.1fr;
-		grid-template-rows: 1fr 1fr;
-		justify-items: end;
-		background-color: transparent;
-
-    & > * {
-      grid-column-start: 2;
-    }
-	}
 
 
 
   input:focus,
+  a:focus,
   textarea:focus,
   button:focus,
   select:focus {
     outline-color: rgb(163, 180, 255);
     outline-offset: 3px;
     outline-style: solid;
-    outline-width: 2px;
+    outline-width: 1px;
+    border-radius: 1.4px;
   }
+
 
 
   input, 
   button,
   textarea,
   select {
-    border-radius: 2px;
+    border-radius: 1.4px;
   }
+
+
+h1, h2, h3, h4, h5, h6, label, button, a, span, input {
+  color: var(--text-color, white);
+}
+
+
+/* Header buttons for language selection and audio control */
+  .top-right-buttons {
+    position: absolute;
+		z-index: 1000;
+    width: 100px;
+    height: auto;
+    right: 0;
+    top: 0;
+
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		justify-content: flex-start;
+		/* padding-bottom: 20px; */
+	}
+
+  .top-right-buttons:nth-child(1) > .square-button {
+    margin-bottom: 0;
+  }
+
+  .top-left-buttons {
+    position: absolute;
+    z-index: 1000;
+    width: 100px;
+    height: auto;
+    left: 0;
+    top: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .square-button {
+		background-color: transparent;
+    aspect-ratio: 1;
+    max-width: 40px;
+    padding: 0;
+    width: 40px;
+    height: auto;
+		border: none;
+		box-shadow: none;
+    margin: var(--base-margin);
+    cursor: pointer;
+  }
+
+  .square-button > * {
+    margin: auto;
+  }
+
+
+
+  	
+.lang-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+	display: grid;
+	width: 100%;
+	height: 100%;
+	z-index: 3000;
+	background-color: black;
+	grid-template-rows: 0.2fr 1fr 1fr;
+}

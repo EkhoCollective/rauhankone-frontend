@@ -13,7 +13,7 @@
 	<div>
 		<a href={$_('main_link_ekho')} target="_blank">© Ekho Collective</a>
 	</div>
-	<div><a href={$_('main_link_gdpr')} target="_blank">GDPR</a></div>
+	<div><a href={$_('main_link_gdpr')} target="_blank">{$_('main_link_gdpr_title')}</a></div>
 </div>
 
 <style>

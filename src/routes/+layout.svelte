@@ -1,31 +1,30 @@
 <script lang="ts">
-	import '../app.css';
-	import '$lib/i18n';
-	import { onMount } from 'svelte';
 	import { page } from '$app/state';
-	import { fade } from 'svelte/transition';
-	import { error } from '@sveltejs/kit';
-	import { _, locale, waitLocale, init } from 'svelte-i18n';
-	import { getAuthToken } from '$lib/utils/api_token';
-	import { apiRequest } from '$lib/utils/api_request';
 	import CardLang from '$lib/components/cards/CardLang.svelte';
-	import CardError from '$lib/components/cards/CardError.svelte';
 	import CardLoader from '$lib/components/cards/CardLoader.svelte';
 	import Header from '$lib/components/mini-components/Header.svelte';
+	import '$lib/i18n';
+	import { getAuthToken } from '$lib/utils/api_token';
 	import { Dialog } from 'bits-ui';
 	import { setContext } from 'svelte';
+	import { onMount } from 'svelte';
+	import { init, waitLocale, _ } from 'svelte-i18n';
+	import { fade } from 'svelte/transition';
+	import '../app.css';
+	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
+	import { resolve } from '$app/paths';
 
 	let { children } = $props();
-
-	// let questions = $state(null);
-	// let raiseError = getContext('raiseError') as () => boolean;
 	let showLang = $state(false);
-	let transitionDuration = 500;
+	let transitionDuration = 100;
 	let translateStories = $state(false);
+	let pathName = $state<string | null>(null);
 
 	// Navigation context state
 	let navigationSource = $state<'main' | 'submit' | null>(null);
 	let submittedStoryId = $state<string | null>(null);
+
+
 
 	// Set navigation context
 	setContext('navigation', {
@@ -53,43 +52,28 @@
 		initialLocale: 'en'
 	});
 
-	const API_QUESTIONS_OPTIONS = () => ({
-		API_ENDPOINT: '/get_questions',
-		API_METHOD: 'POST',
-		REQUEST_BODY: { question_type: 'starter' }
-	});
 
 	async function handleGetToken() {
 		await getAuthToken()
-			// .then(() => {
-			// 	handleGetQuestions();
-			// })
 			.catch((err) => {
-				// console.log('Error getting token', error);
-				// raiseError = true;
-				throw error(500, 'Failed to get token');
+				console.error('Error getting token:', err);
+				customErrorHandler($_("error.authFailed"), err.code);
 			});
 	}
 
-	// async function handleGetQuestions() {
-	// 	await apiRequest(API_QUESTIONS_OPTIONS())
-	// 		.then((response) => {
-	// 			questions = response;
-	// 		})
-	// 		.catch((err) => {
-	// 			// console.log('Error getting questions', error);
-	// 			// raiseError = true;
-	// 			throw error(500, 'Failed to get questions');
-	// 		});
-	// }
+
 
 	let handleToggleLangDialog = () => {
 		showLang = !showLang;
 	};
 
-	onMount(() => {
-		window.scrollTo(0, 0);
-		handleGetToken();
+  	
+
+
+onMount(() => {
+	window.scrollTo(0, 0);
+	handleGetToken();
+	pathName = (window.location.origin);
 	});
 
 	// $inspect(questions);
@@ -97,6 +81,31 @@
 
 <svelte:head>
 	<link rel="icon" type="image/svg" href="/favicon.ico" />
+	<title>{$_('main_title')} | {$_('main_subtitle')} | Oulu 2026</title>
+	<meta name="description" content={$_('main_description')} />
+	<link rel="canonical" href={pathName} />
+	<meta name="theme-color" content="#000000" />
+	<script type="application/ld+json">
+    {
+    "@context": "http://schema.org",
+    "@type": "WebPage",
+    "name": $_("main_title"),
+    "description": $_("main_description"),
+	}
+	</script>
+
+
+<meta property="og:url" content={resolve('/')} />
+<meta property="og:title" content={$_('main_title')} />
+<meta property="og:description" content={$_('main_description')} />
+<!-- <meta property="og:image:url" content={resolve('/favicon.ico')} /> -->
+
+
+	<meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content={$_('main_title')} />
+    <meta name="twitter:description" content={$_('main_description')} />
+    <meta name="twitter:image" content={'/favicon.ico'} />
+    <meta name="twitter:image:alt" content={$_('main_title')} />
 </svelte:head>
 
 <div class="app">
@@ -104,19 +113,17 @@
 	{#await waitLocale()}
 		<CardLoader />
 	{:then}
-		<!-- Lang Dialog -->
-		<Dialog.Root bind:open={showLang}>
-			<Dialog.Portal>
-				<Dialog.Overlay>
-					<CardLang closeLangCard={handleToggleLangDialog} bind:translate={translateStories} />
-				</Dialog.Overlay>
-			</Dialog.Portal>
-		</Dialog.Root>
 
-		<!-- Header -->
-		<header class="header-container">
+	 <!-- Lang Dialog -->
+			<Dialog.Root bind:open={showLang}>	
+				<Dialog.Portal>
+						<CardLang closeLangCard={handleToggleLangDialog} bind:translate={translateStories} />
+				</Dialog.Portal>
+			</Dialog.Root>
+		
+		
+			<!-- Header -->
 			<Header toggleLang={handleToggleLangDialog} {showLang} />
-		</header>
 
 		<!-- Pages -->
 		{#key page.url.pathname}
@@ -138,12 +145,4 @@
 		font-family: 'Roboto', sans-serif;
 	}
 
-	.header-container {
-		height: 100px;
-		z-index: 1000;
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-	}
 </style>

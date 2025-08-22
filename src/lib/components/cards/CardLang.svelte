@@ -1,16 +1,19 @@
 <script lang="ts">
+
+
 	import { _, locale, waitLocale } from 'svelte-i18n';
+	import CheckIcon from '../mini-components/CheckIcon.svelte';
 	import { X } from 'lucide-svelte';
-	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import { Dialog } from 'bits-ui';
 	import { playBlip } from '$lib/composables/useAudio';
+	import DialogContent from '../DialogContent.svelte';
 	let { closeLangCard, translate = $bindable() } = $props();
 
 	const languages = [
 		{ code: 'en', name: 'English' },
 		{ code: 'fi', name: 'Suomi' },
-		{ code: 'sv', name: 'Svenska' },
-		{ code: 'sa', name: 'Sámegiella' }
+		/* { code: 'sv', name: 'Svenska' },
+		{ code: 'sa', name: 'Sámegiella' } */
 	];
 
 	async function handleLocaleChange(lang_code: string) {
@@ -27,10 +30,10 @@
 </script>
 
 <!-- Header/Language Selector -->
-<Dialog.Content class="lang-container" trapFocus={true}>
-	<div class="card-header-container">
+<DialogContent class="lang-container" trapFocus={true}>
+	<div class="top-right-buttons">
 		<Dialog.Close
-			class="btn btn-close"
+			class="square-button"
 			onclick={() => {
 				playUISound();
 				closeLangCard();
@@ -40,12 +43,13 @@
 		</Dialog.Close>
 	</div>
 
+
 	<!-- Buttons Container -->
-	<div class="card-btn-container">
+	<div class="lang-card-langbuttons">
 		{#each languages as { code, name }, i}
 			<button
-				class="btn btn-lang"
-				class:active-lang={$locale === code}
+				class="btn-lang"
+				data-selected={$locale === code}
 				onclick={() => {
 					playUISound();
 					handleLocaleChange(code);
@@ -55,77 +59,45 @@
 			</button>
 		{/each}
 	</div>
-	<!-- Extra Selector -->
 
-	<!-- Accessable version -->
 	<div class="card-extra-container">
-		<!-- <Checkmark bind:checkValue={translate} /> -->
-		<input
-			type="checkbox"
-			value={translate}
-			id="translate-checkbox"
-			name="translate-checkbox"
-			onchange={() => (translate = !translate)}
+		<CheckIcon
+		translateIdForCheckbox="header_btn_translate_all"
+		bind:checkValue={translate}
+		hideLabel={false}
 		/>
-		<label for="translate-checkbox">{$_('btn_translate_check')}</label>
 	</div>
-</Dialog.Content>
+</DialogContent>
 
 <style>
-	.card-extra-container input[type='checkbox'] {
-		width: 25px;
-		aspect-ratio: 1;
-		margin-right: 10px;
-		--accent-color-checkbox: white;
-		accent-color: var(--accent-color-checkbox); /* Match Checkmark color if possible */
-		border-radius: 3px;
-		border: 2px solid var(--accent-color-checkbox);
-		background: black;
-		appearance: none;
-		display: inline-block;
-		vertical-align: middle;
-		position: relative;
-		cursor: pointer;
-		transition: box-shadow 0.1s;
-	}
-	.card-extra-container input[type='checkbox']:checked {
-		background-color: var(--accent-color-checkbox);
-		border-color: var(--accent-color-checkbox);
-	}
-	.card-extra-container input[type='checkbox']:checked::after {
-		content: '';
-		position: absolute;
-		left: 6px;
-		top: 2px;
-		width: 8px;
-		height: 14px;
-		border: solid white;
-		border-width: 0 3px 3px 0;
-		transform: rotate(45deg);
-	}
 
-	.btn {
-		aspect-ratio: 1;
-		height: 50px;
-		width: auto;
-		color: white;
-	}
-	.card-btn-container {
-		grid-row-start: 2;
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-		align-items: center;
-		justify-items: center;
-	}
+
+.lang-card-langbuttons {
+	grid-row-start: 2;
+	display: flex;
+	height: 100%;
+	width: 100%;
+	flex-direction: column;
+	gap: 30px;
+	align-items: center;
+	justify-content: center;
+	padding-bottom: 10%;
+}
+
 	.btn-lang {
 		background-color: black;
 		border: none;
 		box-shadow: none;
 		font-size: 18px;
-		font-weight: 200;
 		color: white;
 	}
+
+
+	.btn-lang[data-selected='true'] {
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+
 	.card-extra-container {
 		grid-row-start: 3;
 		font-size: 18px;
@@ -136,9 +108,6 @@
 		max-width: 75%;
 	}
 
-	.active-lang {
-		text-decoration: underline;
-		font-weight: 400;
-		text-underline-offset: 2px;
-	}
+
+
 </style>

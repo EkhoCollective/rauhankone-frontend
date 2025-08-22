@@ -278,8 +278,8 @@
 				out:blur={{ delay: suggestionFadeTimer, duration: 500 }}
 				class="suggestions-bubble bubble"
 			>
-				<p>{suggestion}</p>
-				<p>{$_('submit_please_extend')}</p>
+			<p>{$_('submit_please_extend')}</p><br />
+			<p>{suggestion}</p>
 			</div>
 		{/if}
 		<!-- Show thank you message if user has finished the story -->
@@ -300,12 +300,8 @@
 			<!-- Disclaimer -->
 			<div transition:blur class="disclaimer-container">
 				<!-- Checkmark -->
-				<div class="checkmark-container">
-					<Checkmark bind:checkValue={userAgreed} />
-				</div>
-				<div class="disclaimer-text">
-					<p>{$_('submit_disclaimer')}</p>
-				</div>
+					<Checkmark bind:checkValue={userAgreed} translateIdForCheckbox={"submit_disclaimer"} hideLabel={false}/>
+
 			</div>
 			<!-- Buttons Container -->
 			<div transition:blur class="disclaimer-btn-container">
