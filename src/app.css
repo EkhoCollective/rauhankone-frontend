@@ -1,6 +1,4 @@
 @import 'tailwindcss';
-@plugin "daisyui";
-@plugin '@tailwindcss/typography';
 
 
 *, *::before, *::after {
@@ -19,6 +17,7 @@ button, p, label {
 
 :root {
   --base-margin: 8px;
+  --base-margin-2: calc(var(--base-margin) * 2);
 }
 
 
