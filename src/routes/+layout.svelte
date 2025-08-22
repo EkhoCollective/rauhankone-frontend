@@ -81,31 +81,31 @@ onMount(() => {
 
 <svelte:head>
 	<link rel="icon" type="image/svg" href="/favicon.ico" />
-	<title>{$_('main_title')} | {$_('main_subtitle')} | Oulu 2026</title>
-	<meta name="description" content={$_('main_description')} />
+	<title>{$_('main_title', { default: "Layers in the Peace Machine"})} | {$_('main_subtitle', { default: "The Layer of Sharing"})} | Oulu 2026</title>
+	<meta name="description" content={$_('main_description', { default: "The Peace Machine is built together, layer by layer – from each person's stories, perspectives, and the shared will to create peace. Share your own personal memory and you will be part of the Peace Machine. You can also explore memories shared by others."})} />
 	<link rel="canonical" href={pathName} />
 	<meta name="theme-color" content="#000000" />
 	<script type="application/ld+json">
     {
     "@context": "http://schema.org",
     "@type": "WebPage",
-    "name": $_("main_title"),
-    "description": $_("main_description"),
+    "name": $_("main_title", { default: "Layers in the Peace Machine"}),
+    "description": $_("main_description", { default: "The Peace Machine is built together, layer by layer – from each person's stories, perspectives, and the shared will to create peace. Share your own personal memory and you will be part of the Peace Machine. You can also explore memories shared by others."}),
 	}
 	</script>
 
 
 <meta property="og:url" content={resolve('/')} />
-<meta property="og:title" content={$_('main_title')} />
-<meta property="og:description" content={$_('main_description')} />
+<meta property="og:title" content={$_('main_title', { default: "Layers in the Peace Machine"})} />
+<meta property="og:description" content={$_('main_description', {default: "The Peace Machine is built together, layer by layer – from each person's stories, perspectives, and the shared will to create peace. Share your own personal memory and you will be part of the Peace Machine. You can also explore memories shared by others."})} />
 <!-- <meta property="og:image:url" content={resolve('/favicon.ico')} /> -->
 
 
 	<meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content={$_('main_title')} />
-    <meta name="twitter:description" content={$_('main_description')} />
+    <meta name="twitter:title" content={$_('main_title', { default: "Layers in the Peace Machine"})} />
+    <meta name="twitter:description" content={$_('main_description', {default: "The Peace Machine is built together, layer by layer – from each person's stories, perspectives, and the shared will to create peace. Share your own personal memory and you will be part of the Peace Machine. You can also explore memories shared by others."})} />
     <meta name="twitter:image" content={'/favicon.ico'} />
-    <meta name="twitter:image:alt" content={$_('main_title')} />
+    <meta name="twitter:image:alt" content={$_('main_title', { default: "Layers in the Peace Machine"})} />
 </svelte:head>
 
 <div class="app">
