@@ -1,0 +1,1 @@
+import"./DANAKjFK.js";import{Q as a,T as s,V as i}from"./WruvV_wX.js";import{b as l}from"./PRNz_OS5.js";var r=a('<div class="loader svelte-stukza"></div>');function f(t,e){var o=r();s(()=>l(o,`--loader-color: ${e.color??""}; --pulse-size: ${e.pulseSize??""}; --pulse-timing: ${e.pulseTiming??""}`)),i(t,o)}export{f as L};
