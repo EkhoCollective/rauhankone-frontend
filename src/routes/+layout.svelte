@@ -12,15 +12,19 @@
 	import { fade } from 'svelte/transition';
 	import '../app.css';
 	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
+	import { resolve } from '$app/paths';
 
 	let { children } = $props();
 	let showLang = $state(false);
 	let transitionDuration = 100;
 	let translateStories = $state(false);
+	let pathName = $state<string | null>(null);
 
 	// Navigation context state
 	let navigationSource = $state<'main' | 'submit' | null>(null);
 	let submittedStoryId = $state<string | null>(null);
+
+
 
 	// Set navigation context
 	setContext('navigation', {
@@ -63,9 +67,13 @@
 		showLang = !showLang;
 	};
 
-	onMount(() => {
-		window.scrollTo(0, 0);
-		handleGetToken();
+  	
+
+
+onMount(() => {
+	window.scrollTo(0, 0);
+	handleGetToken();
+	pathName = (window.location.origin);
 	});
 
 	// $inspect(questions);
@@ -73,6 +81,31 @@
 
 <svelte:head>
 	<link rel="icon" type="image/svg" href="/favicon.ico" />
+	<title>{$_('main_title')} | {$_('main_subtitle')} | Oulu 2026</title>
+	<meta name="description" content={$_('main_description')} />
+	<link rel="canonical" href={pathName} />
+	<meta name="theme-color" content="#000000" />
+	<script type="application/ld+json">
+    {
+    "@context": "http://schema.org",
+    "@type": "WebPage",
+    "name": $_("main_title"),
+    "description": $_("main_description"),
+	}
+	</script>
+
+
+<meta property="og:url" content={resolve('/')} />
+<meta property="og:title" content={$_('main_title')} />
+<meta property="og:description" content={$_('main_description')} />
+<!-- <meta property="og:image:url" content={resolve('/favicon.ico')} /> -->
+
+
+	<meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content={$_('main_title')} />
+    <meta name="twitter:description" content={$_('main_description')} />
+    <meta name="twitter:image" content={'/favicon.ico'} />
+    <meta name="twitter:image:alt" content={$_('main_title')} />
 </svelte:head>
 
 <div class="app">
