@@ -187,7 +187,18 @@
 		height: 40px;
 		text-align: center;
 		font-weight: 500;
+		cursor: pointer;
 	}
+
+
+	.btn-explore:focus,
+	.btn-submit:focus {
+    outline-color: rgb(163, 180, 255);
+    outline-offset: 3px;
+    outline-style: solid;
+    outline-width: 1px;
+    border-radius: 1.4px;
+  }
 
 	@media (min-width: 768px) {
 		.card-bg-container {

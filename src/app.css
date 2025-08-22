@@ -65,6 +65,7 @@ label {
 
 
   input:focus,
+  a:focus,
   textarea:focus,
   button:focus,
   select:focus {
@@ -72,7 +73,7 @@ label {
     outline-offset: 3px;
     outline-style: solid;
     outline-width: 1px;
-    border-radius: 2px;
+    border-radius: 1.4px;
   }
 
 
@@ -81,7 +82,7 @@ label {
   button,
   textarea,
   select {
-    border-radius: 2px;
+    border-radius: 1.4px;
   }
 
 
