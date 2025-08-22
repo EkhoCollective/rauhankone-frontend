@@ -54,15 +54,15 @@
 	<div class="card-main-container-inner">
 		<!-- Title -->
 		<div class="card-title-container">
-			<div>{$_('main_title')}</div>
+			<h1>{$_('main_title')}</h1>
 		</div>
 		<!-- Subtitle -->
 		<div class="card-sub-title-container">
-			<div>{$_('main_subtitle')}</div>
+			<h2>{$_('main_subtitle')}</h2>
 		</div>
 		<!-- Main Text -->
 		<div class="card-description-container">
-			<div>{splitA($_('main_description'))}<br /><br />{splitB($_('main_description'))}</div>
+			<p>{splitA($_('main_description'))}<br /><br />{splitB($_('main_description'))}</p>
 		</div>
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
@@ -113,9 +113,11 @@
 		top: 0;
 		left: 0;
 		display: grid;
-		grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+		grid-template-rows: auto;
+		grid-template-columns: 1fr;
 		padding: 50px 10% 50px 10%;
 		z-index: 50;
+
 	}
 
 	.card-title-container {
@@ -131,22 +133,27 @@
 		font-size: 46px;
 		font-weight: bold;
 		line-height: 1.25em;
+		padding-bottom: var(--base-padding);
 	}
 	.card-description-container {
 		grid-row-start: 3;
 		font-size: 16px;
 	}
 	.card-btn-container {
-		grid-row-start: 4;
-		display: grid;
-		grid-template-columns: 1fr 1fr;
+		display: flex;
+		flex-direction: row;
 		gap: 20px;
 		align-items: center;
 		justify-items: center;
+		justify-content: space-between;
 	}
+
 	.btn-submit {
+		/*Unset all effects*/
+		all: unset;
 		background-color: black;
 		border-color: white;
+		border: 1px solid white;
 		box-shadow: none;
 		width: 100%;
 		font-size: 16px;
@@ -155,6 +162,7 @@
 	}
 
 	.btn-explore {
+		all: unset;
 		background-color: black;
 		border-color: none;
 		border: none;
@@ -171,6 +179,14 @@
 		border-top: 1px solid white;
 		padding-top: 10px;
 		font-size: 14px;
+	}
+
+	.btn-submit,
+	.btn-explore {
+		width: 170px;
+		height: 40px;
+		text-align: center;
+		font-weight: 500;
 	}
 
 	@media (min-width: 768px) {
@@ -190,10 +206,10 @@
 			grid-template-rows: 1fr 1fr 1fr 1fr;
 			grid-template-columns: 1fr 1fr;
 			grid-template-areas:
-				'title title'
-				'subtitle btn-container'
-				'text btn-container'
-				'footer footer';
+				'title 			title'
+				'subtitle 		btn-container'
+				'text-area 		btn-container'
+				'footer-area 	footer-area';
 		}
 		.card-title-container {
 			grid-area: title;
@@ -204,18 +220,17 @@
 		}
 
 		.card-description-container {
-			grid-area: text;
+			grid-area: text-area;
 		}
 
-
-
-		.btn-submit,
-		.btn-explore {
-			width: 170px;
+		.card-btn-container {
+			grid-area: btn-container;
+			flex-direction: column;
+			justify-content: center;
 		}
 
 		.card-footer-container {
-			grid-area: footer;
+			grid-area: footer-area;
 			border-top: none;
 			/* justify-items: start; */
 		}
