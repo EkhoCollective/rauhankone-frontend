@@ -7,6 +7,10 @@
 }
 
 
+button {
+  cursor: pointer;
+}
+
 button, p, label {
   font-weight: 400;
 }
@@ -81,7 +85,9 @@ label {
   }
 
 
-
+h1, h2, h3, h4, h5, h6, label, button, a, span, input {
+  color: var(--text-color, white);
+}
 
 
 /* Header buttons for language selection and audio control */
@@ -128,6 +134,7 @@ label {
 		border: none;
 		box-shadow: none;
     margin: var(--base-margin);
+    cursor: pointer;
   }
 
   .square-button > * {

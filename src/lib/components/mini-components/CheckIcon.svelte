@@ -58,10 +58,10 @@ input[type="checkbox"] {
   margin: 0;
 
   font: inherit;
-  color: currentColor;
+  color: white;
   width: 1.15em;
   height: 1.15em;
-  border: 1px solid currentColor;
+  border: 1px solid white;
   border-radius: 2px;
   transform: translateY(-0.075em);
   display: grid;
