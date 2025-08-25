@@ -32,6 +32,8 @@
 	let {
 		data,
 		selectedStory = $bindable(),
+		isTranslated = $bindable(),
+		currentLocale = $bindable(),
 		controls = $bindable(),
 		onNavigateToStory,
 		navigateToClosestStory = $bindable(),
@@ -41,6 +43,8 @@
 	}: {
 		data: any;
 		selectedStory: any;
+		isTranslated: boolean;
+		currentLocale: string;
 		controls?: CameraControlsRef;
 		onNavigateToStory?: (story: any) => void;
 		navigateToClosestStory?: () => void;
@@ -490,7 +494,8 @@
 		geometryCache.clear();
 	});
 
-	// $inspect(selectedStory);
+	$inspect(data, currentLocale, isTranslated);
+	// $inspect();
 </script>
 
 <!-- <PerfMonitor anchorY="bottom" /> -->

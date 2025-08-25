@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { _, locale } from 'svelte-i18n';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
@@ -17,7 +17,7 @@
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
 	import { getContext } from 'svelte';
-	import { globalAudioStore } from '$lib/stores/globalAudioStore';
+	// import { globalAudioStore } from '$lib/stores/globalAudioStore';
 
 	let { getOnlyTranslated = $bindable() } = $props();
 
@@ -32,7 +32,8 @@
 	};
 
 	let response_clusters: any = $state(null);
-	let requestLanguage = $state('Any');
+	let currentLocale: string = $state('');
+	let requestLanguage: string = $state('');
 	let toastEnabled = $state(true);
 	let navButtonValue = $state('');
 
@@ -56,7 +57,7 @@
 	const camZoomMobile = 5;
 
 	const minDimensionalValue: number = 2;
-	const maxDimensionalValue: number = 10;
+	const maxDimensionalValue: number = 15;
 
 	// Mobile detection state - determined once on mount
 	let isMobileDevice = $state(false);
@@ -74,7 +75,7 @@
 		);
 	}
 
-	const API_CLUSTERS_OPTIONS = {
+	const API_CLUSTERS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_clusters',
 		API_METHOD: 'POST',
 		REQUEST_BODY: {
@@ -83,13 +84,13 @@
 			story: null,
 			grid_size: [dimValue(), dimValue(), dimValue()]
 		}
-	};
+	});
 
 	async function fetchClusters() {
-		await apiRequest(API_CLUSTERS_OPTIONS)
+		await apiRequest(API_CLUSTERS_OPTIONS())
 			.then((response) => {
 				response_clusters = response;
-				// console.log('Fetched clusters:', response_clusters);
+				console.log('Fetched clusters:', response_clusters);
 				// console.log('Navigation data at fetch time:', navigationData);
 				// responsefromDB = true;
 			})
@@ -100,10 +101,14 @@
 	}
 
 	function handleGetTranslate() {
+		// Update current locale from svelte-i18n
+		currentLocale = $locale || 'en';
+
+		// Determine what to send to API
 		if (getOnlyTranslated === true) {
-			requestLanguage = getLocaleFullName();
-		} else {
 			requestLanguage = 'Any';
+		} else {
+			requestLanguage = getLocaleFullName();
 		}
 		return requestLanguage;
 	}
@@ -210,33 +215,6 @@
 		}
 	}
 
-	// Function to find story by ID in clusters and return the actual StoryInstance from Map
-	function findStoryInstanceById(storyId: string) {
-		if (!response_clusters?.clusters) return null;
-
-		// First, find the story data in the API response
-		for (const cluster of response_clusters.clusters) {
-			for (const story of cluster.stories) {
-				// Story contains multiple arrays (different language versions)
-				// Check each element in the story array for the matching id
-				for (const storyElement of story) {
-					if (storyElement?.id === storyId) {
-						// console.log('Found story:', storyElement);
-
-						// Found the story! Return the entire story array with cluster info
-						return {
-							story: story,
-							cluster_audio_id: cluster.text,
-							cluster_id: cluster.text,
-							text: story[0]?.text
-						};
-					}
-				}
-			}
-		}
-		return null;
-	}
-
 	// Function to handle automatic modal opening based on navigation context
 	function handleAutoModal() {
 		if (!navigationData.source || hasHandledAutoModal) return;
@@ -305,8 +283,40 @@
 		}
 	});
 
-	// $inspect(selectedStory);
-	// $inspect(response_clusters);
+	// Track previous locale to avoid constant refetching
+	let previousLocale = $state($locale || 'en');
+
+	// Watch for locale changes and refetch clusters
+	$effect(() => {
+		const newLocale = $locale || 'en';
+
+		// Only refetch if locale actually changed
+		if (newLocale !== previousLocale) {
+			// console.log('Language changed to:', newLocale);
+			// console.log('New language full name:', getLocaleFullName());
+
+			// Refetch clusters when language changes
+			if (response_clusters !== null) {
+				// console.log('Refetching clusters due to language change...');
+				response_clusters = null;
+				// console.log('getLocaleFullName', getLocaleFullName());
+				fetchClusters();
+			}
+
+			// Update previous locale
+			previousLocale = newLocale;
+		}
+	});
+
+	// TODO:
+
+	// check current language
+	// if any then return only the first story in the story
+	// if other langauge selected then return only the stories that
+	// have that langauge even if is first one or not
+	// if translated is slected, retrun "any" and the current locale
+
+	// this fixes the double sotry and simplifies the clusters
 </script>
 
 <svelte:head>
@@ -346,6 +356,8 @@
 			<Scene
 				bind:controls
 				data={response_clusters}
+				bind:isTranslated={getOnlyTranslated}
+				bind:currentLocale
 				bind:selectedStory
 				bind:navigateToClosestStory
 				bind:navigateToFurthestStory
