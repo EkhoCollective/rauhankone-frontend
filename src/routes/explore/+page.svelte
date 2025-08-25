@@ -19,7 +19,8 @@
 	import { getContext } from 'svelte';
 	// import { globalAudioStore } from '$lib/stores/globalAudioStore';
 
-	let { getOnlyTranslated = $bindable() } = $props();
+	// Get translation setting from context
+	let getOnlyTranslated = $state(false);
 
 	const { switchToPage } = useAudio();
 
@@ -29,6 +30,12 @@
 		setSubmittedStoryId: (storyId: string) => void;
 		getNavigationData: () => { source: 'main' | 'submit' | null; storyId: string | null };
 		clearNavigation: () => void;
+	};
+
+	// Get translation context from layout
+	const translationContext = getContext('translation') as {
+		translateStories: boolean;
+		setTranslateStories: (value: boolean) => void;
 	};
 
 	let response_clusters: any = $state(null);
@@ -252,6 +259,8 @@
 		// Set audio context for explore page
 		switchToPage('explore');
 
+		// Get translation setting from context
+
 		// Detect mobile device once on mount
 		isMobileDevice = detectMobile();
 
@@ -306,6 +315,10 @@
 			// Update previous locale
 			previousLocale = newLocale;
 		}
+	});
+
+	$effect(() => {
+		getOnlyTranslated = translationContext.translateStories;
 	});
 
 	// TODO:

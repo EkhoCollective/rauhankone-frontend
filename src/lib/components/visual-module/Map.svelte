@@ -494,7 +494,7 @@
 		geometryCache.clear();
 	});
 
-	$inspect(data, currentLocale, isTranslated);
+	$inspect(isTranslated);
 	// $inspect();
 </script>
 
