@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
+	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import * as THREE from 'three';
 	import {
 		Mesh,
@@ -185,26 +186,50 @@
 			const cluster = data.clusters[i];
 			const cluster_audio_id = '';
 
+			// Filter stories based on isTranslated flag and current language
+			let filteredStories = cluster.stories;
+			if (isTranslated) {
+				const currentLanguage = getLocaleFullName();
+				filteredStories = cluster.stories.filter((story: any) => {
+					// Check if any story in the array matches the current language
+					return story.some((storyVariant: any) => storyVariant?.language === currentLanguage);
+				});
+
+				// If we have matching stories, filter each story to only include the matching language variant
+				if (filteredStories.length > 0) {
+					filteredStories = filteredStories.map((story: any) => {
+						const matchingVariant = story.find(
+							(storyVariant: any) => storyVariant?.language === currentLanguage
+						);
+						return matchingVariant ? [matchingVariant] : story;
+					});
+				}
+			}
+
+			// Filter out any stories that don't have valid coordinates in the first element
+			filteredStories = filteredStories.filter((story: any) => {
+				return story && story.length > 0 && story[0] && story[0].coordinates;
+			});
+
 			// Get the color of the cluster
 			const initialColor = new Color(Math.random(), Math.random(), Math.random());
 			const selectedColor = new Color('white');
 
 			// Generate random offsets for each story (to be reused consistently)
 			const storyOffsets: { x: number; y: number; z: number }[] = [];
-			for (let j = 0; j < cluster.stories.length; j += 1) {
+			for (let j = 0; j < filteredStories.length; j += 1) {
 				storyOffsets.push({
 					x: (Math.random() - 0.5) * clusterSpread,
 					y: (Math.random() - 0.5) * clusterSpread,
 					z: (Math.random() - 0.5) * clusterSpread
 				});
 			}
-
 			// Only create curves if there are multiple stories in the cluster
 			let allStoryPositions: Vector3[] = [];
-			if (cluster.stories.length > 1) {
+			if (filteredStories.length > 1) {
 				// Collect all story positions in this cluster WITH the same random offsets
-				for (let j = 0; j < cluster.stories.length; j += 1) {
-					const story = cluster.stories[j];
+				for (let j = 0; j < filteredStories.length; j += 1) {
+					const story = filteredStories[j];
 					const offset = storyOffsets[j];
 
 					const storyPos = new Vector3(
@@ -216,8 +241,8 @@
 				}
 			}
 
-			for (let j = 0; j < cluster.stories.length; j += 1) {
-				const story = cluster.stories[j];
+			for (let j = 0; j < filteredStories.length; j += 1) {
+				const story = filteredStories[j];
 				const text_length = story[0].text.length;
 				const scale = minSphereScale + mapTextLengthToRange(text_length);
 				const cluster_id = cluster.text;
@@ -314,6 +339,7 @@
 		}
 		centroid = calculateCentroid();
 		lookAtCentroid();
+		console.log(instances);
 	}
 
 	// Calculate centroid
@@ -493,9 +519,6 @@
 		});
 		geometryCache.clear();
 	});
-
-	$inspect(isTranslated);
-	// $inspect();
 </script>
 
 <!-- <PerfMonitor anchorY="bottom" /> -->

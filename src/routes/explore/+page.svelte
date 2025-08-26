@@ -193,16 +193,31 @@
 
 	$effect(() => {
 		if (selectedStory !== null) {
+			const currentLanguage = getLocaleFullName();
+
 			// Handle different story structures - selectedStory might be a StoryInstance or raw story data
 			if (selectedStory.story && Array.isArray(selectedStory.story)) {
 				// StoryInstance - story is an array
-				selectedStoryLanguageText = selectedStory.story[0]?.text;
+				// Loop through stories to find the first one that matches the current language
+				const matchingStory = selectedStory.story.find(
+					(story: any) => story?.language === currentLanguage
+				);
+				selectedStoryLanguageText = matchingStory?.text || null;
 			} else if (Array.isArray(selectedStory)) {
 				// Raw story data - selectedStory itself is an array
-				selectedStoryLanguageText = selectedStory[0]?.text;
+				// Loop through stories to find the first one that matches the current language
+				const matchingStory = selectedStory.find(
+					(story: any) => story?.language === currentLanguage
+				);
+				selectedStoryLanguageText = matchingStory?.text || null;
 			} else {
 				// Fallback - might be a single story object
-				selectedStoryLanguageText = selectedStory.text || null;
+				// Check if the single story matches the current language
+				if (selectedStory.language === currentLanguage) {
+					selectedStoryLanguageText = selectedStory.text || null;
+				} else {
+					selectedStoryLanguageText = null;
+				}
 			}
 		}
 	});
@@ -320,15 +335,7 @@
 		getOnlyTranslated = translationContext.translateStories;
 	});
 
-	// TODO:
-
-	// check current language
-	// if any then return only the first story in the story
-	// if other langauge selected then return only the stories that
-	// have that langauge even if is first one or not
-	// if translated is slected, retrun "any" and the current locale
-
-	// this fixes the double sotry and simplifies the clusters
+	$inspect(selectedStory);
 </script>
 
 <svelte:head>
