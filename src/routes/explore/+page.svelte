@@ -10,13 +10,12 @@
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
 	import Scene from '$lib/components/visual-module/Map.svelte';
 	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
-	// import CardError from '$lib/components/cards/CardError.svelte';
-	import { error } from '@sveltejs/kit';
 	import { useAudio } from '$lib/composables/useAudio';
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
 	import { getContext } from 'svelte';
+	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
 	// import { globalAudioStore } from '$lib/stores/globalAudioStore';
 
 	// Get translation setting from context
@@ -103,7 +102,7 @@
 			})
 			.catch((err) => {
 				// console.error('Failed to get clusters:', err);
-				throw error(500, 'Failed to get clusters');
+				customErrorHandler($_('error_description_general'), 500);
 			});
 	}
 

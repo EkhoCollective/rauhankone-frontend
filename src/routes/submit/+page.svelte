@@ -10,12 +10,10 @@
 	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
 	import Loader from '$lib/components/mini-components/Loader.svelte';
-	import { error } from '@sveltejs/kit';
-	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { blur, fade } from 'svelte/transition';
 	import { getContext } from 'svelte';
 	import { useAudio } from '$lib/composables/useAudio';
-
+	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
 	// Get navigation context from layout
 	const navigationContext = getContext('navigation') as {
 		setSource: (source: 'main' | 'submit') => void;
@@ -93,7 +91,7 @@
 					goto(`${base}/explore`);
 				})
 				.catch((err) => {
-					throw error(500, 'Failed to add story');
+					customErrorHandler($_('error_description_general'), 500);
 				});
 		}
 	}
@@ -105,7 +103,8 @@
 			suggestionState = 'ok';
 		} catch (err) {
 			// console.error('Failed to get suggestions:', err);
-			throw error(500, 'Failed to get suggestions');
+			customErrorHandler($_('error_description_general'), 500);
+			
 		}
 	}
 
@@ -118,15 +117,14 @@
 			.catch((err) => {
 				// console.log('Error getting questions', error);
 				// raiseError = true;
-				throw error(500, 'Failed to get questions');
+				customErrorHandler($_('error_description_general'), 500);
 			});
 	}
 
 	function handleGetQuestionContainer() {
 		// const questionsData = getQuestionsData();
 		if (!getQuestionsData) {
-			throw error(500, 'Failed to get questions');
-			return;
+			customErrorHandler($_('error_description_general'), 500);
 		}
 		const randomGroupIndex = Math.floor(Math.random() * getQuestionsData.questions.length);
 		questionContainer = getQuestionsData.questions[randomGroupIndex];
@@ -145,8 +143,7 @@
 		}
 
 		if (!filteredQuestion) {
-			throw error(500, 'Failed to get question container');
-			return;
+			customErrorHandler($_('error_description_general'), 500);
 		}
 		question = filteredQuestion.text;
 		questionOriginalId = filteredQuestion.original_id;
