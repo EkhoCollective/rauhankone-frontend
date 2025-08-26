@@ -7,6 +7,7 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	esbuild: {
 		drop: ['console', 'debugger'],
+		exclude: ['node_modules/**', "testing/**"]
 	},
 	test: {
 		workspace: [
