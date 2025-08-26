@@ -14,6 +14,8 @@
 	} from 'three';
 
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
+	import { EffectComposer } from 'threlte-postprocessing';
+	import { DepthOfFieldEffect, BloomEffect } from 'threlte-postprocessing/effects';
 	import { T, useTask } from '@threlte/core';
 	import {
 		interactivity,
@@ -59,7 +61,7 @@
 	const minSphereScale: number = 1;
 	const minMapScale: number = 0.075;
 	const maxMapScale: number = 1.5;
-	const sphereResolution: number = 12;
+	const sphereResolution: number = 32;
 	const cameraOffset: number = 10;
 	const centroidCameraOffset: number = 40;
 	let centroid = $state(new THREE.Vector3());
@@ -84,8 +86,13 @@
 
 	const meshes = [
 		new Mesh(
-			new SphereGeometry(1, sphereResolution, sphereResolution),
-			new MeshBasicMaterial({ color: 'white', toneMapped: false, transparent: true, opacity: 0.1 })
+			new SphereGeometry(0.1, sphereResolution, sphereResolution)
+			// new MeshBasicMaterial({
+			// 	color: 'white',
+			// 	toneMapped: false,
+			// 	transparent: true,
+			// 	opacity: 0.001
+			// })
 		) // MeshA - main sphere
 	];
 
@@ -339,7 +346,7 @@
 		}
 		centroid = calculateCentroid();
 		lookAtCentroid();
-		console.log(instances);
+		// console.log(instances);
 	}
 
 	// Calculate centroid
@@ -533,92 +540,100 @@
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
 
-<InstancedMeshes {meshes}>
-	{#snippet children({ components: [MeshA, MeshB, MeshC, MeshD] })}
-		{#each instances as instance}
-			<MeshA
-				position.y={instance.positions.y}
-				position.x={instance.positions.x}
-				position.z={instance.positions.z}
-				scale={instance.scale}
-				onclick={() => {
-					// Store the previous selected story before changing
-					if (selectedStory) {
-						previousSelectedStory = selectedStory;
-					}
+<EffectComposer>
+	<DepthOfFieldEffect focusDistance={0} focalLength={0.15} bokehScale={10} height={480} />
+	<BloomEffect luminanceThreshold={0} luminanceSmoothing={0.9} height={128} radius={0.75} />
+	<!-- <NoiseEffect opacity={0.02} /> -->
+	<!-- <VignetteEffect eskil={false} offset={0.1} darkness={1.1} /> -->
 
-					// Reset all other instances' selected state (including previous story)
-					instances.forEach((inst) => {
-						inst.selected = false;
-						inst.tw.set(0);
-					});
+	<InstancedMeshes {meshes}>
+		{#snippet children({ components: [MeshA, MeshB, MeshC, MeshD] })}
+			{#each instances as instance}
+				<MeshA
+					position.y={instance.positions.y}
+					position.x={instance.positions.x}
+					position.z={instance.positions.z}
+					scale={instance.scale}
+					onclick={() => {
+						// Store the previous selected story before changing
+						if (selectedStory) {
+							previousSelectedStory = selectedStory;
+						}
 
-					// Set this instance as selected and keep it highlighted
-					instance.selected = true;
-					instance.tw.set(1);
+						// Reset all other instances' selected state (including previous story)
+						instances.forEach((inst) => {
+							inst.selected = false;
+							inst.tw.set(0);
+						});
 
-					// Calculate nearest and furthest stories for this instance
-					instance.calculateNearestAndFurthest(instances);
-
-					selectedStory = instance;
-
-					// Play blip sound for UI interaction
-					playBlip();
-					// Play cluster-specific sound for the story
-					playClusterSound(instance.cluster_id);
-
-					// Center camera on the selected story
-					if (controls) {
-						// Move camera to look at the story with smooth transition
-						controls.setLookAt(
-							instance.positions.x,
-							instance.positions.y,
-							instance.positions.z + cameraOffset, // Camera position (offset from story)
-							instance.positions.x,
-							instance.positions.y,
-							instance.positions.z, // Look at the story position
-							true // Enable smooth transition
-						);
-					}
-					// TODO: Play cluster sound effect with new audio system
-					// soundEffects.playEffect(instance.cluster_audio_id);
-				}}
-				onpointerenter={() => {
-					// Only animate if not selected
-					if (!instance.selected) {
+						// Set this instance as selected and keep it highlighted
+						instance.selected = true;
 						instance.tw.set(1);
-					}
-				}}
-				onpointerleave={() => {
-					// Only reset if not selected
-					if (!instance.selected) {
-						instance.tw.set(0);
-					}
-				}}
-			>
-				<T.Mesh>
-					<T.SphereGeometry args={[instance.scale * 0.375]} />
-					<FakeGlowMaterial glowColor="white" toneMapped={false} opacity={0.5} />
-				</T.Mesh>
-			</MeshA>
 
-			<!-- Lines outside of MeshA so they don't get scaled/moved on hover -->
-			{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
-				{#each instance.curve as pairCurvePoints}
+						// Calculate nearest and furthest stories for this instance
+						instance.calculateNearestAndFurthest(instances);
+
+						selectedStory = instance;
+
+						// Play blip sound for UI interaction
+						playBlip();
+						// Play cluster-specific sound for the story
+						playClusterSound(instance.cluster_id);
+
+						// Center camera on the selected story
+						if (controls) {
+							// Move camera to look at the story with smooth transition
+							controls.setLookAt(
+								instance.positions.x,
+								instance.positions.y,
+								instance.positions.z + cameraOffset, // Camera position (offset from story)
+								instance.positions.x,
+								instance.positions.y,
+								instance.positions.z, // Look at the story position
+								true // Enable smooth transition
+							);
+						}
+						// TODO: Play cluster sound effect with new audio system
+						// soundEffects.playEffect(instance.cluster_audio_id);
+					}}
+					onpointerenter={() => {
+						// Only animate if not selected
+						if (!instance.selected) {
+							instance.tw.set(1);
+						}
+					}}
+					onpointerleave={() => {
+						// Only reset if not selected
+						if (!instance.selected) {
+							instance.tw.set(0);
+						}
+					}}
+				>
+					<!-- <T.SphereGeometry /> -->
 					<T.Mesh>
-						<MeshLineGeometry points={pairCurvePoints} />
-						<MeshLineMaterial color="white" width={lineThickness} />
+						<T.SphereGeometry args={[instance.scale * 0.375]} />
+						<FakeGlowMaterial glowColor="white" toneMapped={false} opacity={0.5} />
 					</T.Mesh>
-				{/each}
-			{/if}
+				</MeshA>
 
-			<!-- Text instance points - outside MeshA for proper radial scaling -->
-			{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
-				<T.Points>
-					<T is={getPointGeometry(instance)} />
-					<T.PointsMaterial size={pointSize} color="white" />
-				</T.Points>
-			{/if}
-		{/each}
-	{/snippet}
-</InstancedMeshes>
+				<!-- Lines outside of MeshA so they don't get scaled/moved on hover -->
+				{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
+					{#each instance.curve as pairCurvePoints}
+						<T.Mesh>
+							<MeshLineGeometry points={pairCurvePoints} />
+							<MeshLineMaterial color="white" width={lineThickness} />
+						</T.Mesh>
+					{/each}
+				{/if}
+
+				<!-- Text instance points - outside MeshA for proper radial scaling -->
+				{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
+					<T.Points>
+						<T is={getPointGeometry(instance)} />
+						<T.PointsMaterial size={pointSize} color="white" />
+					</T.Points>
+				{/if}
+			{/each}
+		{/snippet}
+	</InstancedMeshes>
+</EffectComposer>

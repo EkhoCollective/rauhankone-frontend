@@ -335,7 +335,7 @@
 		getOnlyTranslated = translationContext.translateStories;
 	});
 
-	$inspect(selectedStory);
+	// $inspect(selectedStory);
 </script>
 
 <svelte:head>
