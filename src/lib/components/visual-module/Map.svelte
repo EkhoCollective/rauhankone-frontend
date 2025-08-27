@@ -14,6 +14,13 @@
 	} from 'three';
 
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
+	import { EffectComposer } from 'threlte-postprocessing';
+	import {
+		DepthOfFieldEffect,
+		BloomEffect,
+		NoiseEffect,
+		VignetteEffect
+	} from 'threlte-postprocessing/effects';
 	import { T, useTask } from '@threlte/core';
 	import {
 		interactivity,
@@ -55,29 +62,53 @@
 	} = $props();
 
 	// State
-	const worldScale: number = 20;
+	const worldScale: number = 25;
 	const minSphereScale: number = 1;
 	const minMapScale: number = 0.075;
 	const maxMapScale: number = 1.5;
-	const sphereResolution: number = 12;
+	const sphereResolution: number = 16;
 	const cameraOffset: number = 10;
 	const centroidCameraOffset: number = 40;
 	let centroid = $state(new THREE.Vector3());
 	let instances: StoryInstance[] = $state([]);
 	let previousSelectedStory: StoryInstance | null = $state(null);
+	let clusterCenters: { x: number; y: number; z: number }[] = $state([]);
+	let clusterCentersStories: { x: number; y: number; z: number }[] = $state([]);
+	let clusterConnectionLines: Vector3[][] = $state([]);
 
 	const clusterSpread: number = 5;
 	const lineThickness: number = 0.025;
+	const clusterConnectionThickness: number = 10;
+	const clusterConnectionOpacity: number = 0.002;
 	const pointSize: number = 0.05;
 	const curviness: number = 0.35;
 	const pointCloudShrink: number = 0.5;
+	const clusterConnectionRadius: number = 35; // Global radius for cluster connections
+	const pointsPerStoryConnection: number = 100;
+	const pointsPerClusterConnection: number = 400;
 
 	// Jiggle movement variables
-	const storyJiggleIntensity: number = 0.05; // How much stories move
-	const pointJiggleIntensity: number = 0.2; // How much points move
+	const storyJiggleIntensity: number = 0.02; // How much stories move
+	const pointJiggleIntensity: number = 0.1; // How much points move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
 	const pointJiggleTime: number = 1000; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
+
+	// Colours
+	const clusterConnectionColor: string = '#1457ff';
+	const storyConnectionColor: string = 'white';
+	const storyColorOuter: string = 'white';
+	const storyColorInner: string = 'white';
+
+	// Curve animation variables
+	const curveSpeed: number = 80; // Speed of curve animation
+	const curveNoiseIntensity: number = 0.05; // Intensity of noise variation
+
+	// Pulse animation variables
+	const pulseFrequencyMin: number = 0.5; // Minimum pulse frequency multiplier
+	const pulseFrequencyMax: number = 0.525; // Maximum pulse frequency multiplier
+	const pulseIntensityMin: number = 0.05; // Minimum pulse intensity (scale change)
+	const pulseIntensityMax: number = 0.075; // Maximum pulse intensity (scale change)
 
 	let noise = new SimplexNoise();
 	let time = $state(0);
@@ -85,7 +116,12 @@
 	const meshes = [
 		new Mesh(
 			new SphereGeometry(1, sphereResolution, sphereResolution),
-			new MeshBasicMaterial({ color: 'white', toneMapped: false, transparent: true, opacity: 0.1 })
+			new MeshBasicMaterial({
+				color: storyColorOuter,
+				toneMapped: false,
+				transparent: true,
+				opacity: 0.0015
+			})
 		) // MeshA - main sphere
 	];
 
@@ -153,7 +189,7 @@
 		const characters = inputText.split('');
 
 		// Define spherical distribution parameters
-		const minRadius = scale * 0.85; // Minimum distance from story center
+		const minRadius = scale * 0.95; // Minimum distance from story center
 		const maxRadius = scale; // Maximum distance from story center
 
 		// Create an instance for each character with spherical distribution
@@ -181,11 +217,21 @@
 
 		// Clear existing instances to avoid duplicates
 		instances.length = 0;
+		clusterCenters.length = 0;
+		clusterCentersStories.length = 0;
+		clusterConnectionLines.length = 0;
 
 		for (let i = 0; i < data.clusters.length; i += 1) {
 			const cluster = data.clusters[i];
 			const cluster_audio_id = '';
+			const clusterCenter = data.clusters[i].som;
 
+			// Add cluster center to the array
+			clusterCenters.push({
+				x: clusterCenter[0] * worldScale,
+				y: clusterCenter[1] * worldScale,
+				z: clusterCenter[2] * worldScale
+			});
 			// Filter stories based on isTranslated flag and current language
 			let filteredStories = cluster.stories;
 			if (isTranslated) {
@@ -241,6 +287,21 @@
 				}
 			}
 
+			// Calculate the center of all stories in this cluster (after offsets)
+			if (allStoryPositions.length > 0) {
+				const storyCenter = new Vector3();
+				allStoryPositions.forEach((pos) => {
+					storyCenter.add(pos);
+				});
+				storyCenter.divideScalar(allStoryPositions.length);
+
+				clusterCentersStories.push({
+					x: storyCenter.x,
+					y: storyCenter.y,
+					z: storyCenter.z
+				});
+			}
+
 			for (let j = 0; j < filteredStories.length; j += 1) {
 				const story = filteredStories[j];
 				const text_length = story[0].text.length;
@@ -279,7 +340,7 @@
 						story_positions.z
 					);
 
-					// Create a separate curve for each pair (current story to each other story)
+					// Create a separate curve for each pair (current story to each other story in the same cluster)
 					for (let k = 0; k < allStoryPositions.length; k += 1) {
 						if (k !== j) {
 							// Skip the current story's position
@@ -289,7 +350,7 @@
 
 							// Calculate distance between the two points
 							const distance = startPos.distanceTo(endPos);
-							const offsetAmount = distance * curviness; // 25% of the distance
+							const offsetAmount = distance * curviness; // Initial curviness
 
 							// Create midpoint at 50% between the two points
 							const midPoint = startPos.clone().lerp(endPos, 0.5);
@@ -314,32 +375,112 @@
 							// Create curve with the offset midpoint
 							const pairPositions = [startPos, midPoint, endPos];
 							const pairCurve = new CatmullRomCurve3(pairPositions);
-							const pairPoints = pairCurve.getPoints(100);
+							const pairPoints = pairCurve.getPoints(pointsPerStoryConnection);
 							storyPairCurves.push(pairPoints);
 						}
 					}
 				}
 
-				instances.push(
-					new StoryInstance(
-						initialColor,
-						selectedColor,
-						scale,
-						cluster_id,
-						cluster_audio_id,
-						storyObject,
-						text_length,
-						text_instances,
-						storyPairCurves, // Pass the array of pair curves
-						story_positions,
-						story_velocities
-					)
+				// Create the instance first
+				const newInstance = new StoryInstance(
+					initialColor,
+					selectedColor,
+					scale,
+					cluster_id,
+					cluster_audio_id,
+					storyObject,
+					text_length,
+					text_instances,
+					storyPairCurves, // Pass the array of pair curves
+					story_positions,
+					story_velocities
 				);
+
+				// Store curve metadata for animation
+				newInstance.curveMetadata = [];
+				if (allStoryPositions.length > 1) {
+					const currentStoryPos = new Vector3(
+						story_positions.x,
+						story_positions.y,
+						story_positions.z
+					);
+
+					for (let k = 0; k < allStoryPositions.length; k += 1) {
+						if (k !== j) {
+							const startPos = currentStoryPos;
+							const endPos = allStoryPositions[k];
+							const distance = startPos.distanceTo(endPos);
+							const randomAxis = Math.floor(Math.random() * 3);
+							const randomDirection = Math.random() < 0.5 ? -1 : 1;
+
+							newInstance.curveMetadata.push({
+								startPos: startPos,
+								endPos: endPos,
+								randomAxis: randomAxis,
+								direction: randomDirection,
+								distance: distance
+							});
+						}
+					}
+				}
+
+				instances.push(newInstance);
 			}
 		}
+
+		// Create connection lines between story centers (green cubes) within radius
+		for (let i = 0; i < clusterCentersStories.length; i += 1) {
+			for (let j = i + 1; j < clusterCentersStories.length; j += 1) {
+				const startPos = new Vector3(
+					clusterCentersStories[i].x,
+					clusterCentersStories[i].y,
+					clusterCentersStories[i].z
+				);
+				const endPos = new Vector3(
+					clusterCentersStories[j].x,
+					clusterCentersStories[j].y,
+					clusterCentersStories[j].z
+				);
+
+				// Calculate distance between the two cluster centers
+				const distance = startPos.distanceTo(endPos);
+
+				// Only create connection if clusters are within the specified radius
+				if (distance <= clusterConnectionRadius) {
+					const offsetAmount = distance * curviness;
+
+					// Create midpoint at 50% between the two points
+					const midPoint = startPos.clone().lerp(endPos, 0.5);
+
+					// Randomly choose x, y, or z axis for offset and direction (up/down)
+					const randomAxis = Math.floor(Math.random() * 3);
+					const randomDirection = Math.random() < 0.5 ? -1 : 1;
+
+					// Apply offset to the chosen axis
+					switch (randomAxis) {
+						case 0:
+							midPoint.x += offsetAmount * randomDirection;
+							break;
+						case 1:
+							midPoint.y += offsetAmount * randomDirection;
+							break;
+						case 2:
+							midPoint.z += offsetAmount * randomDirection;
+							break;
+					}
+
+					// Create curve with the offset midpoint
+					const pairPositions = [startPos, midPoint, endPos];
+					const pairCurve = new CatmullRomCurve3(pairPositions);
+					const pairPoints = pairCurve.getPoints(pointsPerClusterConnection);
+					clusterConnectionLines.push(pairPoints);
+				}
+			}
+		}
+
 		centroid = calculateCentroid();
 		lookAtCentroid();
-		console.log(instances);
+		// console.log(instances);
 	}
 
 	// Calculate centroid
@@ -421,6 +562,7 @@
 				previousSelectedStory.selected = true;
 				previousSelectedStory.tw.set(1);
 			}
+			// Note: Pulsing remains active even after modal closes
 		}
 	});
 
@@ -448,12 +590,15 @@
 	navigateToStoryProp = navigateToStory;
 	findStoryInstanceByStoryIdProp = findStoryInstanceByStoryId;
 
-	// Animation loop for jiggle movement
+	// Animation loop for jiggle movement and curve animation
 	useTask((delta) => {
 		time += delta * jiggleSpeed;
 
 		// Update story positions with SimplexNoise jiggle
 		instances.forEach((instance, index) => {
+			// Update pulse animation
+			instance.updatePulse(delta);
+
 			// Use different noise seeds for each instance and axis
 			const noiseOffsetX =
 				noise.noise3d(index * 100, time * storyJiggleTime, 0) * storyJiggleIntensity;
@@ -504,10 +649,63 @@
 							200
 						) * pointJiggleIntensity;
 
-					point.x = point.originalPosition.x + randomOffsetX;
-					point.y = point.originalPosition.y + randomOffsetY;
-					point.z = point.originalPosition.z + randomOffsetZ;
+					// Add both the story's movement and the point's own jiggle
+					point.x = point.originalPosition.x + randomOffsetX + noiseOffsetX;
+					point.y = point.originalPosition.y + randomOffsetY + noiseOffsetY;
+					point.z = point.originalPosition.z + randomOffsetZ + noiseOffsetZ;
 				});
+			}
+
+			// Update curves with time-based curviness
+			if (instance.curveMetadata && instance.curveMetadata.length > 0) {
+				let storyPairCurves: Vector3[][] = [];
+
+				// Update each curve using stored metadata
+				instance.curveMetadata.forEach((metadata, curveIndex) => {
+					const startPos = new Vector3(
+						instance.positions.x,
+						instance.positions.y,
+						instance.positions.z
+					);
+					const endPos = metadata.endPos;
+
+					// Calculate distance between the two points
+					const distance = startPos.distanceTo(endPos);
+
+					// Time-based curviness with sine function and noise
+					const baseCurviness = curviness;
+					const timeCurviness = Math.sin(time * curveSpeed + index * 100) * baseCurviness;
+					const noiseCurviness =
+						noise.noise3d(index * 50, curveIndex * 50, time * curveSpeed) * curveNoiseIntensity;
+					const dynamicCurviness = timeCurviness + noiseCurviness;
+
+					const offsetAmount = distance * dynamicCurviness;
+
+					// Create midpoint at 50% between the two points
+					const midPoint = startPos.clone().lerp(endPos, 0.5);
+
+					// Apply offset to the stored axis and direction
+					switch (metadata.randomAxis) {
+						case 0:
+							midPoint.x += offsetAmount * metadata.direction;
+							break;
+						case 1:
+							midPoint.y += offsetAmount * metadata.direction;
+							break;
+						case 2:
+							midPoint.z += offsetAmount * metadata.direction;
+							break;
+					}
+
+					// Create curve with the updated midpoint
+					const pairPositions = [startPos, midPoint, endPos];
+					const pairCurve = new CatmullRomCurve3(pairPositions);
+					const pairPoints = pairCurve.getPoints(100);
+					storyPairCurves.push(pairPoints);
+				});
+
+				// Update the instance's curves
+				instance.curve = storyPairCurves;
 			}
 		});
 	});
@@ -533,92 +731,148 @@
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
 
-<InstancedMeshes {meshes}>
-	{#snippet children({ components: [MeshA, MeshB, MeshC, MeshD] })}
-		{#each instances as instance}
-			<MeshA
-				position.y={instance.positions.y}
-				position.x={instance.positions.x}
-				position.z={instance.positions.z}
-				scale={instance.scale}
-				onclick={() => {
-					// Store the previous selected story before changing
-					if (selectedStory) {
-						previousSelectedStory = selectedStory;
-					}
+<!-- Cluster Centers -->
+<!-- {#each clusterCenters as center}
+	<T.Mesh position={[center.x, center.y, center.z]}>
+		<T.BoxGeometry />
+		<T.MeshBasicMaterial color="red" />
+	</T.Mesh>
+{/each} -->
 
-					// Reset all other instances' selected state (including previous story)
-					instances.forEach((inst) => {
-						inst.selected = false;
-						inst.tw.set(0);
-					});
+<!-- Story Centers -->
+<!-- {#each clusterCentersStories as center}
+	<T.Mesh position={[center.x, center.y, center.z]}>
+		<T.BoxGeometry />
+		<T.MeshBasicMaterial color="green" />
+	</T.Mesh>
+{/each} -->
 
-					// Set this instance as selected and keep it highlighted
-					instance.selected = true;
-					instance.tw.set(1);
+<EffectComposer>
+	<DepthOfFieldEffect focusDistance={0} focalLength={0.15} bokehScale={5} height={512} />
+	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.6} height={256} radius={0.65} />
+	<VignetteEffect eskil={false} offset={0.05} darkness={1.1} />
 
-					// Calculate nearest and furthest stories for this instance
-					instance.calculateNearestAndFurthest(instances);
+	<!-- Cluster Connection Lines -->
+	{#each clusterConnectionLines as linePoints}
+		<T.Mesh>
+			<MeshLineGeometry points={linePoints} />
+			<MeshLineMaterial
+				color={clusterConnectionColor}
+				width={clusterConnectionThickness}
+				opacity={clusterConnectionOpacity}
+				transparent={true}
+			/>
+		</T.Mesh>
+	{/each}
 
-					selectedStory = instance;
+	<InstancedMeshes {meshes}>
+		{#snippet children({ components: [MeshA, MeshB, MeshC, MeshD] })}
+			{#each instances as instance}
+				<MeshA
+					position.y={instance.positions.y}
+					position.x={instance.positions.x}
+					position.z={instance.positions.z}
+					scale={instance.scale}
+					onclick={() => {
+						// Store the previous selected story before changing
+						if (selectedStory) {
+							previousSelectedStory = selectedStory;
+						}
 
-					// Play blip sound for UI interaction
-					playBlip();
-					// Play cluster-specific sound for the story
-					playClusterSound(instance.cluster_id);
+						// Stop pulsing for all instances first
+						instances.forEach((inst) => {
+							inst.stopPulsing();
+						});
 
-					// Center camera on the selected story
-					if (controls) {
-						// Move camera to look at the story with smooth transition
-						controls.setLookAt(
-							instance.positions.x,
-							instance.positions.y,
-							instance.positions.z + cameraOffset, // Camera position (offset from story)
-							instance.positions.x,
-							instance.positions.y,
-							instance.positions.z, // Look at the story position
-							true // Enable smooth transition
-						);
-					}
-					// TODO: Play cluster sound effect with new audio system
-					// soundEffects.playEffect(instance.cluster_audio_id);
-				}}
-				onpointerenter={() => {
-					// Only animate if not selected
-					if (!instance.selected) {
+						// Reset all other instances' selected state (including previous story)
+						instances.forEach((inst) => {
+							inst.selected = false;
+							inst.tw.set(0);
+						});
+
+						// Set this instance as selected and keep it highlighted
+						instance.selected = true;
 						instance.tw.set(1);
-					}
-				}}
-				onpointerleave={() => {
-					// Only reset if not selected
-					if (!instance.selected) {
-						instance.tw.set(0);
-					}
-				}}
-			>
-				<T.Mesh>
-					<T.SphereGeometry args={[instance.scale * 0.375]} />
-					<FakeGlowMaterial glowColor="white" toneMapped={false} opacity={0.5} />
-				</T.Mesh>
-			</MeshA>
 
-			<!-- Lines outside of MeshA so they don't get scaled/moved on hover -->
-			{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
-				{#each instance.curve as pairCurvePoints}
+						// Start pulsing for all stories in the same cluster with unique parameters
+						instances.forEach((inst, index) => {
+							if (inst.cluster_id === instance.cluster_id && inst !== instance) {
+								// Configure unique pulse parameters for each story using global ranges
+								const frequency =
+									pulseFrequencyMin + Math.random() * (pulseFrequencyMax - pulseFrequencyMin);
+								const intensity =
+									pulseIntensityMin + Math.random() * (pulseIntensityMax - pulseIntensityMin);
+								const phase = Math.random() * Math.PI * 2; // 0 to 2π
+
+								inst.configurePulse(frequency, intensity, phase);
+								inst.startPulsing();
+							}
+						});
+
+						// Calculate nearest and furthest stories for this instance
+						instance.calculateNearestAndFurthest(instances);
+
+						selectedStory = instance;
+
+						// Play blip sound for UI interaction
+						playBlip();
+						// Play cluster-specific sound for the story
+						playClusterSound(instance.cluster_id);
+
+						// Center camera on the selected story
+						if (controls) {
+							// Move camera to look at the story with smooth transition
+							controls.setLookAt(
+								instance.positions.x,
+								instance.positions.y,
+								instance.positions.z + cameraOffset, // Camera position (offset from story)
+								instance.positions.x,
+								instance.positions.y,
+								instance.positions.z, // Look at the story position
+								true // Enable smooth transition
+							);
+						}
+						// TODO: Play cluster sound effect with new audio system
+						// soundEffects.playEffect(instance.cluster_audio_id);
+					}}
+					onpointerenter={() => {
+						// Only animate if not selected
+						if (!instance.selected) {
+							instance.tw.set(1);
+						}
+					}}
+					onpointerleave={() => {
+						// Only reset if not selected
+						if (!instance.selected) {
+							instance.tw.set(0);
+						}
+					}}
+				>
+					<!-- <T.SphereGeometry /> -->
 					<T.Mesh>
-						<MeshLineGeometry points={pairCurvePoints} />
-						<MeshLineMaterial color="white" width={lineThickness} />
+						<T.SphereGeometry args={[instance.scale * 0.375]} />
+						<FakeGlowMaterial glowColor={storyColorInner} toneMapped={false} opacity={0.5} />
 					</T.Mesh>
-				{/each}
-			{/if}
+				</MeshA>
 
-			<!-- Text instance points - outside MeshA for proper radial scaling -->
-			{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
-				<T.Points>
-					<T is={getPointGeometry(instance)} />
-					<T.PointsMaterial size={pointSize} color="white" />
-				</T.Points>
-			{/if}
-		{/each}
-	{/snippet}
-</InstancedMeshes>
+				<!-- Lines outside of MeshA so they don't get scaled/moved on hover -->
+				{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
+					{#each instance.curve as pairCurvePoints}
+						<T.Mesh>
+							<MeshLineGeometry points={pairCurvePoints} />
+							<MeshLineMaterial color={storyConnectionColor} width={lineThickness} />
+						</T.Mesh>
+					{/each}
+				{/if}
+
+				<!-- Text instance points - outside MeshA for proper radial scaling -->
+				{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
+					<T.Points>
+						<T is={getPointGeometry(instance)} />
+						<T.PointsMaterial size={pointSize} color="white" />
+					</T.Points>
+				{/if}
+			{/each}
+		{/snippet}
+	</InstancedMeshes>
+</EffectComposer>

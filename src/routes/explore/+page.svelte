@@ -63,7 +63,7 @@
 	const camZoomMobile = 5;
 
 	const minDimensionalValue: number = 2;
-	const maxDimensionalValue: number = 15;
+	const maxDimensionalValue: number = 25;
 
 	// Mobile detection state - determined once on mount
 	let isMobileDevice = $state(false);
@@ -96,7 +96,7 @@
 		await apiRequest(API_CLUSTERS_OPTIONS())
 			.then((response) => {
 				response_clusters = response;
-				console.log('Fetched clusters:', response_clusters);
+				// console.log('Fetched clusters:', response_clusters);
 				// console.log('Navigation data at fetch time:', navigationData);
 				// responsefromDB = true;
 			})
@@ -334,8 +334,6 @@
 	$effect(() => {
 		getOnlyTranslated = translationContext.translateStories;
 	});
-
-	$inspect(selectedStory);
 </script>
 
 <svelte:head>
