@@ -24,6 +24,8 @@
 	import { T, useTask } from '@threlte/core';
 	import {
 		interactivity,
+		Instance,
+		InstancedMesh,
 		InstancedMeshes,
 		CameraControls,
 		type CameraControlsRef,
@@ -63,7 +65,7 @@
 
 	// State
 	const worldScale: number = 25;
-	const minSphereScale: number = 1;
+	const minSphereScale: number = 2;
 	const minMapScale: number = 0.075;
 	const maxMapScale: number = 1.5;
 	const sphereResolution: number = 16;
@@ -79,7 +81,7 @@
 	const clusterSpread: number = 5;
 	const lineThickness: number = 0.025;
 	const clusterConnectionThickness: number = 10;
-	const clusterConnectionOpacity: number = 0.002;
+	const clusterConnectionOpacity: number = 0.01;
 	const pointSize: number = 0.05;
 	const curviness: number = 0.35;
 	const pointCloudShrink: number = 0.5;
@@ -120,7 +122,7 @@
 				color: storyColorOuter,
 				toneMapped: false,
 				transparent: true,
-				opacity: 0.0015
+				opacity: 0
 			})
 		) // MeshA - main sphere
 	];
@@ -719,7 +721,7 @@
 	});
 </script>
 
-<!-- <PerfMonitor anchorY="bottom" /> -->
+<PerfMonitor anchorY="bottom" />
 
 <T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 	<CameraControls bind:ref={controls} />
@@ -749,7 +751,13 @@
 
 <EffectComposer>
 	<DepthOfFieldEffect focusDistance={0} focalLength={0.15} bokehScale={5} height={512} />
-	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.6} height={256} radius={0.65} />
+	<BloomEffect
+		luminanceThreshold={0.5}
+		luminanceSmoothing={0.4}
+		height={256}
+		radius={0.65}
+		intensity={4}
+	/>
 	<VignetteEffect eskil={false} offset={0.05} darkness={1.1} />
 
 	<!-- Cluster Connection Lines -->
@@ -765,114 +773,108 @@
 		</T.Mesh>
 	{/each}
 
-	<InstancedMeshes {meshes}>
-		{#snippet children({ components: [MeshA, MeshB, MeshC, MeshD] })}
-			{#each instances as instance}
-				<MeshA
-					position.y={instance.positions.y}
-					position.x={instance.positions.x}
-					position.z={instance.positions.z}
-					scale={instance.scale}
-					onclick={() => {
-						// Store the previous selected story before changing
-						if (selectedStory) {
-							previousSelectedStory = selectedStory;
+	<InstancedMesh>
+		<T.SphereGeometry args={[0.15, sphereResolution, sphereResolution]} />
+		<T.MeshBasicMaterial color="white" toneMapped={false} />
+
+		{#each instances as instance}
+			<Instance
+				position.y={instance.positions.y}
+				position.x={instance.positions.x}
+				position.z={instance.positions.z}
+				scale={instance.scale}
+				onclick={() => {
+					// Store the previous selected story before changing
+					if (selectedStory) {
+						previousSelectedStory = selectedStory;
+					}
+
+					// Stop pulsing for all instances first
+					instances.forEach((inst) => {
+						inst.stopPulsing();
+					});
+
+					// Reset all other instances' selected state (including previous story)
+					instances.forEach((inst) => {
+						inst.selected = false;
+						inst.tw.set(0);
+					});
+
+					// Set this instance as selected and keep it highlighted
+					instance.selected = true;
+					instance.tw.set(1);
+
+					// Start pulsing for all stories in the same cluster with unique parameters
+					instances.forEach((inst, index) => {
+						if (inst.cluster_id === instance.cluster_id && inst !== instance) {
+							// Configure unique pulse parameters for each story using global ranges
+							const frequency =
+								pulseFrequencyMin + Math.random() * (pulseFrequencyMax - pulseFrequencyMin);
+							const intensity =
+								pulseIntensityMin + Math.random() * (pulseIntensityMax - pulseIntensityMin);
+							const phase = Math.random() * Math.PI * 2; // 0 to 2π
+
+							inst.configurePulse(frequency, intensity, phase);
+							inst.startPulsing();
 						}
+					});
 
-						// Stop pulsing for all instances first
-						instances.forEach((inst) => {
-							inst.stopPulsing();
-						});
+					// Calculate nearest and furthest stories for this instance
+					instance.calculateNearestAndFurthest(instances);
 
-						// Reset all other instances' selected state (including previous story)
-						instances.forEach((inst) => {
-							inst.selected = false;
-							inst.tw.set(0);
-						});
+					selectedStory = instance;
 
-						// Set this instance as selected and keep it highlighted
-						instance.selected = true;
+					// Play blip sound for UI interaction
+					playBlip();
+					// Play cluster-specific sound for the story
+					playClusterSound(instance.cluster_id);
+
+					// Center camera on the selected story
+					if (controls) {
+						// Move camera to look at the story with smooth transition
+						controls.setLookAt(
+							instance.positions.x,
+							instance.positions.y,
+							instance.positions.z + cameraOffset, // Camera position (offset from story)
+							instance.positions.x,
+							instance.positions.y,
+							instance.positions.z, // Look at the story position
+							true // Enable smooth transition
+						);
+					}
+					// TODO: Play cluster sound effect with new audio system
+					// soundEffects.playEffect(instance.cluster_audio_id);
+				}}
+				onpointerenter={() => {
+					// Only animate if not selected
+					if (!instance.selected) {
 						instance.tw.set(1);
+					}
+				}}
+				onpointerleave={() => {
+					// Only reset if not selected
+					if (!instance.selected) {
+						instance.tw.set(0);
+					}
+				}}
+			/>
 
-						// Start pulsing for all stories in the same cluster with unique parameters
-						instances.forEach((inst, index) => {
-							if (inst.cluster_id === instance.cluster_id && inst !== instance) {
-								// Configure unique pulse parameters for each story using global ranges
-								const frequency =
-									pulseFrequencyMin + Math.random() * (pulseFrequencyMax - pulseFrequencyMin);
-								const intensity =
-									pulseIntensityMin + Math.random() * (pulseIntensityMax - pulseIntensityMin);
-								const phase = Math.random() * Math.PI * 2; // 0 to 2π
-
-								inst.configurePulse(frequency, intensity, phase);
-								inst.startPulsing();
-							}
-						});
-
-						// Calculate nearest and furthest stories for this instance
-						instance.calculateNearestAndFurthest(instances);
-
-						selectedStory = instance;
-
-						// Play blip sound for UI interaction
-						playBlip();
-						// Play cluster-specific sound for the story
-						playClusterSound(instance.cluster_id);
-
-						// Center camera on the selected story
-						if (controls) {
-							// Move camera to look at the story with smooth transition
-							controls.setLookAt(
-								instance.positions.x,
-								instance.positions.y,
-								instance.positions.z + cameraOffset, // Camera position (offset from story)
-								instance.positions.x,
-								instance.positions.y,
-								instance.positions.z, // Look at the story position
-								true // Enable smooth transition
-							);
-						}
-						// TODO: Play cluster sound effect with new audio system
-						// soundEffects.playEffect(instance.cluster_audio_id);
-					}}
-					onpointerenter={() => {
-						// Only animate if not selected
-						if (!instance.selected) {
-							instance.tw.set(1);
-						}
-					}}
-					onpointerleave={() => {
-						// Only reset if not selected
-						if (!instance.selected) {
-							instance.tw.set(0);
-						}
-					}}
-				>
-					<!-- <T.SphereGeometry /> -->
+			{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
+				{#each instance.curve as pairCurvePoints}
 					<T.Mesh>
-						<T.SphereGeometry args={[instance.scale * 0.375]} />
-						<FakeGlowMaterial glowColor={storyColorInner} toneMapped={false} opacity={0.5} />
+						<MeshLineGeometry points={pairCurvePoints} />
+						<MeshLineMaterial color={storyConnectionColor} width={lineThickness} />
 					</T.Mesh>
-				</MeshA>
+				{/each}
+			{/if}
 
-				<!-- Lines outside of MeshA so they don't get scaled/moved on hover -->
-				{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
-					{#each instance.curve as pairCurvePoints}
-						<T.Mesh>
-							<MeshLineGeometry points={pairCurvePoints} />
-							<MeshLineMaterial color={storyConnectionColor} width={lineThickness} />
-						</T.Mesh>
-					{/each}
-				{/if}
-
-				<!-- Text instance points - outside MeshA for proper radial scaling -->
-				{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
-					<T.Points>
-						<T is={getPointGeometry(instance)} />
-						<T.PointsMaterial size={pointSize} color="white" />
-					</T.Points>
-				{/if}
-			{/each}
-		{/snippet}
-	</InstancedMeshes>
+			<!-- Text instance points - outside MeshA for proper radial scaling -->
+			{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
+				<T.Points>
+					<T is={getPointGeometry(instance)} />
+					<T.PointsMaterial size={pointSize} color="white" />
+				</T.Points>
+			{/if}
+		{/each}
+	</InstancedMesh>
 </EffectComposer>
