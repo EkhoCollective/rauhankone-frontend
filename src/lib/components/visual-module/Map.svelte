@@ -74,6 +74,7 @@
 	let previousSelectedStory: StoryInstance | null = $state(null);
 	let clusterCenters: { x: number; y: number; z: number }[] = $state([]);
 	let clusterCentersStories: { x: number; y: number; z: number }[] = $state([]);
+	let clusterConnectionLines: Vector3[][] = $state([]);
 
 	const clusterSpread: number = 5;
 	const lineThickness: number = 0.025;
@@ -207,6 +208,7 @@
 		instances.length = 0;
 		clusterCenters.length = 0;
 		clusterCentersStories.length = 0;
+		clusterConnectionLines.length = 0;
 
 		for (let i = 0; i < data.clusters.length; i += 1) {
 			const cluster = data.clusters[i];
@@ -414,6 +416,53 @@
 				instances.push(newInstance);
 			}
 		}
+
+		// Create connection lines between all story centers (green cubes)
+		for (let i = 0; i < clusterCentersStories.length; i += 1) {
+			for (let j = i + 1; j < clusterCentersStories.length; j += 1) {
+				const startPos = new Vector3(
+					clusterCentersStories[i].x,
+					clusterCentersStories[i].y,
+					clusterCentersStories[i].z
+				);
+				const endPos = new Vector3(
+					clusterCentersStories[j].x,
+					clusterCentersStories[j].y,
+					clusterCentersStories[j].z
+				);
+
+				// Calculate distance between the two cluster centers
+				const distance = startPos.distanceTo(endPos);
+				const offsetAmount = 0;
+
+				// Create midpoint at 50% between the two points
+				const midPoint = startPos.clone().lerp(endPos, 0.5);
+
+				// Randomly choose x, y, or z axis for offset and direction (up/down)
+				const randomAxis = Math.floor(Math.random() * 3);
+				const randomDirection = Math.random() < 0.5 ? -1 : 1;
+
+				// Apply offset to the chosen axis
+				switch (randomAxis) {
+					case 0:
+						midPoint.x += offsetAmount * randomDirection;
+						break;
+					case 1:
+						midPoint.y += offsetAmount * randomDirection;
+						break;
+					case 2:
+						midPoint.z += offsetAmount * randomDirection;
+						break;
+				}
+
+				// Create curve with the offset midpoint
+				const pairPositions = [startPos, midPoint, endPos];
+				const pairCurve = new CatmullRomCurve3(pairPositions);
+				const pairPoints = pairCurve.getPoints(100);
+				clusterConnectionLines.push(pairPoints);
+			}
+		}
+
 		centroid = calculateCentroid();
 		lookAtCentroid();
 		// console.log(instances);
@@ -668,18 +717,26 @@
 </T.Mesh> -->
 
 <!-- Cluster Centers -->
-{#each clusterCenters as center}
+<!-- {#each clusterCenters as center}
 	<T.Mesh position={[center.x, center.y, center.z]}>
 		<T.BoxGeometry />
 		<T.MeshBasicMaterial color="red" />
 	</T.Mesh>
-{/each}
+{/each} -->
 
 <!-- Story Centers -->
 {#each clusterCentersStories as center}
 	<T.Mesh position={[center.x, center.y, center.z]}>
 		<T.BoxGeometry />
 		<T.MeshBasicMaterial color="green" />
+	</T.Mesh>
+{/each}
+
+<!-- Cluster Connection Lines -->
+{#each clusterConnectionLines as linePoints}
+	<T.Mesh>
+		<MeshLineGeometry points={linePoints} />
+		<MeshLineMaterial color="red" width={lineThickness} />
 	</T.Mesh>
 {/each}
 
