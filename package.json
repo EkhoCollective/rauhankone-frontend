@@ -87,6 +87,7 @@
 		"howler": "^2.2.4",
 		"install": "^0.13.0",
 		"lucide-svelte": "^0.503.0",
+		"pnpm": "^10.15.0",
 		"svelte-i18n": "^4.0.1",
 		"svelte-sound": "^0.6.0",
 		"three": "^0.176.0",
