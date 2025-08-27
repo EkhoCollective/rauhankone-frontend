@@ -10,6 +10,7 @@
 		CatmullRomCurve3,
 		BufferGeometry,
 		Vector3,
+		Vector2,
 		Color,
 		Matrix4
 	} from 'three';
@@ -20,7 +21,8 @@
 		DepthOfFieldEffect,
 		BloomEffect,
 		NoiseEffect,
-		VignetteEffect
+		VignetteEffect,
+		ChromaticAberrationEffect
 	} from 'threlte-postprocessing/effects';
 	import { T, useTask } from '@threlte/core';
 	import {
@@ -86,23 +88,24 @@
 	const pointSize: number = 0.05;
 	const maxNumofPointsPerStory = 200;
 	const curviness: number = 0.35;
-	const pointCloudShrink: number = 0.5;
-	const clusterConnectionRadius: number = 35; // Global radius for cluster connections
+	const clusterCurviness: number = 0.25;
+	// const pointCloudShrink: number = 0.5;
+	const clusterConnectionRadius: number = 50; // Global radius for cluster connections
 	const pointsPerStoryConnection: number = 100;
 	const pointsPerClusterConnection: number = 400;
 
 	// Jiggle movement variables
 	const storyJiggleIntensity: number = 0.02; // How much stories move
-	const pointJiggleIntensity: number = 0.1; // How much points move
+	// const pointJiggleIntensity: number = 0.1; // How much points move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
-	const pointJiggleTime: number = 1000; // Speed of the jiggle animation
+	// const pointJiggleTime: number = 1000; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
 
 	// Colours
 	const clusterConnectionColor: string = '#1457ff';
 	const storyConnectionColor: string = 'white';
 	const storyColorOuter: string = 'white';
-	const storyColorInner: string = 'white';
+	// const storyColorInner: string = 'white';
 
 	// Curve animation variables
 	const curveSpeed: number = 80; // Speed of curve animation
@@ -114,8 +117,16 @@
 	const pulseIntensityMin: number = 0.075; // Minimum pulse intensity (scale change)
 	const pulseIntensityMax: number = 0.1; // Maximum pulse intensity (scale change)
 
+	// Pulsing sphere effect variables
+	let spherePulseFrequency = $state(1.0); // Speed of sphere pulse
+	let spherePulseIntensity = $state(0.8); // How much the sphere grows (0.8 = 80% growth)
+	let sphereBaseSize = $state(0.5); // Base size of the sphere
+	let sphereMaxSize = $state(3.0); // Maximum size the sphere can grow to
+	let sphereBaseOpacity = $state(0.4); // Base opacity of the sphere
+
 	let noise = new SimplexNoise();
 	let time = $state(0);
+	let sphereTime = $state(0); // Separate time for sphere animation
 
 	const meshes = [
 		new Mesh(
@@ -214,6 +225,27 @@
 		});
 
 		return textInstances;
+	}
+
+	// Sphere pulse control functions
+	function setSpherePulseFrequency(frequency: number): void {
+		spherePulseFrequency = Math.max(0.1, Math.min(5.0, frequency));
+	}
+
+	function setSpherePulseIntensity(intensity: number): void {
+		spherePulseIntensity = Math.max(0.1, Math.min(2.0, intensity));
+	}
+
+	function setSphereBaseSize(size: number): void {
+		sphereBaseSize = Math.max(0.1, Math.min(5.0, size));
+	}
+
+	function setSphereMaxSize(size: number): void {
+		sphereMaxSize = Math.max(sphereBaseSize + 0.5, Math.min(10.0, size));
+	}
+
+	function setSphereBaseOpacity(opacity: number): void {
+		sphereBaseOpacity = Math.max(0.0, Math.min(1.0, opacity));
 	}
 
 	function populateFromData() {
@@ -458,7 +490,7 @@
 
 				// Only create connection if clusters are within the specified radius
 				if (distance <= clusterConnectionRadius) {
-					const offsetAmount = distance * curviness;
+					const offsetAmount = distance * clusterCurviness;
 
 					// Create midpoint at 50% between the two points
 					const midPoint = startPos.clone().lerp(endPos, 0.5);
@@ -604,6 +636,7 @@
 	// Animation loop for jiggle movement and curve animation
 	useTask((delta) => {
 		time += delta * jiggleSpeed;
+		sphereTime += delta; // Update sphere animation time
 
 		// Update story positions with SimplexNoise jiggle
 		instances.forEach((instance, index) => {
@@ -786,6 +819,13 @@
 	</T.Mesh>
 {/each} -->
 
+<!-- {#each clusterCentersStories as center}
+	<T.Mesh position={[center.x, center.y, center.z]}>
+		<T.SphereGeometry args={[0.1, 8, 8]} />
+		<T.MeshBasicMaterial color={clusterConnectionColor} toneMapped={false} />
+	</T.Mesh>
+{/each} -->
+
 <!-- Story Centers -->
 <!-- {#each clusterCentersStories as center}
 	<T.Mesh position={[center.x, center.y, center.z]}>
@@ -804,6 +844,11 @@
 		intensity={4}
 	/>
 	<VignetteEffect eskil={false} offset={0.05} darkness={1.1} />
+	<ChromaticAberrationEffect
+		offset={new Vector2(0.001, 0.001)}
+		radialModulation={false}
+		modulationOffset={0.15}
+	/>
 
 	<!-- Cluster Connection Lines -->
 	{#each clusterConnectionLines as linePoints}
@@ -913,6 +958,23 @@
 				{/each}
 			{/if}
 
+			<!-- Pulsing sphere effect for selected stories -->
+			<!-- {#if instance.selected || (previousSelectedStory && previousSelectedStory === instance)}
+				{@const pulseValue = Math.sin(sphereTime * spherePulseFrequency * Math.PI * 2) * 0.5 + 0.5}
+				{@const sphereSize =
+					sphereBaseSize + (sphereMaxSize - sphereBaseSize) * pulseValue * spherePulseIntensity}
+				{@const sphereOpacity = sphereBaseOpacity * (1 - pulseValue * 0.8)}
+
+				<T.Mesh position={[instance.positions.x, instance.positions.y, instance.positions.z]}>
+					<T.SphereGeometry args={[sphereSize, 32, 32]} />
+					<T.MeshBasicMaterial
+						color={clusterConnectionColor}
+						transparent={true}
+						opacity={sphereOpacity}
+					/>
+				</T.Mesh>
+			{/if} -->
+
 			<!-- Text instance points - outside MeshA for proper radial scaling -->
 			{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
 				<T.Points>
@@ -923,3 +985,4 @@
 		{/each}
 	</InstancedMesh>
 </EffectComposer>
+u
