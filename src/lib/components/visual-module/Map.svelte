@@ -75,19 +75,19 @@
 	const pointCloudShrink: number = 0.5;
 
 	// Jiggle movement variables
-	const storyJiggleIntensity: number = 0.025; // How much stories move
+	const storyJiggleIntensity: number = 0.02; // How much stories move
 	const pointJiggleIntensity: number = 0.1; // How much points move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
 	const pointJiggleTime: number = 1000; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
 
 	// Curve animation variables
-	const curveSpeed: number = 100; // Speed of curve animation
+	const curveSpeed: number = 80; // Speed of curve animation
 	const curveNoiseIntensity: number = 0.05; // Intensity of noise variation
 
 	// Pulse animation variables
-	const pulseFrequencyMin: number = 1; // Minimum pulse frequency multiplier
-	const pulseFrequencyMax: number = 1.075; // Maximum pulse frequency multiplier
+	const pulseFrequencyMin: number = 0.5; // Minimum pulse frequency multiplier
+	const pulseFrequencyMax: number = 0.575; // Maximum pulse frequency multiplier
 	const pulseIntensityMin: number = 0.025; // Minimum pulse intensity (scale change)
 	const pulseIntensityMax: number = 0.035; // Maximum pulse intensity (scale change)
 
@@ -638,7 +638,7 @@
 
 <EffectComposer>
 	<DepthOfFieldEffect focusDistance={0} focalLength={0.15} bokehScale={5} height={512} />
-	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.6} height={256} radius={0.85} />
+	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.6} height={256} radius={0.65} />
 	<!-- <NoiseEffect opacity={0.02} /> -->
 	<!-- <VignetteEffect eskil={false} offset={0.1} darkness={1.1} /> -->
 
