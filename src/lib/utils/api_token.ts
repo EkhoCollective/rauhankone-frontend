@@ -1,7 +1,9 @@
+import { baseUrl } from "./consts";
+
 // Get authentication token
 export async function getAuthToken() {
   try {
-    const API_URL = 'https://api.peacemachine.eu';
+    const API_URL = baseUrl;
     const response = await fetch(`${API_URL}/auth/app-token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }

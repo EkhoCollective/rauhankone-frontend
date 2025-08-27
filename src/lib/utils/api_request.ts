@@ -1,9 +1,12 @@
+import { baseUrl } from "./consts";
+
 // Get questions
 export interface ApiRequestOptions {
   API_ENDPOINT: string;
   API_METHOD: string;
   REQUEST_BODY?: any;
 }
+
 
 export async function apiRequest(OPTIONS: ApiRequestOptions) {
   try {
@@ -14,7 +17,7 @@ export async function apiRequest(OPTIONS: ApiRequestOptions) {
       throw new Error('No authentication token found. Get a token first.');
     }
 
-    const API_URL = 'https://api.peacemachine.eu';
+    const API_URL = baseUrl;
 
     const response = await fetch(`${API_URL}${OPTIONS.API_ENDPOINT}`, {
       method: OPTIONS.API_METHOD,
