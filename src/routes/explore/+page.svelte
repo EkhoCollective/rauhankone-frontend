@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { _, locale } from 'svelte-i18n';
 	import { onMount } from 'svelte';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
@@ -10,16 +10,16 @@
 	import ModalStory from '$lib/components/mini-components/ModalStory.svelte';
 	import Scene from '$lib/components/visual-module/Map.svelte';
 	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
-	// import CardError from '$lib/components/cards/CardError.svelte';
-	import { error } from '@sveltejs/kit';
 	import { useAudio } from '$lib/composables/useAudio';
 	import { MathUtils } from 'three';
 	import { Canvas } from '@threlte/core';
 	import type { CameraControlsRef } from '@threlte/extras';
 	import { getContext } from 'svelte';
-	import { globalAudioStore } from '$lib/stores/globalAudioStore';
+	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
+	// import { globalAudioStore } from '$lib/stores/globalAudioStore';
 
-	let { getOnlyTranslated = $bindable() } = $props();
+	// Get translation setting from context
+	let getOnlyTranslated = $state(false);
 
 	const { switchToPage } = useAudio();
 
@@ -31,8 +31,15 @@
 		clearNavigation: () => void;
 	};
 
+	// Get translation context from layout
+	const translationContext = getContext('translation') as {
+		translateStories: boolean;
+		setTranslateStories: (value: boolean) => void;
+	};
+
 	let response_clusters: any = $state(null);
-	let requestLanguage = $state('Any');
+	let currentLocale: string = $state('');
+	let requestLanguage: string = $state('');
 	let toastEnabled = $state(true);
 	let navButtonValue = $state('');
 
@@ -56,7 +63,7 @@
 	const camZoomMobile = 5;
 
 	const minDimensionalValue: number = 2;
-	const maxDimensionalValue: number = 10;
+	const maxDimensionalValue: number = 25;
 
 	// Mobile detection state - determined once on mount
 	let isMobileDevice = $state(false);
@@ -74,7 +81,7 @@
 		);
 	}
 
-	const API_CLUSTERS_OPTIONS = {
+	const API_CLUSTERS_OPTIONS = () => ({
 		API_ENDPOINT: '/get_clusters',
 		API_METHOD: 'POST',
 		REQUEST_BODY: {
@@ -83,10 +90,10 @@
 			story: null,
 			grid_size: [dimValue(), dimValue(), dimValue()]
 		}
-	};
+	});
 
 	async function fetchClusters() {
-		await apiRequest(API_CLUSTERS_OPTIONS)
+		await apiRequest(API_CLUSTERS_OPTIONS())
 			.then((response) => {
 				response_clusters = response;
 				// console.log('Fetched clusters:', response_clusters);
@@ -95,15 +102,19 @@
 			})
 			.catch((err) => {
 				// console.error('Failed to get clusters:', err);
-				throw error(500, 'Failed to get clusters');
+				customErrorHandler($_('error_description_general'), 500);
 			});
 	}
 
 	function handleGetTranslate() {
+		// Update current locale from svelte-i18n
+		currentLocale = $locale || 'en';
+
+		// Determine what to send to API
 		if (getOnlyTranslated === true) {
-			requestLanguage = getLocaleFullName();
-		} else {
 			requestLanguage = 'Any';
+		} else {
+			requestLanguage = getLocaleFullName();
 		}
 		return requestLanguage;
 	}
@@ -182,16 +193,31 @@
 
 	$effect(() => {
 		if (selectedStory !== null) {
+			const currentLanguage = getLocaleFullName();
+
 			// Handle different story structures - selectedStory might be a StoryInstance or raw story data
 			if (selectedStory.story && Array.isArray(selectedStory.story)) {
 				// StoryInstance - story is an array
-				selectedStoryLanguageText = selectedStory.story[0]?.text;
+				// Loop through stories to find the first one that matches the current language
+				const matchingStory = selectedStory.story.find(
+					(story: any) => story?.language === currentLanguage
+				);
+				selectedStoryLanguageText = matchingStory?.text || null;
 			} else if (Array.isArray(selectedStory)) {
 				// Raw story data - selectedStory itself is an array
-				selectedStoryLanguageText = selectedStory[0]?.text;
+				// Loop through stories to find the first one that matches the current language
+				const matchingStory = selectedStory.find(
+					(story: any) => story?.language === currentLanguage
+				);
+				selectedStoryLanguageText = matchingStory?.text || null;
 			} else {
 				// Fallback - might be a single story object
-				selectedStoryLanguageText = selectedStory.text || null;
+				// Check if the single story matches the current language
+				if (selectedStory.language === currentLanguage) {
+					selectedStoryLanguageText = selectedStory.text || null;
+				} else {
+					selectedStoryLanguageText = null;
+				}
 			}
 		}
 	});
@@ -208,33 +234,6 @@
 		if (navigateToFurthestStory) {
 			navigateToFurthestStory();
 		}
-	}
-
-	// Function to find story by ID in clusters and return the actual StoryInstance from Map
-	function findStoryInstanceById(storyId: string) {
-		if (!response_clusters?.clusters) return null;
-
-		// First, find the story data in the API response
-		for (const cluster of response_clusters.clusters) {
-			for (const story of cluster.stories) {
-				// Story contains multiple arrays (different language versions)
-				// Check each element in the story array for the matching id
-				for (const storyElement of story) {
-					if (storyElement?.id === storyId) {
-						// console.log('Found story:', storyElement);
-
-						// Found the story! Return the entire story array with cluster info
-						return {
-							story: story,
-							cluster_audio_id: cluster.text,
-							cluster_id: cluster.text,
-							text: story[0]?.text
-						};
-					}
-				}
-			}
-		}
-		return null;
 	}
 
 	// Function to handle automatic modal opening based on navigation context
@@ -274,6 +273,8 @@
 		// Set audio context for explore page
 		switchToPage('explore');
 
+		// Get translation setting from context
+
 		// Detect mobile device once on mount
 		isMobileDevice = detectMobile();
 
@@ -305,8 +306,34 @@
 		}
 	});
 
-	// $inspect(selectedStory);
-	// $inspect(response_clusters);
+	// Track previous locale to avoid constant refetching
+	let previousLocale = $state($locale || 'en');
+
+	// Watch for locale changes and refetch clusters
+	$effect(() => {
+		const newLocale = $locale || 'en';
+
+		// Only refetch if locale actually changed
+		if (newLocale !== previousLocale) {
+			// console.log('Language changed to:', newLocale);
+			// console.log('New language full name:', getLocaleFullName());
+
+			// Refetch clusters when language changes
+			if (response_clusters !== null) {
+				// console.log('Refetching clusters due to language change...');
+				response_clusters = null;
+				// console.log('getLocaleFullName', getLocaleFullName());
+				fetchClusters();
+			}
+
+			// Update previous locale
+			previousLocale = newLocale;
+		}
+	});
+
+	$effect(() => {
+		getOnlyTranslated = translationContext.translateStories;
+	});
 </script>
 
 <svelte:head>
@@ -346,6 +373,8 @@
 			<Scene
 				bind:controls
 				data={response_clusters}
+				bind:isTranslated={getOnlyTranslated}
+				bind:currentLocale
 				bind:selectedStory
 				bind:navigateToClosestStory
 				bind:navigateToFurthestStory

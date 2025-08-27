@@ -1,0 +1,6 @@
+POST https://prod.peacemachine.eu/auth/app-token HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer your_access_token
+Origin: https://peacemachine.eu
+Referer: https://peacemachine.eu/

@@ -111,6 +111,12 @@ h1, h2, h3, h4, h5, h6, label, button, a, span, input {
     margin-bottom: 0;
   }
 
+  .top-right-buttons:nth-child(2) > div button {
+    margin-top: 0;
+  }
+
+  
+
   .top-left-buttons {
     position: absolute;
     z-index: 1000;

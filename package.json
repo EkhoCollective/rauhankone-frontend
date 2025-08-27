@@ -1,10 +1,10 @@
 {
 	"name": "rauhankone-frontend",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"scripts": {
 		"dev": "NODE_ENV=development vite dev --mode development",
 		"build": "vite build && npm run prepack",
-		"gh-pages": "npm run build && npx gh-pages -d build",
+		"gh-pages": "npm run build && npx gh-pages -d build --cname peacemachine.eu",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"prepack": "svelte-kit sync && svelte-package && publint",
@@ -87,8 +87,10 @@
 		"howler": "^2.2.4",
 		"install": "^0.13.0",
 		"lucide-svelte": "^0.503.0",
+		"pnpm": "^10.15.0",
 		"svelte-i18n": "^4.0.1",
 		"svelte-sound": "^0.6.0",
-		"three": "^0.176.0"
+		"three": "^0.176.0",
+		"threlte-postprocessing": "^0.0.10"
 	}
 }

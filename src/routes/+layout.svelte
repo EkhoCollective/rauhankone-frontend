@@ -44,6 +44,16 @@
 		}
 	});
 
+	// Set translation context
+	setContext('translation', {
+		get translateStories() {
+			return translateStories;
+		},
+		setTranslateStories: (value: boolean) => {
+			translateStories = value;
+		}
+	});
+
 	// Set context at component initialization
 	// setContext('questions', () => questions);
 
@@ -52,16 +62,12 @@
 		initialLocale: 'en'
 	});
 
-
 	async function handleGetToken() {
-		await getAuthToken()
-			.catch((err) => {
-				console.error('Error getting token:', err);
-				customErrorHandler($_("error.authFailed"), err.code);
-			});
+		await getAuthToken().catch((err) => {
+			console.error('Error getting token:', err);
+			customErrorHandler($_('error.authFailed'), err.code);
+		});
 	}
-
-
 
 	let handleToggleLangDialog = () => {
 		showLang = !showLang;
@@ -70,10 +76,10 @@
   	
 
 
-onMount(() => {
-	window.scrollTo(0, 0);
-	handleGetToken();
-	pathName = (window.location.origin);
+	onMount(() => {
+		window.scrollTo(0, 0);
+		handleGetToken();
+		pathName = window.location.origin;
 	});
 
 	// $inspect(questions);
@@ -81,31 +87,60 @@ onMount(() => {
 
 <svelte:head>
 	<link rel="icon" type="image/svg" href="/favicon.ico" />
-	<title>{$_('main_title')} | {$_('main_subtitle')} | Oulu 2026</title>
-	<meta name="description" content={$_('main_description')} />
+	<title
+		>{$_('main_title', { default: 'Layers in the Peace Machine' })} | {$_('main_subtitle', {
+			default: 'The Layer of Sharing'
+		})} | Oulu 2026</title
+	>
+	<meta
+		name="description"
+		content={$_('main_description', {
+			default:
+				"The Peace Machine is built together, layer by layer – from each person's stories, perspectives, and the shared will to create peace. Share your own personal memory and you will be part of the Peace Machine. You can also explore memories shared by others."
+		})}
+	/>
 	<link rel="canonical" href={pathName} />
 	<meta name="theme-color" content="#000000" />
 	<script type="application/ld+json">
     {
     "@context": "http://schema.org",
     "@type": "WebPage",
-    "name": $_("main_title"),
-    "description": $_("main_description"),
+    "name": $_("main_title", { default: "Layers in the Peace Machine"}),
+    "description": $_("main_description", { default: "The Peace Machine is built together, layer by layer – from each person's stories, perspectives, and the shared will to create peace. Share your own personal memory and you will be part of the Peace Machine. You can also explore memories shared by others."}),
 	}
 	</script>
 
+	<meta property="og:url" content={resolve('/')} />
+	<meta
+		property="og:title"
+		content={$_('main_title', { default: 'Layers in the Peace Machine' })}
+	/>
+	<meta
+		property="og:description"
+		content={$_('main_description', {
+			default:
+				"The Peace Machine is built together, layer by layer – from each person's stories, perspectives, and the shared will to create peace. Share your own personal memory and you will be part of the Peace Machine. You can also explore memories shared by others."
+		})}
+	/>
+	<!-- <meta property="og:image:url" content={resolve('/favicon.ico')} /> -->
 
-<meta property="og:url" content={resolve('/')} />
-<meta property="og:title" content={$_('main_title')} />
-<meta property="og:description" content={$_('main_description')} />
-<!-- <meta property="og:image:url" content={resolve('/favicon.ico')} /> -->
-
-
-	<meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content={$_('main_title')} />
-    <meta name="twitter:description" content={$_('main_description')} />
-    <meta name="twitter:image" content={'/favicon.ico'} />
-    <meta name="twitter:image:alt" content={$_('main_title')} />
+	<meta name="twitter:card" content="summary" />
+	<meta
+		name="twitter:title"
+		content={$_('main_title', { default: 'Layers in the Peace Machine' })}
+	/>
+	<meta
+		name="twitter:description"
+		content={$_('main_description', {
+			default:
+				"The Peace Machine is built together, layer by layer – from each person's stories, perspectives, and the shared will to create peace. Share your own personal memory and you will be part of the Peace Machine. You can also explore memories shared by others."
+		})}
+	/>
+	<meta name="twitter:image" content={'/favicon.ico'} />
+	<meta
+		name="twitter:image:alt"
+		content={$_('main_title', { default: 'Layers in the Peace Machine' })}
+	/>
 </svelte:head>
 
 <div class="app">
@@ -113,17 +148,15 @@ onMount(() => {
 	{#await waitLocale()}
 		<CardLoader />
 	{:then}
+		<!-- Lang Dialog -->
+		<Dialog.Root bind:open={showLang}>
+			<Dialog.Portal>
+				<CardLang closeLangCard={handleToggleLangDialog} bind:translate={translateStories} />
+			</Dialog.Portal>
+		</Dialog.Root>
 
-	 <!-- Lang Dialog -->
-			<Dialog.Root bind:open={showLang}>	
-				<Dialog.Portal>
-						<CardLang closeLangCard={handleToggleLangDialog} bind:translate={translateStories} />
-				</Dialog.Portal>
-			</Dialog.Root>
-		
-		
-			<!-- Header -->
-			<Header toggleLang={handleToggleLangDialog} {showLang} />
+		<!-- Header -->
+		<Header toggleLang={handleToggleLangDialog} {showLang} />
 
 		<!-- Pages -->
 		{#key page.url.pathname}
@@ -144,5 +177,4 @@ onMount(() => {
 		color: white;
 		font-family: 'Roboto', sans-serif;
 	}
-
 </style>

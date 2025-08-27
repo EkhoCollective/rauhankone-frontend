@@ -10,12 +10,10 @@
 	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
 	import Loader from '$lib/components/mini-components/Loader.svelte';
-	import { error } from '@sveltejs/kit';
-	// import CardError from '$lib/components/cards/CardError.svelte';
 	import { blur, fade } from 'svelte/transition';
 	import { getContext } from 'svelte';
 	import { useAudio } from '$lib/composables/useAudio';
-
+	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
 	// Get navigation context from layout
 	const navigationContext = getContext('navigation') as {
 		setSource: (source: 'main' | 'submit') => void;
@@ -75,25 +73,25 @@
 		if (userAgreed === true) {
 			await apiRequest(API_ADD_STORY_OPTIONS())
 				.then((response) => {
-					console.log('Add Story Response:', response);
+					// console.log('Add Story Response:', response);
 
 					// Set navigation context before going to explore
 					navigationContext.setSource('submit');
 
 					// Check multiple possible field names for the story ID
 					let storyId = response.story_id || response.id || response.storyId || response.story?.id;
-					console.log('Extracted story ID:', storyId);
+					// console.log('Extracted story ID:', storyId);
 
 					if (storyId) {
 						navigationContext.setSubmittedStoryId(storyId);
 					} else {
-						console.warn('No story ID found in response:', response);
+						// console.warn('No story ID found in response:', response);
 					}
 
 					goto(`${base}/explore`);
 				})
 				.catch((err) => {
-					throw error(500, 'Failed to add story');
+					customErrorHandler($_('error_description_general'), 500);
 				});
 		}
 	}
@@ -105,7 +103,7 @@
 			suggestionState = 'ok';
 		} catch (err) {
 			// console.error('Failed to get suggestions:', err);
-			throw error(500, 'Failed to get suggestions');
+			customErrorHandler($_('error_description_general'), 500);
 		}
 	}
 
@@ -118,15 +116,14 @@
 			.catch((err) => {
 				// console.log('Error getting questions', error);
 				// raiseError = true;
-				throw error(500, 'Failed to get questions');
+				customErrorHandler($_('error_description_general'), 500);
 			});
 	}
 
 	function handleGetQuestionContainer() {
 		// const questionsData = getQuestionsData();
 		if (!getQuestionsData) {
-			throw error(500, 'Failed to get questions');
-			return;
+			customErrorHandler($_('error_description_general'), 500);
 		}
 		const randomGroupIndex = Math.floor(Math.random() * getQuestionsData.questions.length);
 		questionContainer = getQuestionsData.questions[randomGroupIndex];
@@ -145,8 +142,7 @@
 		}
 
 		if (!filteredQuestion) {
-			throw error(500, 'Failed to get question container');
-			return;
+			customErrorHandler($_('error_description_general'), 500);
 		}
 		question = filteredQuestion.text;
 		questionOriginalId = filteredQuestion.original_id;
@@ -278,8 +274,9 @@
 				out:blur={{ delay: suggestionFadeTimer, duration: 500 }}
 				class="suggestions-bubble bubble"
 			>
-			<p>{$_('submit_please_extend')}</p><br />
-			<p>{suggestion}</p>
+				<p>{$_('submit_please_extend')}</p>
+				<br />
+				<p>{suggestion}</p>
 			</div>
 		{/if}
 		<!-- Show thank you message if user has finished the story -->
@@ -300,8 +297,11 @@
 			<!-- Disclaimer -->
 			<div transition:blur class="disclaimer-container">
 				<!-- Checkmark -->
-					<Checkmark bind:checkValue={userAgreed} translateIdForCheckbox={"submit_disclaimer"} hideLabel={false}/>
-
+				<Checkmark
+					bind:checkValue={userAgreed}
+					translateIdForCheckbox={'submit_disclaimer'}
+					hideLabel={false}
+				/>
 			</div>
 			<!-- Buttons Container -->
 			<div transition:blur class="disclaimer-btn-container">

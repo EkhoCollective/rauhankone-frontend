@@ -4,7 +4,7 @@ import { baseUrl } from "./consts";
 export interface ApiRequestOptions {
   API_ENDPOINT: string;
   API_METHOD: string;
-  REQUEST_BODY?: any;
+  REQUEST_BODY?: Record<string, unknown>;
 }
 
 
