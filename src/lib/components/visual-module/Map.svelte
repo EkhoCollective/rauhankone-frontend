@@ -15,7 +15,12 @@
 
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { EffectComposer } from 'threlte-postprocessing';
-	import { DepthOfFieldEffect, BloomEffect } from 'threlte-postprocessing/effects';
+	import {
+		DepthOfFieldEffect,
+		BloomEffect,
+		NoiseEffect,
+		VignetteEffect
+	} from 'threlte-postprocessing/effects';
 	import { T, useTask } from '@threlte/core';
 	import {
 		interactivity,
@@ -67,6 +72,8 @@
 	let centroid = $state(new THREE.Vector3());
 	let instances: StoryInstance[] = $state([]);
 	let previousSelectedStory: StoryInstance | null = $state(null);
+	let clusterCenters: { x: number; y: number; z: number }[] = $state([]);
+	let clusterCentersStories: { x: number; y: number; z: number }[] = $state([]);
 
 	const clusterSpread: number = 5;
 	const lineThickness: number = 0.025;
@@ -198,11 +205,20 @@
 
 		// Clear existing instances to avoid duplicates
 		instances.length = 0;
+		clusterCenters.length = 0;
+		clusterCentersStories.length = 0;
 
 		for (let i = 0; i < data.clusters.length; i += 1) {
 			const cluster = data.clusters[i];
 			const cluster_audio_id = '';
+			const clusterCenter = data.clusters[i].som;
 
+			// Add cluster center to the array
+			clusterCenters.push({
+				x: clusterCenter[0] * worldScale,
+				y: clusterCenter[1] * worldScale,
+				z: clusterCenter[2] * worldScale
+			});
 			// Filter stories based on isTranslated flag and current language
 			let filteredStories = cluster.stories;
 			if (isTranslated) {
@@ -256,6 +272,21 @@
 					);
 					allStoryPositions.push(storyPos);
 				}
+			}
+
+			// Calculate the center of all stories in this cluster (after offsets)
+			if (allStoryPositions.length > 0) {
+				const storyCenter = new Vector3();
+				allStoryPositions.forEach((pos) => {
+					storyCenter.add(pos);
+				});
+				storyCenter.divideScalar(allStoryPositions.length);
+
+				clusterCentersStories.push({
+					x: storyCenter.x,
+					y: storyCenter.y,
+					z: storyCenter.z
+				});
 			}
 
 			for (let j = 0; j < filteredStories.length; j += 1) {
@@ -636,11 +667,26 @@
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
 
+<!-- Cluster Centers -->
+{#each clusterCenters as center}
+	<T.Mesh position={[center.x, center.y, center.z]}>
+		<T.BoxGeometry />
+		<T.MeshBasicMaterial color="red" />
+	</T.Mesh>
+{/each}
+
+<!-- Story Centers -->
+{#each clusterCentersStories as center}
+	<T.Mesh position={[center.x, center.y, center.z]}>
+		<T.BoxGeometry />
+		<T.MeshBasicMaterial color="green" />
+	</T.Mesh>
+{/each}
+
 <EffectComposer>
 	<DepthOfFieldEffect focusDistance={0} focalLength={0.15} bokehScale={5} height={512} />
 	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.6} height={256} radius={0.65} />
-	<!-- <NoiseEffect opacity={0.02} /> -->
-	<!-- <VignetteEffect eskil={false} offset={0.1} darkness={1.1} /> -->
+	<VignetteEffect eskil={false} offset={0.05} darkness={1.1} />
 
 	<InstancedMeshes {meshes}>
 		{#snippet children({ components: [MeshA, MeshB, MeshC, MeshD] })}

@@ -334,8 +334,6 @@
 	$effect(() => {
 		getOnlyTranslated = translationContext.translateStories;
 	});
-
-	$inspect(response_clusters);
 </script>
 
 <svelte:head>
