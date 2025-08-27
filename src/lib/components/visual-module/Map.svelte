@@ -10,7 +10,8 @@
 		CatmullRomCurve3,
 		BufferGeometry,
 		Vector3,
-		Color
+		Color,
+		Matrix4
 	} from 'three';
 
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
@@ -68,7 +69,7 @@
 	const minSphereScale: number = 2;
 	const minMapScale: number = 0.075;
 	const maxMapScale: number = 1.5;
-	const sphereResolution: number = 16;
+	const sphereResolution: number = 3;
 	const cameraOffset: number = 10;
 	const centroidCameraOffset: number = 40;
 	let centroid = $state(new THREE.Vector3());
@@ -83,6 +84,7 @@
 	const clusterConnectionThickness: number = 10;
 	const clusterConnectionOpacity: number = 0.01;
 	const pointSize: number = 0.05;
+	const maxNumofPointsPerStory = 200;
 	const curviness: number = 0.35;
 	const pointCloudShrink: number = 0.5;
 	const clusterConnectionRadius: number = 35; // Global radius for cluster connections
@@ -109,8 +111,8 @@
 	// Pulse animation variables
 	const pulseFrequencyMin: number = 0.5; // Minimum pulse frequency multiplier
 	const pulseFrequencyMax: number = 0.525; // Maximum pulse frequency multiplier
-	const pulseIntensityMin: number = 0.05; // Minimum pulse intensity (scale change)
-	const pulseIntensityMax: number = 0.075; // Maximum pulse intensity (scale change)
+	const pulseIntensityMin: number = 0.075; // Minimum pulse intensity (scale change)
+	const pulseIntensityMax: number = 0.1; // Maximum pulse intensity (scale change)
 
 	let noise = new SimplexNoise();
 	let time = $state(0);
@@ -170,7 +172,7 @@
 		const minRange = minMapScale;
 		const maxRange = maxMapScale;
 		const minTextLength = 0;
-		const maxTextLength = 1000; // Adjust this based on your typical text lengths
+		const maxTextLength = 500; // Adjust this based on your typical text lengths
 
 		// Clamp the text length to the expected range
 		const clampedLength = Math.max(minTextLength, Math.min(maxTextLength, textLength));
@@ -191,7 +193,7 @@
 		const characters = inputText.split('');
 
 		// Define spherical distribution parameters
-		const minRadius = scale * 0.95; // Minimum distance from story center
+		const minRadius = scale * 0.9; // Minimum distance from story center
 		const maxRadius = scale; // Maximum distance from story center
 
 		// Create an instance for each character with spherical distribution
@@ -326,8 +328,15 @@
 					vz: (Math.random() - 0.5) * 0.1
 				};
 
+				// Cap the story text to 200 characters
+
+				const cappedText =
+					story[0].text.length > maxNumofPointsPerStory
+						? story[0].text.substring(0, maxNumofPointsPerStory) + '...'
+						: story[0].text;
+
 				let text_instances = createTextInstances(
-					story[0].text,
+					cappedText,
 					scale,
 					new Vector3(story_positions.x, story_positions.y, story_positions.z)
 				);
@@ -623,7 +632,7 @@
 			instance.positions.y = instance.originalPositions.y + noiseOffsetY;
 			instance.positions.z = instance.originalPositions.z + noiseOffsetZ;
 
-			// Generate random jiggle for text points
+			// Generate rotation for text points around story center
 			if (instance.text_instances && instance.text_instances.length > 0) {
 				instance.text_instances.forEach((point, pointIndex) => {
 					// Store original positions if not already stored
@@ -631,30 +640,58 @@
 						point.originalPosition = point.clone();
 					}
 
-					// Apply random jiggle to each point
-					const randomOffsetX =
-						noise.noise3d(
-							pointIndex * 100,
-							time * pointJiggleTime * mapTextLengthToRange(instance.text_instances.length),
-							0
-						) * pointJiggleIntensity;
-					const randomOffsetY =
-						noise.noise3d(
-							pointIndex * 100,
-							time * pointJiggleTime * mapTextLengthToRange(instance.text_instances.length),
-							100
-						) * pointJiggleIntensity;
-					const randomOffsetZ =
-						noise.noise3d(
-							pointIndex * 100,
-							time * pointJiggleTime * mapTextLengthToRange(instance.text_instances.length),
-							200
-						) * pointJiggleIntensity;
+					// Store rotation parameters if not already stored
+					if (!point.rotationParams) {
+						// Generate random rotation axis and speed for each point
+						const randomAxis = Math.floor(Math.random() * 3); // 0=x, 1=y, 2=z
+						const randomSpeed = 50 + Math.random() * 500; // Speed between 0.5 and 2.0
+						const randomDirection = Math.random() < 0.5 ? 1 : -1; // Clockwise or counter-clockwise
 
-					// Add both the story's movement and the point's own jiggle
-					point.x = point.originalPosition.x + randomOffsetX + noiseOffsetX;
-					point.y = point.originalPosition.y + randomOffsetY + noiseOffsetY;
-					point.z = point.originalPosition.z + randomOffsetZ + noiseOffsetZ;
+						point.rotationParams = {
+							axis: randomAxis,
+							speed: randomSpeed * randomDirection
+						};
+					}
+
+					// Calculate rotation around the original story center (without jiggle)
+					const originalStoryCenter = new Vector3(
+						instance.originalPositions!.x,
+						instance.originalPositions!.y,
+						instance.originalPositions!.z
+					);
+
+					// Get the vector from original story center to original point position
+					const offsetFromCenter = point.originalPosition.clone().sub(originalStoryCenter);
+
+					// Apply rotation based on the stored parameters
+					const rotationAngle = time * point.rotationParams.speed;
+
+					// Create rotation matrix based on the axis
+					const rotationMatrix = new Matrix4();
+					switch (point.rotationParams.axis) {
+						case 0: // X-axis rotation
+							rotationMatrix.makeRotationX(rotationAngle);
+							break;
+						case 1: // Y-axis rotation
+							rotationMatrix.makeRotationY(rotationAngle);
+							break;
+						case 2: // Z-axis rotation
+							rotationMatrix.makeRotationZ(rotationAngle);
+							break;
+					}
+
+					// Apply rotation to the offset vector
+					const rotatedOffset = offsetFromCenter.clone().applyMatrix4(rotationMatrix);
+
+					// Set the new position as current story center + rotated offset
+					const currentStoryCenter = new Vector3(
+						instance.positions.x,
+						instance.positions.y,
+						instance.positions.z
+					);
+					point.x = currentStoryCenter.x + rotatedOffset.x;
+					point.y = currentStoryCenter.y + rotatedOffset.y;
+					point.z = currentStoryCenter.z + rotatedOffset.z;
 				});
 			}
 
@@ -749,8 +786,16 @@
 	</T.Mesh>
 {/each} -->
 
+<!-- Story Centers -->
+<!-- {#each clusterCentersStories as center}
+	<T.Mesh position={[center.x, center.y, center.z]}>
+		<T.SphereGeometry args={[10, 16, 16]} />
+		<T.MeshBasicMaterial color={clusterConnectionColor} transparent={true} opacity={0.005} />
+	</T.Mesh>
+{/each} -->
+
 <EffectComposer>
-	<DepthOfFieldEffect focusDistance={0} focalLength={0.15} bokehScale={5} height={512} />
+	<DepthOfFieldEffect focusDistance={0} focalLength={0.125} bokehScale={6} height={512} />
 	<BloomEffect
 		luminanceThreshold={0.5}
 		luminanceSmoothing={0.4}
@@ -774,7 +819,7 @@
 	{/each}
 
 	<InstancedMesh>
-		<T.SphereGeometry args={[0.15, sphereResolution, sphereResolution]} />
+		<T.SphereGeometry args={[0.15, sphereResolution, 2]} />
 		<T.MeshBasicMaterial color="white" toneMapped={false} />
 
 		{#each instances as instance}
