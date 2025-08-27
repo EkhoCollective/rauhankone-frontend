@@ -61,7 +61,7 @@
 	const minSphereScale: number = 1;
 	const minMapScale: number = 0.075;
 	const maxMapScale: number = 1.5;
-	const sphereResolution: number = 32;
+	const sphereResolution: number = 16;
 	const cameraOffset: number = 10;
 	const centroidCameraOffset: number = 40;
 	let centroid = $state(new THREE.Vector3());
@@ -75,7 +75,7 @@
 	const pointCloudShrink: number = 0.5;
 
 	// Jiggle movement variables
-	const storyJiggleIntensity: number = 0.05; // How much stories move
+	const storyJiggleIntensity: number = 0.25; // How much stories move
 	const pointJiggleIntensity: number = 0.1; // How much points move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
 	const pointJiggleTime: number = 1000; // Speed of the jiggle animation
@@ -90,13 +90,13 @@
 
 	const meshes = [
 		new Mesh(
-			new SphereGeometry(0.1, sphereResolution, sphereResolution)
-			// new MeshBasicMaterial({
-			// 	color: 'white',
-			// 	toneMapped: false,
-			// 	transparent: true,
-			// 	opacity: 0.001
-			// })
+			new SphereGeometry(1, sphereResolution, sphereResolution),
+			new MeshBasicMaterial({
+				color: 'white',
+				toneMapped: false,
+				transparent: true,
+				opacity: 0.002
+			})
 		) // MeshA - main sphere
 	];
 
@@ -544,9 +544,10 @@
 							200
 						) * pointJiggleIntensity;
 
-					point.x = point.originalPosition.x + randomOffsetX;
-					point.y = point.originalPosition.y + randomOffsetY;
-					point.z = point.originalPosition.z + randomOffsetZ;
+					// Add both the story's movement and the point's own jiggle
+					point.x = point.originalPosition.x + randomOffsetX + noiseOffsetX;
+					point.y = point.originalPosition.y + randomOffsetY + noiseOffsetY;
+					point.z = point.originalPosition.z + randomOffsetZ + noiseOffsetZ;
 				});
 			}
 
@@ -626,8 +627,8 @@
 </T.Mesh> -->
 
 <EffectComposer>
-	<DepthOfFieldEffect focusDistance={0} focalLength={0.1} bokehScale={5} height={480} />
-	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.9} height={128} radius={0.75} />
+	<DepthOfFieldEffect focusDistance={0} focalLength={0.15} bokehScale={5} height={512} />
+	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.6} height={256} radius={0.75} />
 	<!-- <NoiseEffect opacity={0.02} /> -->
 	<!-- <VignetteEffect eskil={false} offset={0.1} darkness={1.1} /> -->
 
