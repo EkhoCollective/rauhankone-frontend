@@ -73,19 +73,19 @@
 		if (userAgreed === true) {
 			await apiRequest(API_ADD_STORY_OPTIONS())
 				.then((response) => {
-					console.log('Add Story Response:', response);
+					// console.log('Add Story Response:', response);
 
 					// Set navigation context before going to explore
 					navigationContext.setSource('submit');
 
 					// Check multiple possible field names for the story ID
 					let storyId = response.story_id || response.id || response.storyId || response.story?.id;
-					console.log('Extracted story ID:', storyId);
+					// console.log('Extracted story ID:', storyId);
 
 					if (storyId) {
 						navigationContext.setSubmittedStoryId(storyId);
 					} else {
-						console.warn('No story ID found in response:', response);
+						// console.warn('No story ID found in response:', response);
 					}
 
 					goto(`${base}/explore`);
@@ -104,7 +104,6 @@
 		} catch (err) {
 			// console.error('Failed to get suggestions:', err);
 			customErrorHandler($_('error_description_general'), 500);
-			
 		}
 	}
 
@@ -275,8 +274,9 @@
 				out:blur={{ delay: suggestionFadeTimer, duration: 500 }}
 				class="suggestions-bubble bubble"
 			>
-			<p>{$_('submit_please_extend')}</p><br />
-			<p>{suggestion}</p>
+				<p>{$_('submit_please_extend')}</p>
+				<br />
+				<p>{suggestion}</p>
 			</div>
 		{/if}
 		<!-- Show thank you message if user has finished the story -->
@@ -297,8 +297,11 @@
 			<!-- Disclaimer -->
 			<div transition:blur class="disclaimer-container">
 				<!-- Checkmark -->
-					<Checkmark bind:checkValue={userAgreed} translateIdForCheckbox={"submit_disclaimer"} hideLabel={false}/>
-
+				<Checkmark
+					bind:checkValue={userAgreed}
+					translateIdForCheckbox={'submit_disclaimer'}
+					hideLabel={false}
+				/>
 			</div>
 			<!-- Buttons Container -->
 			<div transition:blur class="disclaimer-btn-container">

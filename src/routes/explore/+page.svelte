@@ -96,7 +96,7 @@
 		await apiRequest(API_CLUSTERS_OPTIONS())
 			.then((response) => {
 				response_clusters = response;
-				console.log('Fetched clusters:', response_clusters);
+				// console.log('Fetched clusters:', response_clusters);
 				// console.log('Navigation data at fetch time:', navigationData);
 				// responsefromDB = true;
 			})

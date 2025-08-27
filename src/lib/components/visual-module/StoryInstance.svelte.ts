@@ -20,6 +20,12 @@ export default class {
   // Track if this sphere is currently selected
   selected = $state(false)
   
+  // Make curve reactive for time-based animation
+  curve: any = $state([])
+  
+  // Store curve metadata for animation
+  curveMetadata: any[] = []
+  
   // Store references to closest and furthest stories
   closestStory: any = null
   furthestStory: any = null
@@ -78,7 +84,7 @@ export default class {
     public story: any[], 
     public story_text_length: number,
     public text_instances: any[],
-    public curve: any,
+    curve: any,
     positions: {x: number, y: number, z: number},
     velocities: {vx: number, vy: number, vz: number},
     // cluster_initial_position: {cx: number, cy: number, cz: number},

@@ -76,10 +76,14 @@
 
 	// Jiggle movement variables
 	const storyJiggleIntensity: number = 0.05; // How much stories move
-	const pointJiggleIntensity: number = 0.2; // How much points move
+	const pointJiggleIntensity: number = 0.1; // How much points move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
 	const pointJiggleTime: number = 1000; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
+
+	// Curve animation variables
+	const curveSpeed: number = 200; // Speed of curve animation
+	const curveNoiseIntensity: number = 0.05; // Intensity of noise variation
 
 	let noise = new SimplexNoise();
 	let time = $state(0);
@@ -160,7 +164,7 @@
 		const characters = inputText.split('');
 
 		// Define spherical distribution parameters
-		const minRadius = scale * 0.85; // Minimum distance from story center
+		const minRadius = scale * 0.95; // Minimum distance from story center
 		const maxRadius = scale; // Maximum distance from story center
 
 		// Create an instance for each character with spherical distribution
@@ -286,7 +290,7 @@
 						story_positions.z
 					);
 
-					// Create a separate curve for each pair (current story to each other story)
+					// Create a separate curve for each pair (current story to each other story in the same cluster)
 					for (let k = 0; k < allStoryPositions.length; k += 1) {
 						if (k !== j) {
 							// Skip the current story's position
@@ -296,7 +300,7 @@
 
 							// Calculate distance between the two points
 							const distance = startPos.distanceTo(endPos);
-							const offsetAmount = distance * curviness; // 25% of the distance
+							const offsetAmount = distance * curviness; // Initial curviness
 
 							// Create midpoint at 50% between the two points
 							const midPoint = startPos.clone().lerp(endPos, 0.5);
@@ -327,21 +331,50 @@
 					}
 				}
 
-				instances.push(
-					new StoryInstance(
-						initialColor,
-						selectedColor,
-						scale,
-						cluster_id,
-						cluster_audio_id,
-						storyObject,
-						text_length,
-						text_instances,
-						storyPairCurves, // Pass the array of pair curves
-						story_positions,
-						story_velocities
-					)
+				// Create the instance first
+				const newInstance = new StoryInstance(
+					initialColor,
+					selectedColor,
+					scale,
+					cluster_id,
+					cluster_audio_id,
+					storyObject,
+					text_length,
+					text_instances,
+					storyPairCurves, // Pass the array of pair curves
+					story_positions,
+					story_velocities
 				);
+
+				// Store curve metadata for animation
+				newInstance.curveMetadata = [];
+				if (allStoryPositions.length > 1) {
+					const currentStoryPos = new Vector3(
+						story_positions.x,
+						story_positions.y,
+						story_positions.z
+					);
+
+					for (let k = 0; k < allStoryPositions.length; k += 1) {
+						if (k !== j) {
+							const startPos = currentStoryPos;
+							const endPos = allStoryPositions[k];
+							const distance = startPos.distanceTo(endPos);
+							const randomAxis = Math.floor(Math.random() * 3);
+							const randomDirection = Math.random() < 0.5 ? -1 : 1;
+
+							newInstance.curveMetadata.push({
+								startPos: startPos,
+								endPos: endPos,
+								randomAxis: randomAxis,
+								direction: randomDirection,
+								distance: distance
+							});
+						}
+					}
+				}
+
+				instances.push(newInstance);
 			}
 		}
 		centroid = calculateCentroid();
@@ -455,7 +488,7 @@
 	navigateToStoryProp = navigateToStory;
 	findStoryInstanceByStoryIdProp = findStoryInstanceByStoryId;
 
-	// Animation loop for jiggle movement
+	// Animation loop for jiggle movement and curve animation
 	useTask((delta) => {
 		time += delta * jiggleSpeed;
 
@@ -516,6 +549,58 @@
 					point.z = point.originalPosition.z + randomOffsetZ;
 				});
 			}
+
+			// Update curves with time-based curviness
+			if (instance.curveMetadata && instance.curveMetadata.length > 0) {
+				let storyPairCurves: Vector3[][] = [];
+
+				// Update each curve using stored metadata
+				instance.curveMetadata.forEach((metadata, curveIndex) => {
+					const startPos = new Vector3(
+						instance.positions.x,
+						instance.positions.y,
+						instance.positions.z
+					);
+					const endPos = metadata.endPos;
+
+					// Calculate distance between the two points
+					const distance = startPos.distanceTo(endPos);
+
+					// Time-based curviness with sine function and noise
+					const baseCurviness = curviness;
+					const timeCurviness = Math.sin(time * curveSpeed + index * 100) * baseCurviness;
+					const noiseCurviness =
+						noise.noise3d(index * 50, curveIndex * 50, time * curveSpeed) * curveNoiseIntensity;
+					const dynamicCurviness = timeCurviness + noiseCurviness;
+
+					const offsetAmount = distance * dynamicCurviness;
+
+					// Create midpoint at 50% between the two points
+					const midPoint = startPos.clone().lerp(endPos, 0.5);
+
+					// Apply offset to the stored axis and direction
+					switch (metadata.randomAxis) {
+						case 0:
+							midPoint.x += offsetAmount * metadata.direction;
+							break;
+						case 1:
+							midPoint.y += offsetAmount * metadata.direction;
+							break;
+						case 2:
+							midPoint.z += offsetAmount * metadata.direction;
+							break;
+					}
+
+					// Create curve with the updated midpoint
+					const pairPositions = [startPos, midPoint, endPos];
+					const pairCurve = new CatmullRomCurve3(pairPositions);
+					const pairPoints = pairCurve.getPoints(100);
+					storyPairCurves.push(pairPoints);
+				});
+
+				// Update the instance's curves
+				instance.curve = storyPairCurves;
+			}
 		});
 	});
 
@@ -541,8 +626,8 @@
 </T.Mesh> -->
 
 <EffectComposer>
-	<DepthOfFieldEffect focusDistance={0} focalLength={0.15} bokehScale={10} height={480} />
-	<BloomEffect luminanceThreshold={0} luminanceSmoothing={0.9} height={128} radius={0.75} />
+	<DepthOfFieldEffect focusDistance={0} focalLength={0.1} bokehScale={5} height={480} />
+	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.9} height={128} radius={0.75} />
 	<!-- <NoiseEffect opacity={0.02} /> -->
 	<!-- <VignetteEffect eskil={false} offset={0.1} darkness={1.1} /> -->
 
