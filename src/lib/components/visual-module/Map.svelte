@@ -81,6 +81,7 @@
 	const pointSize: number = 0.05;
 	const curviness: number = 0.35;
 	const pointCloudShrink: number = 0.5;
+	const clusterConnectionRadius: number = 35; // Global radius for cluster connections
 
 	// Jiggle movement variables
 	const storyJiggleIntensity: number = 0.02; // How much stories move
@@ -417,7 +418,7 @@
 			}
 		}
 
-		// Create connection lines between all story centers (green cubes)
+		// Create connection lines between story centers (green cubes) within radius
 		for (let i = 0; i < clusterCentersStories.length; i += 1) {
 			for (let j = i + 1; j < clusterCentersStories.length; j += 1) {
 				const startPos = new Vector3(
@@ -433,33 +434,37 @@
 
 				// Calculate distance between the two cluster centers
 				const distance = startPos.distanceTo(endPos);
-				const offsetAmount = 0;
 
-				// Create midpoint at 50% between the two points
-				const midPoint = startPos.clone().lerp(endPos, 0.5);
+				// Only create connection if clusters are within the specified radius
+				if (distance <= clusterConnectionRadius) {
+					const offsetAmount = 0;
 
-				// Randomly choose x, y, or z axis for offset and direction (up/down)
-				const randomAxis = Math.floor(Math.random() * 3);
-				const randomDirection = Math.random() < 0.5 ? -1 : 1;
+					// Create midpoint at 50% between the two points
+					const midPoint = startPos.clone().lerp(endPos, 0.5);
 
-				// Apply offset to the chosen axis
-				switch (randomAxis) {
-					case 0:
-						midPoint.x += offsetAmount * randomDirection;
-						break;
-					case 1:
-						midPoint.y += offsetAmount * randomDirection;
-						break;
-					case 2:
-						midPoint.z += offsetAmount * randomDirection;
-						break;
+					// Randomly choose x, y, or z axis for offset and direction (up/down)
+					const randomAxis = Math.floor(Math.random() * 3);
+					const randomDirection = Math.random() < 0.5 ? -1 : 1;
+
+					// Apply offset to the chosen axis
+					switch (randomAxis) {
+						case 0:
+							midPoint.x += offsetAmount * randomDirection;
+							break;
+						case 1:
+							midPoint.y += offsetAmount * randomDirection;
+							break;
+						case 2:
+							midPoint.z += offsetAmount * randomDirection;
+							break;
+					}
+
+					// Create curve with the offset midpoint
+					const pairPositions = [startPos, midPoint, endPos];
+					const pairCurve = new CatmullRomCurve3(pairPositions);
+					const pairPoints = pairCurve.getPoints(100);
+					clusterConnectionLines.push(pairPoints);
 				}
-
-				// Create curve with the offset midpoint
-				const pairPositions = [startPos, midPoint, endPos];
-				const pairCurve = new CatmullRomCurve3(pairPositions);
-				const pairPoints = pairCurve.getPoints(100);
-				clusterConnectionLines.push(pairPoints);
 			}
 		}
 
