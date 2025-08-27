@@ -20,6 +20,16 @@ export default class {
   // Track if this sphere is currently selected
   selected = $state(false)
   
+  // Pulsing state and animation
+  isPulsing = $state(false)
+  pulseTime = $state(0)
+  pulseTween = new Tween(0, { easing: cubicOut, duration: 1000 })
+  
+  // Pulse configuration - unique for each story
+  pulseFrequency = $state(1.0) // Base frequency multiplier
+  pulseIntensity = $state(0.2) // Base intensity (0.2 = ±20% scale change)
+  pulsePhase = $state(0) // Unique phase offset for each story
+  
   // Make curve reactive for time-based animation
   curve: any = $state([])
   
@@ -31,8 +41,36 @@ export default class {
   furthestStory: any = null
   
   get scale() {
-    return this.tw.current/5 + this.scale_init
+    // Add pulsing effect to scale when pulsing
+    const pulseScale = this.isPulsing ? 1 + Math.sin(this.pulseTime * Math.PI * 2 + this.pulsePhase) * this.pulseIntensity : 1
+    return (this.tw.current/5 + this.scale_init) * pulseScale
     // fix this. put a minimum max size for every single point
+  }
+  
+  // Start pulsing animation
+  startPulsing(): void {
+    this.isPulsing = true
+    this.pulseTime = 0
+  }
+  
+  // Stop pulsing animation
+  stopPulsing(): void {
+    this.isPulsing = false
+    this.pulseTime = 0
+  }
+  
+  // Update pulse time (called in animation loop)
+  updatePulse(delta: number): void {
+    if (this.isPulsing) {
+      this.pulseTime += delta * 2 * this.pulseFrequency // Speed of pulse oscillation with frequency multiplier
+    }
+  }
+  
+  // Configure pulse parameters
+  configurePulse(frequency: number = 1.0, intensity: number = 0.2, phase: number = 0): void {
+    this.pulseFrequency = frequency
+    this.pulseIntensity = intensity
+    this.pulsePhase = phase
   }
   
   // Calculate distance to another story instance
@@ -75,6 +113,7 @@ export default class {
     this.closestStory = closest
     this.furthestStory = furthest
   }
+  
   constructor(
     initialColor: Color,
     selectedColor: Color,

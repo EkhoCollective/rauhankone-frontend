@@ -75,15 +75,21 @@
 	const pointCloudShrink: number = 0.5;
 
 	// Jiggle movement variables
-	const storyJiggleIntensity: number = 0.25; // How much stories move
+	const storyJiggleIntensity: number = 0.025; // How much stories move
 	const pointJiggleIntensity: number = 0.1; // How much points move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
 	const pointJiggleTime: number = 1000; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
 
 	// Curve animation variables
-	const curveSpeed: number = 200; // Speed of curve animation
+	const curveSpeed: number = 100; // Speed of curve animation
 	const curveNoiseIntensity: number = 0.05; // Intensity of noise variation
+
+	// Pulse animation variables
+	const pulseFrequencyMin: number = 1; // Minimum pulse frequency multiplier
+	const pulseFrequencyMax: number = 1.075; // Maximum pulse frequency multiplier
+	const pulseIntensityMin: number = 0.025; // Minimum pulse intensity (scale change)
+	const pulseIntensityMax: number = 0.035; // Maximum pulse intensity (scale change)
 
 	let noise = new SimplexNoise();
 	let time = $state(0);
@@ -461,6 +467,7 @@
 				previousSelectedStory.selected = true;
 				previousSelectedStory.tw.set(1);
 			}
+			// Note: Pulsing remains active even after modal closes
 		}
 	});
 
@@ -494,6 +501,9 @@
 
 		// Update story positions with SimplexNoise jiggle
 		instances.forEach((instance, index) => {
+			// Update pulse animation
+			instance.updatePulse(delta);
+
 			// Use different noise seeds for each instance and axis
 			const noiseOffsetX =
 				noise.noise3d(index * 100, time * storyJiggleTime, 0) * storyJiggleIntensity;
@@ -628,7 +638,7 @@
 
 <EffectComposer>
 	<DepthOfFieldEffect focusDistance={0} focalLength={0.15} bokehScale={5} height={512} />
-	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.6} height={256} radius={0.75} />
+	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.6} height={256} radius={0.85} />
 	<!-- <NoiseEffect opacity={0.02} /> -->
 	<!-- <VignetteEffect eskil={false} offset={0.1} darkness={1.1} /> -->
 
@@ -646,6 +656,11 @@
 							previousSelectedStory = selectedStory;
 						}
 
+						// Stop pulsing for all instances first
+						instances.forEach((inst) => {
+							inst.stopPulsing();
+						});
+
 						// Reset all other instances' selected state (including previous story)
 						instances.forEach((inst) => {
 							inst.selected = false;
@@ -655,6 +670,21 @@
 						// Set this instance as selected and keep it highlighted
 						instance.selected = true;
 						instance.tw.set(1);
+
+						// Start pulsing for all stories in the same cluster with unique parameters
+						instances.forEach((inst, index) => {
+							if (inst.cluster_id === instance.cluster_id && inst !== instance) {
+								// Configure unique pulse parameters for each story using global ranges
+								const frequency =
+									pulseFrequencyMin + Math.random() * (pulseFrequencyMax - pulseFrequencyMin);
+								const intensity =
+									pulseIntensityMin + Math.random() * (pulseIntensityMax - pulseIntensityMin);
+								const phase = Math.random() * Math.PI * 2; // 0 to 2π
+
+								inst.configurePulse(frequency, intensity, phase);
+								inst.startPulsing();
+							}
+						});
 
 						// Calculate nearest and furthest stories for this instance
 						instance.calculateNearestAndFurthest(instances);
