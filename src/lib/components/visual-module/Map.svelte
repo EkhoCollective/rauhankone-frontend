@@ -62,7 +62,7 @@
 	} = $props();
 
 	// State
-	const worldScale: number = 20;
+	const worldScale: number = 25;
 	const minSphereScale: number = 1;
 	const minMapScale: number = 0.075;
 	const maxMapScale: number = 1.5;
@@ -78,10 +78,14 @@
 
 	const clusterSpread: number = 5;
 	const lineThickness: number = 0.025;
+	const clusterConnectionThickness: number = 10;
+	const clusterConnectionOpacity: number = 0.002;
 	const pointSize: number = 0.05;
 	const curviness: number = 0.35;
 	const pointCloudShrink: number = 0.5;
 	const clusterConnectionRadius: number = 35; // Global radius for cluster connections
+	const pointsPerStoryConnection: number = 100;
+	const pointsPerClusterConnection: number = 400;
 
 	// Jiggle movement variables
 	const storyJiggleIntensity: number = 0.02; // How much stories move
@@ -90,15 +94,21 @@
 	const pointJiggleTime: number = 1000; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
 
+	// Colours
+	const clusterConnectionColor: string = '#1457ff';
+	const storyConnectionColor: string = 'white';
+	const storyColorOuter: string = 'white';
+	const storyColorInner: string = 'white';
+
 	// Curve animation variables
 	const curveSpeed: number = 80; // Speed of curve animation
 	const curveNoiseIntensity: number = 0.05; // Intensity of noise variation
 
 	// Pulse animation variables
 	const pulseFrequencyMin: number = 0.5; // Minimum pulse frequency multiplier
-	const pulseFrequencyMax: number = 0.575; // Maximum pulse frequency multiplier
-	const pulseIntensityMin: number = 0.025; // Minimum pulse intensity (scale change)
-	const pulseIntensityMax: number = 0.035; // Maximum pulse intensity (scale change)
+	const pulseFrequencyMax: number = 0.525; // Maximum pulse frequency multiplier
+	const pulseIntensityMin: number = 0.05; // Minimum pulse intensity (scale change)
+	const pulseIntensityMax: number = 0.075; // Maximum pulse intensity (scale change)
 
 	let noise = new SimplexNoise();
 	let time = $state(0);
@@ -107,10 +117,10 @@
 		new Mesh(
 			new SphereGeometry(1, sphereResolution, sphereResolution),
 			new MeshBasicMaterial({
-				color: 'white',
+				color: storyColorOuter,
 				toneMapped: false,
 				transparent: true,
-				opacity: 0.002
+				opacity: 0.0015
 			})
 		) // MeshA - main sphere
 	];
@@ -365,7 +375,7 @@
 							// Create curve with the offset midpoint
 							const pairPositions = [startPos, midPoint, endPos];
 							const pairCurve = new CatmullRomCurve3(pairPositions);
-							const pairPoints = pairCurve.getPoints(100);
+							const pairPoints = pairCurve.getPoints(pointsPerStoryConnection);
 							storyPairCurves.push(pairPoints);
 						}
 					}
@@ -437,7 +447,7 @@
 
 				// Only create connection if clusters are within the specified radius
 				if (distance <= clusterConnectionRadius) {
-					const offsetAmount = 0;
+					const offsetAmount = distance * curviness;
 
 					// Create midpoint at 50% between the two points
 					const midPoint = startPos.clone().lerp(endPos, 0.5);
@@ -462,7 +472,7 @@
 					// Create curve with the offset midpoint
 					const pairPositions = [startPos, midPoint, endPos];
 					const pairCurve = new CatmullRomCurve3(pairPositions);
-					const pairPoints = pairCurve.getPoints(100);
+					const pairPoints = pairCurve.getPoints(pointsPerClusterConnection);
 					clusterConnectionLines.push(pairPoints);
 				}
 			}
@@ -730,25 +740,30 @@
 {/each} -->
 
 <!-- Story Centers -->
-{#each clusterCentersStories as center}
+<!-- {#each clusterCentersStories as center}
 	<T.Mesh position={[center.x, center.y, center.z]}>
 		<T.BoxGeometry />
 		<T.MeshBasicMaterial color="green" />
 	</T.Mesh>
-{/each}
-
-<!-- Cluster Connection Lines -->
-{#each clusterConnectionLines as linePoints}
-	<T.Mesh>
-		<MeshLineGeometry points={linePoints} />
-		<MeshLineMaterial color="red" width={lineThickness} />
-	</T.Mesh>
-{/each}
+{/each} -->
 
 <EffectComposer>
 	<DepthOfFieldEffect focusDistance={0} focalLength={0.15} bokehScale={5} height={512} />
 	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.6} height={256} radius={0.65} />
 	<VignetteEffect eskil={false} offset={0.05} darkness={1.1} />
+
+	<!-- Cluster Connection Lines -->
+	{#each clusterConnectionLines as linePoints}
+		<T.Mesh>
+			<MeshLineGeometry points={linePoints} />
+			<MeshLineMaterial
+				color={clusterConnectionColor}
+				width={clusterConnectionThickness}
+				opacity={clusterConnectionOpacity}
+				transparent={true}
+			/>
+		</T.Mesh>
+	{/each}
 
 	<InstancedMeshes {meshes}>
 		{#snippet children({ components: [MeshA, MeshB, MeshC, MeshD] })}
@@ -836,7 +851,7 @@
 					<!-- <T.SphereGeometry /> -->
 					<T.Mesh>
 						<T.SphereGeometry args={[instance.scale * 0.375]} />
-						<FakeGlowMaterial glowColor="white" toneMapped={false} opacity={0.5} />
+						<FakeGlowMaterial glowColor={storyColorInner} toneMapped={false} opacity={0.5} />
 					</T.Mesh>
 				</MeshA>
 
@@ -845,7 +860,7 @@
 					{#each instance.curve as pairCurvePoints}
 						<T.Mesh>
 							<MeshLineGeometry points={pairCurvePoints} />
-							<MeshLineMaterial color="white" width={lineThickness} />
+							<MeshLineMaterial color={storyConnectionColor} width={lineThickness} />
 						</T.Mesh>
 					{/each}
 				{/if}

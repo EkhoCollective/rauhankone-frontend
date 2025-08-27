@@ -63,7 +63,7 @@
 	const camZoomMobile = 5;
 
 	const minDimensionalValue: number = 2;
-	const maxDimensionalValue: number = 15;
+	const maxDimensionalValue: number = 25;
 
 	// Mobile detection state - determined once on mount
 	let isMobileDevice = $state(false);
