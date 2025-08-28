@@ -35,7 +35,8 @@
 		PerfMonitor,
 		FakeGlowMaterial,
 		MeshLineGeometry,
-		MeshLineMaterial
+		MeshLineMaterial,
+		Text3DGeometry
 	} from '@threlte/extras';
 	import { useAudio } from '$lib/composables/useAudio';
 
@@ -84,7 +85,7 @@
 	const clusterSpread: number = 5;
 	const lineThickness: number = 0.025;
 	const clusterConnectionThickness: number = 10;
-	const clusterConnectionOpacity: number = 0.01;
+	const clusterConnectionOpacity: number = 0.0075;
 	const pointSize: number = 0.05;
 	const maxNumofPointsPerStory = 200;
 	const curviness: number = 0.35;
@@ -204,7 +205,7 @@
 		const characters = inputText.split('');
 
 		// Define spherical distribution parameters
-		const minRadius = scale * 0.9; // Minimum distance from story center
+		const minRadius = scale * 0.35; // Minimum distance from story center
 		const maxRadius = scale; // Maximum distance from story center
 
 		// Create an instance for each character with spherical distribution
