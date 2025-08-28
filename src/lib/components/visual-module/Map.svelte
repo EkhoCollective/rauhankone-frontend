@@ -3,24 +3,12 @@
 	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import * as THREE from 'three';
-	import {
-		Mesh,
-		SphereGeometry,
-		MeshBasicMaterial,
-		CatmullRomCurve3,
-		BufferGeometry,
-		Vector3,
-		Vector2,
-		Color,
-		Matrix4
-	} from 'three';
-
+	import { CatmullRomCurve3, Vector3, Vector2, Color } from 'three';
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { EffectComposer } from 'threlte-postprocessing';
 	import {
 		DepthOfFieldEffect,
 		BloomEffect,
-		NoiseEffect,
 		VignetteEffect,
 		ChromaticAberrationEffect
 	} from 'threlte-postprocessing/effects';
@@ -30,16 +18,13 @@
 		interactivity,
 		Instance,
 		InstancedMesh,
-		InstancedMeshes,
 		CameraControls,
 		type CameraControlsRef,
 		PerfMonitor,
-		FakeGlowMaterial,
 		MeshLineGeometry,
 		MeshLineMaterial,
 		Text3DGeometry
 	} from '@threlte/extras';
-	import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
 	import { useAudio } from '$lib/composables/useAudio';
 
 	const { playBlip, playClusterSound } = useAudio();
@@ -88,27 +73,21 @@
 	const lineThickness: number = 0.025;
 	const clusterConnectionThickness: number = 10;
 	const clusterConnectionOpacity: number = 0.0075;
-	// const pointSize: number = 0.05;
 	const maxNumofPointsPerStory = 100;
 	const curviness: number = 0.35;
 	const clusterCurviness: number = 0.25;
-	// const pointCloudShrink: number = 0.5;
 	const clusterConnectionRadius: number = 50; // Global radius for cluster connections
 	const pointsPerStoryConnection: number = 100;
 	const pointsPerClusterConnection: number = 400;
 
 	// Jiggle movement variables
 	const storyJiggleIntensity: number = 0.02; // How much stories move
-	// const pointJiggleIntensity: number = 0.1; // How much points move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
-	// const pointJiggleTime: number = 1000; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
 
 	// Colours
 	const clusterConnectionColor: string = '#1457ff';
 	const storyConnectionColor: string = 'white';
-	// const storyColorOuter: string = 'white';
-	// const storyColorInner: string = 'white';
 
 	// Curve animation variables
 	const curveSpeed: number = 80; // Speed of curve animation
@@ -120,28 +99,10 @@
 	const pulseIntensityMin: number = 0.075; // Minimum pulse intensity (scale change)
 	const pulseIntensityMax: number = 0.1; // Maximum pulse intensity (scale change)
 
-	// Pulsing sphere effect variables
-	// let spherePulseFrequency = $state(1.0); // Speed of sphere pulse
-	// let spherePulseIntensity = $state(0.8); // How much the sphere grows (0.8 = 80% growth)
-	// let sphereBaseSize = $state(0.5); // Base size of the sphere
-	// let sphereMaxSize = $state(3.0); // Maximum size the sphere can grow to
-	// let sphereBaseOpacity = $state(0.4); // Base opacity of the sphere
-
+	// Time variables
 	let noise = new SimplexNoise();
 	let time = $state(0);
 	let sphereTime = $state(0); // Separate time for sphere animation
-
-	// const meshes = [
-	// 	new Mesh(
-	// 		new SphereGeometry(1, sphereResolution, sphereResolution),
-	// 		new MeshBasicMaterial({
-	// 			color: storyColorOuter,
-	// 			toneMapped: false,
-	// 			transparent: true,
-	// 			opacity: 0
-	// 		})
-	// 	) // MeshA - main sphere
-	// ];
 
 	// Interactivity
 	interactivity({
@@ -150,35 +111,6 @@
 			return items.slice(0, 1);
 		}
 	});
-	// Simple optimization: reuse BufferGeometry instead of creating new ones
-	// const geometryCache = new Map<string, BufferGeometry>();
-
-	// Function to get or create geometry for points
-	// function getPointGeometry(instance: StoryInstance): BufferGeometry {
-	// 	// Calculate scaled points
-	// 	const scaledPoints = instance.text_instances.map((point) => {
-	// 		// Calculate direction vector from sphere center to point
-	// 		const direction = point
-	// 			.clone()
-	// 			.sub(new Vector3(instance.positions.x, instance.positions.y, instance.positions.z));
-	// 		// Scale the direction vector based on tween value and add back to center
-	// 		// const scaleFactor = 1 - instance.tw.current * pointCloudShrink; // Scale from 0.5 to 1.0
-	// 		return new Vector3(instance.positions.x, instance.positions.y, instance.positions.z).add(
-	// 			direction.multiplyScalar(1)
-	// 		);
-	// 	});
-
-	// 	const cacheKey = `${instance.cluster_id}_${instance.positions.x}_${instance.positions.y}_${instance.positions.z}`;
-	// 	let geometry = geometryCache.get(cacheKey);
-
-	// 	if (!geometry) {
-	// 		geometry = new BufferGeometry();
-	// 		geometryCache.set(cacheKey, geometry);
-	// 	}
-
-	// 	geometry.setFromPoints(scaledPoints);
-	// 	return geometry;
-	// }
 
 	// Function to map text length to a range from 1 to 5
 	function mapTextLengthToRange(textLength: number): number {
@@ -230,27 +162,6 @@
 
 		return textInstances;
 	}
-
-	// // Sphere pulse control functions
-	// function setSpherePulseFrequency(frequency: number): void {
-	// 	spherePulseFrequency = Math.max(0.1, Math.min(5.0, frequency));
-	// }
-
-	// function setSpherePulseIntensity(intensity: number): void {
-	// 	spherePulseIntensity = Math.max(0.1, Math.min(2.0, intensity));
-	// }
-
-	// function setSphereBaseSize(size: number): void {
-	// 	sphereBaseSize = Math.max(0.1, Math.min(5.0, size));
-	// }
-
-	// function setSphereMaxSize(size: number): void {
-	// 	sphereMaxSize = Math.max(sphereBaseSize + 0.5, Math.min(10.0, size));
-	// }
-
-	// function setSphereBaseOpacity(opacity: number): void {
-	// 	sphereBaseOpacity = Math.max(0.0, Math.min(1.0, opacity));
-	// }
 
 	function populateFromData() {
 		if (!data || !data.clusters) return;
@@ -527,7 +438,6 @@
 
 		centroid = calculateCentroid();
 		lookAtCentroid();
-		// console.log(instances);
 	}
 
 	// Calculate centroid
@@ -669,82 +579,6 @@
 			instance.positions.y = instance.originalPositions.y + noiseOffsetY;
 			instance.positions.z = instance.originalPositions.z + noiseOffsetZ;
 
-			// Generate rotation for text points around story center
-			// if (instance.text_instances && instance.text_instances.length > 0) {
-			// 	instance.text_instances.forEach((point, pointIndex) => {
-			// 		// Store original positions if not already stored
-			// 		if (!point.originalPosition) {
-			// 			point.originalPosition = point.position.clone();
-			// 		}
-
-			// 		// Store rotation parameters if not already stored
-			// 		if (!point.rotationParams) {
-			// 			// Generate random rotation axis and speed for each point
-			// 			const randomAxis = Math.floor(Math.random() * 3); // 0=x, 1=y, 2=z
-			// 			const randomSpeed = 50 + Math.random() * 500; // Speed between 0.5 and 2.0
-			// 			const randomDirection = Math.random() < 0.5 ? 1 : -1; // Clockwise or counter-clockwise
-
-			// 			point.rotationParams = {
-			// 				axis: randomAxis,
-			// 				speed: randomSpeed * randomDirection
-			// 			};
-			// 		}
-
-			// 		// Calculate rotation around the original story center (without jiggle)
-			// 		const originalStoryCenter = new Vector3(
-			// 			instance.originalPositions!.x,
-			// 			instance.originalPositions!.y,
-			// 			instance.originalPositions!.z
-			// 		);
-
-			// 		// Get the vector from original story center to original point position
-			// 		const offsetFromCenter = point.originalPosition.clone().sub(originalStoryCenter);
-
-			// 		// Apply rotation based on the stored parameters
-			// 		const rotationAngle = time * point.rotationParams.speed;
-
-			// 		// Create rotation matrix based on the axis
-			// 		const rotationMatrix = new Matrix4();
-			// 		switch (point.rotationParams.axis) {
-			// 			case 0: // X-axis rotation
-			// 				rotationMatrix.makeRotationX(rotationAngle);
-			// 				break;
-			// 			case 1: // Y-axis rotation
-			// 				rotationMatrix.makeRotationY(rotationAngle);
-			// 				break;
-			// 			case 2: // Z-axis rotation
-			// 				rotationMatrix.makeRotationZ(rotationAngle);
-			// 				break;
-			// 		}
-
-			// 		// Apply rotation to the offset vector
-			// 		const rotatedOffset = offsetFromCenter.clone().applyMatrix4(rotationMatrix);
-
-			// 		// Set the new position as current story center + rotated offset
-			// 		const currentStoryCenter = new Vector3(
-			// 			instance.positions.x,
-			// 			instance.positions.y,
-			// 			instance.positions.z
-			// 		);
-			// 		// Create a new Vector3 object to trigger Svelte reactivity
-			// 		point.position = new Vector3(
-			// 			currentStoryCenter.x + rotatedOffset.x,
-			// 			currentStoryCenter.y + rotatedOffset.y,
-			// 			currentStoryCenter.z + rotatedOffset.z
-			// 		);
-
-			// 		if (pointIndex === 0) {
-			// 			// Only log first character to avoid spam
-			// 			console.log(
-			// 				'Updated position for first character:',
-			// 				point.position.x,
-			// 				point.position.y,
-			// 				point.position.z
-			// 			);
-			// 		}
-			// 	});
-			// }
-
 			// Update curves with time-based curviness
 			if (instance.curveMetadata && instance.curveMetadata.length > 0) {
 				let storyPairCurves: Vector3[][] = [];
@@ -798,14 +632,6 @@
 			}
 		});
 	});
-
-	// Cleanup geometry cache on component destroy
-	// onDestroy(() => {
-	// 	geometryCache.forEach((geometry) => {
-	// 		geometry.dispose();
-	// 	});
-	// 	geometryCache.clear();
-	// });
 </script>
 
 <PerfMonitor anchorY="bottom" />
@@ -825,21 +651,6 @@
 	<T.Mesh position={[center.x, center.y, center.z]}>
 		<T.BoxGeometry />
 		<T.MeshBasicMaterial color="red" />
-	</T.Mesh>
-{/each} -->
-
-	<!-- Story Centers -->
-	<!-- {#each clusterCentersStories as center}
-	<T.Mesh position={[center.x, center.y, center.z]}>
-		<T.BoxGeometry />
-		<T.MeshBasicMaterial color="green" />
-	</T.Mesh>
-{/each} -->
-
-	<!-- {#each clusterCentersStories as center}
-	<T.Mesh position={[center.x, center.y, center.z]}>
-		<T.SphereGeometry args={[0.1, 8, 8]} />
-		<T.MeshBasicMaterial color={clusterConnectionColor} toneMapped={false} />
 	</T.Mesh>
 {/each} -->
 
@@ -879,9 +690,9 @@
 				/>
 			</T.Mesh>
 		{/each}
-
+		<!-- InstancedMesh -->
 		<InstancedMesh>
-			<T.SphereGeometry args={[0.15, sphereResolution, 2]} />
+			<T.SphereGeometry args={[0.15, 3, 2]} />
 			<T.MeshBasicMaterial color="white" toneMapped={false} />
 
 			{#each instances as instance}
@@ -966,6 +777,12 @@
 					}}
 				/>
 
+				<!-- <Attractor
+					range={100}
+					strength={10000}
+					position={[instance.positions.x, instance.positions.y, instance.positions.z]}
+				/> -->
+
 				{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
 					{#each instance.curve as pairCurvePoints}
 						<T.Mesh>
@@ -975,67 +792,10 @@
 					{/each}
 				{/if}
 
-				<!-- Pulsing sphere effect for selected stories -->
-				<!-- {#if instance.selected || (previousSelectedStory && previousSelectedStory === instance)}
-				{@const pulseValue = Math.sin(sphereTime * spherePulseFrequency * Math.PI * 2) * 0.5 + 0.5}
-				{@const sphereSize =
-					sphereBaseSize + (sphereMaxSize - sphereBaseSize) * pulseValue * spherePulseIntensity}
-				{@const sphereOpacity = sphereBaseOpacity * (1 - pulseValue * 0.8)}
-
-				<T.Mesh position={[instance.positions.x, instance.positions.y, instance.positions.z]}>
-					<T.SphereGeometry args={[sphereSize, 32, 32]} />
-					<T.MeshBasicMaterial
-						color={clusterConnectionColor}
-						transparent={true}
-						opacity={sphereOpacity}
-					/>
-				</T.Mesh>
-			{/if} -->
-
-				<!-- Text instance points - outside MeshA for proper radial scaling -->
-				<!-- {#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
-				<T.Points>
-					<T is={getPointGeometry(instance)} />
-					<T.PointsMaterial size={pointSize} color="white" />
-				</T.Points>
-			{/if} -->
-
 				{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
-					<Attractor
-						range={50}
-						strength={5}
-						position={[instance.positions.x, instance.positions.y, instance.positions.z]}
-					/>
-					<Attractor
-						range={6}
-						strength={-5}
-						position={[instance.positions.x, instance.positions.y, instance.positions.z]}
-					/>
-					<!-- <T.Mesh>
-				<T is={getPointGeometry(instance)} />
-				<T.PointsMaterial size={pointSize} color="white" />
-				<Text3DGeometry
-      font={$font}
-      text={instance.text_instances}
-    />
-		<T.MeshBasicMaterial color="white" toneMapped={false} />
-			</T.Mesh> -->
-
 					{#each instance.text_instances as character, index}
-						<!-- {console.log(character)} -->
-						<!-- {console.log(
-						'Rendering character:',
-						character.char,
-						'at position:',
-						character.position.x,
-						character.position.y,
-						character.position.z
-					)} -->
-
-						<!-- <RigidBody> -->
-						<!-- <Collider shape="ball" args={[0.75]} mass={Math.random() * 10} /> -->
 						<RigidBody>
-							<Collider shape="ball" args={[0.1]} mass={1} />
+							<!-- <Collider shape="ball" args={[0.1]} mass={10000} /> -->
 							<T.Mesh position={[character.position.x, character.position.y, character.position.z]}>
 								<Text3DGeometry
 									text={character.char}
@@ -1054,16 +814,6 @@
 						<!-- </RigidBody> -->
 					{/each}
 				{/if}
-
-				<!-- {#each textInstances as character, index}
-		<RigidBody>
-			<Collider shape="ball" args={[0.75]} mass={Math.random() * 10} />
-			<T.Mesh position={[index * 1, 0, 0]}>
-				<Text3DGeometry text={character} size={1} depth={0.1} />
-				<T.MeshToonMaterial color="white" />
-			</T.Mesh>
-		</RigidBody>
-	{/each} -->
 			{/each}
 		</InstancedMesh>
 	</EffectComposer>
