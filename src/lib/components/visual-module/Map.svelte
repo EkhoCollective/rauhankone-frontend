@@ -634,7 +634,7 @@
 	});
 </script>
 
-<PerfMonitor anchorY="bottom" />
+<!-- <PerfMonitor anchorY="bottom" /> -->
 <World gravity={[0, 0, 0]}>
 	<T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 		<CameraControls bind:ref={controls} />
