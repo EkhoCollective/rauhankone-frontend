@@ -57,8 +57,8 @@
 	// State
 	const worldScale: number = 25;
 	const minSphereScale: number = 2;
-	const minMapScale: number = 0.075;
-	const maxMapScale: number = 1.5;
+	const minMapScale: number = 0.01;
+	const maxMapScale: number = 2;
 	const sphereResolution: number = 3;
 	const cameraOffset: number = 10;
 	const centroidCameraOffset: number = 40;
@@ -635,186 +635,217 @@
 </script>
 
 <!-- <PerfMonitor anchorY="bottom" /> -->
-<World gravity={[0, 0, 0]}>
-	<T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
-		<CameraControls bind:ref={controls} />
-	</T.PerspectiveCamera>
+<!-- <World gravity={[0, 0, 0]}> -->
+<T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
+	<CameraControls bind:ref={controls} />
+</T.PerspectiveCamera>
 
-	<!-- Centroid -->
-	<!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
+<!-- Centroid -->
+<!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
 	<T.BoxGeometry />
 	<T.MeshBasicMaterial color="red" />
 </T.Mesh> -->
 
-	<!-- Cluster Centers -->
-	<!-- {#each clusterCenters as center}
+<!-- Cluster Centers -->
+<!-- {#each clusterCenters as center}
 	<T.Mesh position={[center.x, center.y, center.z]}>
 		<T.BoxGeometry />
 		<T.MeshBasicMaterial color="red" />
 	</T.Mesh>
 {/each} -->
 
-	<!-- Story Centers -->
-	<!-- {#each clusterCentersStories as center}
+<!-- Story Centers -->
+<!-- {#each clusterCentersStories as center}
 	<T.Mesh position={[center.x, center.y, center.z]}>
 		<T.SphereGeometry args={[10, 16, 16]} />
 		<T.MeshBasicMaterial color={clusterConnectionColor} transparent={true} opacity={0.005} />
 	</T.Mesh>
 {/each} -->
 
-	<EffectComposer>
-		<DepthOfFieldEffect focusDistance={0} focalLength={0.125} bokehScale={6} height={512} />
-		<BloomEffect
-			luminanceThreshold={0.5}
-			luminanceSmoothing={0.4}
-			height={256}
-			radius={0.65}
-			intensity={4}
-		/>
-		<VignetteEffect eskil={false} offset={0.05} darkness={1.1} />
-		<ChromaticAberrationEffect
-			offset={new Vector2(0.001, 0.001)}
-			radialModulation={false}
-			modulationOffset={0.15}
-		/>
+<EffectComposer>
+	<DepthOfFieldEffect focusDistance={0} focalLength={0.125} bokehScale={6} height={512} />
+	<BloomEffect
+		luminanceThreshold={0.5}
+		luminanceSmoothing={0.4}
+		height={256}
+		radius={0.65}
+		intensity={4}
+	/>
+	<VignetteEffect eskil={false} offset={0.05} darkness={1.1} />
+	<ChromaticAberrationEffect
+		offset={new Vector2(0.001, 0.001)}
+		radialModulation={false}
+		modulationOffset={0.15}
+	/>
 
-		<!-- Cluster Connection Lines -->
-		{#each clusterConnectionLines as linePoints}
-			<T.Mesh>
-				<MeshLineGeometry points={linePoints} />
-				<MeshLineMaterial
-					color={clusterConnectionColor}
-					width={clusterConnectionThickness}
-					opacity={clusterConnectionOpacity}
-					transparent={true}
-				/>
-			</T.Mesh>
-		{/each}
-		<!-- InstancedMesh -->
-		<InstancedMesh>
-			<T.SphereGeometry args={[0.15, 3, 2]} />
-			<T.MeshBasicMaterial color="white" toneMapped={false} />
+	<!-- Cluster Connection Lines -->
+	{#each clusterConnectionLines as linePoints}
+		<T.Mesh>
+			<MeshLineGeometry points={linePoints} />
+			<MeshLineMaterial
+				color={clusterConnectionColor}
+				width={clusterConnectionThickness}
+				opacity={clusterConnectionOpacity}
+				transparent={true}
+			/>
+		</T.Mesh>
+	{/each}
+	<!-- InstancedMesh -->
+	<InstancedMesh>
+		<T.SphereGeometry args={[0.15, 3, 2]} />
+		<T.MeshBasicMaterial color="white" toneMapped={false} />
 
-			{#each instances as instance}
-				<Instance
-					position.y={instance.positions.y}
-					position.x={instance.positions.x}
-					position.z={instance.positions.z}
-					scale={instance.scale}
-					onclick={() => {
-						// Store the previous selected story before changing
-						if (selectedStory) {
-							previousSelectedStory = selectedStory;
+		{#each instances as instance}
+			<Instance
+				position.y={instance.positions.y}
+				position.x={instance.positions.x}
+				position.z={instance.positions.z}
+				scale={instance.scale}
+				onclick={() => {
+					// Store the previous selected story before changing
+					if (selectedStory) {
+						previousSelectedStory = selectedStory;
+					}
+
+					// Stop pulsing for all instances first
+					instances.forEach((inst) => {
+						inst.stopPulsing();
+					});
+
+					// Reset all other instances' selected state (including previous story)
+					instances.forEach((inst) => {
+						inst.selected = false;
+						inst.tw.set(0);
+					});
+
+					// Set this instance as selected and keep it highlighted
+					instance.selected = true;
+					instance.tw.set(1);
+
+					// Start pulsing for all stories in the same cluster with unique parameters
+					instances.forEach((inst, index) => {
+						if (inst.cluster_id === instance.cluster_id && inst !== instance) {
+							// Configure unique pulse parameters for each story using global ranges
+							const frequency =
+								pulseFrequencyMin + Math.random() * (pulseFrequencyMax - pulseFrequencyMin);
+							const intensity =
+								pulseIntensityMin + Math.random() * (pulseIntensityMax - pulseIntensityMin);
+							const phase = Math.random() * Math.PI * 2; // 0 to 2π
+
+							inst.configurePulse(frequency, intensity, phase);
+							inst.startPulsing();
 						}
+					});
 
-						// Stop pulsing for all instances first
-						instances.forEach((inst) => {
-							inst.stopPulsing();
-						});
+					// Calculate nearest and furthest stories for this instance
+					instance.calculateNearestAndFurthest(instances);
 
-						// Reset all other instances' selected state (including previous story)
-						instances.forEach((inst) => {
-							inst.selected = false;
-							inst.tw.set(0);
-						});
+					selectedStory = instance;
 
-						// Set this instance as selected and keep it highlighted
-						instance.selected = true;
+					// Play blip sound for UI interaction
+					playBlip();
+					// Play cluster-specific sound for the story
+					playClusterSound(instance.cluster_id);
+
+					// Center camera on the selected story
+					if (controls) {
+						// Move camera to look at the story with smooth transition
+						controls.setLookAt(
+							instance.positions.x,
+							instance.positions.y,
+							instance.positions.z + cameraOffset, // Camera position (offset from story)
+							instance.positions.x,
+							instance.positions.y,
+							instance.positions.z, // Look at the story position
+							true // Enable smooth transition
+						);
+					}
+					// TODO: Play cluster sound effect with new audio system
+					// soundEffects.playEffect(instance.cluster_audio_id);
+				}}
+				onpointerenter={() => {
+					// Only animate if not selected
+					if (!instance.selected) {
 						instance.tw.set(1);
+					}
+				}}
+				onpointerleave={() => {
+					// Only reset if not selected
+					if (!instance.selected) {
+						instance.tw.set(0);
+					}
+				}}
+			/>
 
-						// Start pulsing for all stories in the same cluster with unique parameters
-						instances.forEach((inst, index) => {
-							if (inst.cluster_id === instance.cluster_id && inst !== instance) {
-								// Configure unique pulse parameters for each story using global ranges
-								const frequency =
-									pulseFrequencyMin + Math.random() * (pulseFrequencyMax - pulseFrequencyMin);
-								const intensity =
-									pulseIntensityMin + Math.random() * (pulseIntensityMax - pulseIntensityMin);
-								const phase = Math.random() * Math.PI * 2; // 0 to 2π
-
-								inst.configurePulse(frequency, intensity, phase);
-								inst.startPulsing();
-							}
-						});
-
-						// Calculate nearest and furthest stories for this instance
-						instance.calculateNearestAndFurthest(instances);
-
-						selectedStory = instance;
-
-						// Play blip sound for UI interaction
-						playBlip();
-						// Play cluster-specific sound for the story
-						playClusterSound(instance.cluster_id);
-
-						// Center camera on the selected story
-						if (controls) {
-							// Move camera to look at the story with smooth transition
-							controls.setLookAt(
-								instance.positions.x,
-								instance.positions.y,
-								instance.positions.z + cameraOffset, // Camera position (offset from story)
-								instance.positions.x,
-								instance.positions.y,
-								instance.positions.z, // Look at the story position
-								true // Enable smooth transition
-							);
-						}
-						// TODO: Play cluster sound effect with new audio system
-						// soundEffects.playEffect(instance.cluster_audio_id);
-					}}
-					onpointerenter={() => {
-						// Only animate if not selected
-						if (!instance.selected) {
-							instance.tw.set(1);
-						}
-					}}
-					onpointerleave={() => {
-						// Only reset if not selected
-						if (!instance.selected) {
-							instance.tw.set(0);
-						}
-					}}
-				/>
-
-				<!-- <Attractor
+			<!-- <Attractor
 					range={100}
 					strength={10000}
 					position={[instance.positions.x, instance.positions.y, instance.positions.z]}
 				/> -->
 
-				{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
-					{#each instance.curve as pairCurvePoints}
-						<T.Mesh>
-							<MeshLineGeometry points={pairCurvePoints} />
-							<MeshLineMaterial color={storyConnectionColor} width={lineThickness} />
-						</T.Mesh>
-					{/each}
-				{/if}
+			{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
+				{#each instance.curve as pairCurvePoints}
+					<T.Mesh>
+						<MeshLineGeometry points={pairCurvePoints} />
+						<MeshLineMaterial color={storyConnectionColor} width={lineThickness} />
+					</T.Mesh>
+				{/each}
+			{/if}
 
-				{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
-					{#each instance.text_instances as character, index}
-						<RigidBody>
-							<!-- <Collider shape="ball" args={[0.1]} mass={10000} /> -->
-							<T.Mesh position={[character.position.x, character.position.y, character.position.z]}>
-								<Text3DGeometry
-									text={character.char}
-									size={0.125}
-									depth={0.01}
-									curveSegments={1}
-									bevelThickness={0}
-									bevelSize={0}
-									bevelSegments={1}
-									bevelEnabled={true}
-									smooth={0}
-								/>
-								<T.MeshBasicMaterial color="white" toneMapped={false} />
-							</T.Mesh>
-						</RigidBody>
-						<!-- </RigidBody> -->
-					{/each}
-				{/if}
-			{/each}
-		</InstancedMesh>
-	</EffectComposer>
-</World>
+			{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
+				{#each instance.text_instances as character, index}
+					{@const { animatedX, animatedY, animatedZ } = (() => {
+						// Store original character positions if not already stored
+						if (!character.originalPosition) {
+							character.originalPosition = {
+								x: character.position.x,
+								y: character.position.y,
+								z: character.position.z
+							};
+						}
+
+						// Use different noise seeds for each character and axis
+						const charNoiseOffsetX =
+							noise.noise3d(index * 200, time * storyJiggleTime * 2, 300) *
+							storyJiggleIntensity *
+							2.0;
+						const charNoiseOffsetY =
+							noise.noise3d(index * 200, time * storyJiggleTime * 2, 400) *
+							storyJiggleIntensity *
+							2.0;
+						const charNoiseOffsetZ =
+							noise.noise3d(index * 200, time * storyJiggleTime * 2, 500) *
+							storyJiggleIntensity *
+							2.0;
+
+						// Calculate animated position
+						return {
+							animatedX: character.originalPosition.x + charNoiseOffsetX,
+							animatedY: character.originalPosition.y + charNoiseOffsetY,
+							animatedZ: character.originalPosition.z + charNoiseOffsetZ
+						};
+					})()}
+					<!-- <RigidBody> -->
+					<!-- <Collider shape="ball" args={[0.1]} mass={10000} /> -->
+					<T.Mesh position={[animatedX, animatedY, animatedZ]}>
+						<Text3DGeometry
+							text={character.char}
+							size={0.125}
+							depth={0.01}
+							curveSegments={1}
+							bevelThickness={0}
+							bevelSize={0}
+							bevelSegments={1}
+							bevelEnabled={true}
+							smooth={0}
+						/>
+						<T.MeshBasicMaterial color="white" toneMapped={false} />
+					</T.Mesh>
+					<!-- </RigidBody> -->
+					<!-- </RigidBody> -->
+				{/each}
+			{/if}
+		{/each}
+	</InstancedMesh>
+</EffectComposer>
+<!-- </World> -->
