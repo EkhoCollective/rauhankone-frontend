@@ -323,7 +323,7 @@
 <style>
 	.card-submit-container {
 		width: 100%;
-		min-height: 100vh;
+		min-height: 100%;
 		background-color: black;
 		display: flex;
 		flex-direction: column;
