@@ -23,6 +23,8 @@
 	"submit_btn_submit": "Submit",
 	"submit_disclaimer": "By submitting, I confirm that I am the original author of this memory and have the right to publish it. I also confirm that the memory does not contain any personal or sensitive information about others.",
 	"submit_input_placeholder": "Type here...",
+	"audio_label_mute": "Mute audio",
+	"audio_label_unmute": "Unmute audio",
 	"submit_please_extend": "Would you like to extend your story?",
 	"submit_type_more": "Please share a bit more to participate in building the Peace Machine."
 }
