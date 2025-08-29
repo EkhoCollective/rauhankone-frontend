@@ -53,19 +53,11 @@
 
 <style>
 	.modal-story-container {
-		/* background-color: black; */
-		/* backdrop-filter: blur(10px); */
-		/* text-align: center; */
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		/* height: 100vh; */
-		/* margin: 0; */
-		width: 100vw;
-		height: 100vh;
-		/* background-color: black; */
-		/* display: grid; */
-		/* grid-template-rows: 50px 1fr 25%; */
+		width: 100%;
+		height: 100%;
 	}
 
 	.modal-story-content {
@@ -73,7 +65,7 @@
 		display: flex;
 		flex-direction: column;
 		/* min-height: 200px; */
-		height: 50vh;
+		height: 50%;
 		/* min-width: 90%; */
 		width: 100%;
 		overflow: hidden;
@@ -151,7 +143,7 @@
 	@media (max-width: 767px) {
 		.modal-story-content {
 			max-width: 95%;
-			max-height: 85vh;
+			max-height: 85%;
 		}
 
 		.modal-story-body {
