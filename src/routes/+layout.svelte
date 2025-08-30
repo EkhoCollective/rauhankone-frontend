@@ -160,21 +160,21 @@
 
 		<!-- Pages -->
 		{#key page.url.pathname}
-			<main
-				class="page-container"
+			<div class="page-container"
 				in:fade={{ duration: transitionDuration }}
 				out:fade={{ duration: transitionDuration }}
 			>
 				{@render children()}
-			</main>
+			</div>
 		{/key}
 	{/await}
 </div>
 
 <style>
-	.app {
-		background-color: black;
-		color: white;
-		font-family: 'Roboto', sans-serif;
+
+	.page-container {
+		max-height: 100%;
+		min-height: 100vh;
 	}
+
 </style>

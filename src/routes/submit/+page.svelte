@@ -237,15 +237,17 @@
 			out:fade={{ duration: transitionDuration }}
 			class="question-container"
 		>
-			<p>{question}</p>
+			<span id="question-label-main">{question}</span>
 		</div>
 
 		<!-- Input Area -->
 		<div class="input-container">
 			<Textarea
+				name={$_('submit_input_placeholder', {default: "Your story"})}
 				bind:textValue={story}
 				minHeight="200px"
 				debounceTime={typingTimer}
+				labelId="question-label-main"
 				bind:typingActive={isTyping}
 			/>
 		</div>
@@ -308,7 +310,7 @@
 				<div>
 					<button
 						disabled={!userAgreed}
-						class="btn"
+						data-variant="primary"
 						onclick={() => {
 							playUISound();
 							handleSubmit();
@@ -322,65 +324,77 @@
 
 <style>
 	.card-submit-container {
-		width: 100%;
-		min-height: 100%;
-		background-color: black;
-		display: flex;
-		flex-direction: column;
-		padding: 0 10% 0 10%;
+		display: grid;
+		grid-template-areas: 
+			'question'
+			'input-container'
+			'suggestions-area'
+			'actions-area'
+			;
+		grid-template-columns: 1fr;
+		/* gap: var(--pad-1); */
+		min-height: 100vh;
+		min-width: 100vw;
+		max-width: 100%;
+		padding: 5% 10% 5% 10%;
 	}
 	.question-container {
-		margin-top: 80px;
+		display: flex;
+		grid-area: question;
+		margin-top: var(--pad-3);
 		font-size: 16px;
-		padding-bottom: 40px;
-		border-bottom: 1px solid white;
+		max-width: 80%;
+		margin-bottom: var(--pad-3);
+		/* border-bottom: 1px solid white; */
 	}
+
+	.question-container > * {
+		line-height: 1.5;
+	}
+
 	.input-container {
-		margin-top: 40px;
+		grid-area: input-container;
+		display: flex;
+		flex-direction: column;
+		min-width: 100%;
+		min-height: 100%;
 		font-size: 18px;
 		font-family: 'Roboto Slab', serif;
 	}
 
+	
+
 	.suggestions-container {
-		margin-top: 40px;
-		min-height: 150px;
-		position: relative;
+		grid-area: suggestions-area;
 		display: flex;
-		justify-content: end;
+		justify-content: flex-start;
 		align-items: flex-start;
 	}
 	.disclaimer-container {
-		margin-top: 40px;
 		font-size: 14px;
-		display: grid;
-		grid-template-columns: 40px 1fr;
-		align-items: start;
-		justify-items: start;
-	}
-	.disclaimer-btn-container {
-		margin-top: 20px;
-		justify-self: end;
-		font-size: 16px;
-		display: flex;
-		flex-direction: column;
-		align-items: end;
-	}
-	.btn {
-		background-color: black;
-		border-color: white;
-		border-radius: 0px;
-		color: white;
-		min-width: 130px;
-	}
-	.btn:disabled {
-		border-color: rgb(90, 90, 90);
-		color: rgb(90, 90, 90);
 	}
 
+
+	.disclaimer-btn-container {
+		margin: var(--pad-1);
+		font-size: 16px;
+		align-self: end;
+	}
+
+
+	.actions-container {
+		grid-area: actions-area;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		min-height: 100px;
+		max-width: 100%;
+		margin: auto 0;
+	}
+
+
 	.bubble {
-		position: absolute;
-		top: 0;
-		right: 0;
 		max-width: 80%;
 		font-size: 16px;
 		text-align: left;
@@ -408,53 +422,45 @@
 	}
 
 	/* Media Queries */
-	@media (min-width: 768px) {
+	@media (min-width: 768px){
 		.card-submit-container {
+			height: 100%;
+    		min-height: 100vh;
 			display: grid;
-			grid-template-rows: 1fr 1fr 1fr;
+			grid-template-rows: auto min-content auto;
 			grid-template-columns: minmax(0, 1fr) 1fr;
 			grid-template-areas:
-				'question .'
-				'input actions'
-				'suggestions .';
+				'question 			.'
+				'input-container 	actions-area'
+				'suggestions-area 	.';
 		}
 
-		.question-container {
-			grid-area: question;
-		}
-
-		.input-container {
-			grid-area: input;
-			margin-top: 40px;
-		}
 
 		.suggestions-container {
-			grid-area: suggestions;
-			margin-top: 0;
+			margin-top: var(--pad-2);
+			position: relative;
 		}
 
 		.actions-container {
-			grid-area: actions;
-			display: flex;
-			flex-direction: column;
-			gap: 100px;
+			margin-left: 40px;
 		}
 
 		.disclaimer-container {
+			display: flex;
+			min-width: 100%;
 			margin-top: 0;
-			padding: 0 100px 0 100px;
+		}
+
+		.bubble {
+			position: absolute;
+			top: 0;
+			right: 0;
 		}
 
 		.disclaimer-btn-container {
-			margin-top: 0;
-			padding-top: 0;
-			display: flex;
 			align-self: end;
 			justify-self: end;
 		}
 
-		.btn {
-			width: 170px;
-		}
 	}
 </style>

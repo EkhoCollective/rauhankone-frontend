@@ -3,6 +3,8 @@
 	let {
 		textValue = $bindable(),
 		minHeight,
+		labelId,
+		name,
 		debounceTime = 750,
 		typingActive = $bindable(false)
 	} = $props();
@@ -19,39 +21,51 @@
 </script>
 
 <div class="container">
-	<pre aria-hidden="true" style="min-height: {minHeight}">{textValue + '\n'}</pre>
-	<textarea onkeydown={debounce} bind:value={textValue} placeholder={$_('submit_input_placeholder')}
-	></textarea>
+	<!-- <pre aria-hidden="true" style="min-height: {minHeight}">{textValue + '\n'}</pre> -->
+	<textarea onkeydown={debounce} bind:value={textValue} placeholder={$_('submit_input_placeholder')} name={labelId}></textarea>
 </div>
 
 <style>
 	.container {
-		position: relative;
-		border: 0px solid black;
+		display: flex;
+		flex-direction: column;
+		min-width: 100%;
+		min-height: 100%;
 	}
-	pre,
+
 	textarea {
 		font-family: inherit;
-		padding: 0.5em;
-		box-sizing: border-box;
-		outline: none;
-		border: 0px solid black;
 		line-height: 1.2;
-		overflow: hidden;
-		color: #a0a0a0;
-		background-color: black;
-	}
-	textarea {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
+		
+		border-radius: unset;
+		padding: 0.5em;
+		
+		border: none;
+		outline: 1px solid rgb(126, 126, 126);
+		transition: outline 0.1s ease-in-out;
+		
+		overflow-y: scroll;
+		overflow-x: hidden;
 		resize: none;
+		
 		background-color: black;
+		color: white;
+		
+		height: 100%;
+		min-height: 200px;
+		max-height: 300px;
+		width: 100%;
+		
 	}
-	.container:has(textarea:focus) {
-		outline: none;
-		border: 0px solid black;
-		background-color: black;
+
+	textarea::placeholder {
+		color: #a0a0a0;
+	}
+	textarea:focus,
+	textarea:focus-within {
+		border-radius: unset;
+		outline: 1px solid rgb(255, 255, 255);
+		outline-offset: unset;
+		transition: outline 0.1s ease-in-out;
 	}
 </style>

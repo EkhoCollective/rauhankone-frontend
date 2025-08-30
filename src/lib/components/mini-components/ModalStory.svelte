@@ -35,8 +35,8 @@
 					onNavigateClosest && onNavigateClosest();
 				}}
 			>
-				{$_('explore_modal_btn_closest')}</button
-			>
+				{$_('explore_modal_btn_closest')}
+			</button>
 			<button
 				class="btn btn-action"
 				onclick={() => {
@@ -44,9 +44,8 @@
 					onNavigateFurthest && onNavigateFurthest();
 				}}
 			>
-				{$_('explore_modal_btn_furthest')}</button
-			>
-			<!-- <button class="btn btn-action"> Random</button> -->
+				{$_('explore_modal_btn_furthest')}
+			</button>
 		</div>
 	</div>
 </div>

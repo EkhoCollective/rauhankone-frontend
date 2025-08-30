@@ -59,8 +59,9 @@ input[type="checkbox"] {
 
   font: inherit;
   color: white;
-  width: 1.15em;
-  height: 1.15em;
+  width: 1.15rem;
+  height: 1.15rem;
+  aspect-ratio: 1;
   border: 1px solid white;
   transform: translateY(-0.075em);
   display: grid;
@@ -89,7 +90,7 @@ input[type="checkbox"]:checked::before {
 
 .checkmark-container {
   display: flex;
-  gap: 0.5em;
+  gap: 1rem;
   align-items: center;
 }
 

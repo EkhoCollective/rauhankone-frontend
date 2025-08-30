@@ -47,7 +47,7 @@
 	<title>{$_('main_title')} | {$_('main_subtitle')} | Oulu 2026</title>
 </svelte:head>
 
-<div class="card-main-container" onmousemove={handleMouseMove} role="presentation">
+<main class="card-main-container" onmousemove={handleMouseMove}>
 	<div class="card-bg-container">
 		<BackgroundMouse bind:this={backgroundRef} maxMovement={75} stiffness={0.05} damping={0.95} />
 	</div>
@@ -67,31 +67,30 @@
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<button
-				class="btn btn-submit"
+				class="btn"
+				data-variant="primary"
 				onclick={() => {
 					playUISound();
 					goto(`${base}/submit`);
-				}}
-			>
+				}}>
 				{$_('main_btn_take_part')}
 			</button>
 			<button
-				class="btn btn-explore"
+				class="btn"
+				data-variant="secondary"
 				onclick={() => {
 					playUISound();
 					navigationContext.setSource('main');
 					goto(`${base}/explore`);
-				}}
-			>
-				{$_('main_btn_explore')}</button
-			>
+				}}>
+				{$_('main_btn_explore')}</button>
 		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
 			<Footer />
 		</div>
 	</div>
-</div>
+	</main>
 
 <style>
 	.card-bg-container {
@@ -99,10 +98,11 @@
 	}
 
 	.card-main-container {
-		display: flex;
+		margin-top: 0;
+		display: grid;
 		max-width: 100%;
-		height: 100%;
 		background-color: black;
+
 	}
 
 	.card-main-container-inner {
@@ -110,19 +110,23 @@
 		display: grid;
 		grid-template-rows: auto;
 		grid-template-columns: auto;
-		padding: 20px;
-		width: 100%;
-		max-width: 100%;
+		justify-content: flex-start;
 		z-index: 50;
+		margin: 50px 10%;
 	}
 
 
 	.card-title-container {
 		grid-row-start: 1;
+		max-width: 50%;
+		display: flex;
+		align-items: center;
+	}
+
+	.card-title-container h1 {
 		font-size: 24px;
-		width: 50%;
-		line-height: 1.25em;
-		align-self: center;
+		font-weight: 400;
+		line-height: 1.2;
 	}
 
 	.card-sub-title-container {
@@ -131,15 +135,19 @@
 		font-weight: bold;
 		line-height: 1.25em;
 		padding-bottom: var(--base-padding);
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 	}
 	.card-description-container {
 		grid-row-start: 3;
 		font-size: 16px;
 	}
 	.card-btn-container {
+		margin-top: var(--pad-3);
 		display: flex;
 		flex-direction: row;
-		gap: 20px;
+		/* gap: 20px; */
 		align-items: center;
 		justify-items: center;
 		justify-content: space-between;
@@ -147,57 +155,13 @@
 
 
 
-	.btn-submit {
-		/*Unset all effects*/
-		all: unset;
-		background-color: black;
-		border-color: white;
-		border: 1px solid white;
-		box-shadow: none;
-		width: 100%;
-		font-size: 16px;
-		border-radius: 0px;
-		color: white;
-	}
-
-	.btn-explore {
-		all: unset;
-		background-color: black;
-		border-color: none;
-		border: none;
-		box-shadow: none;
-		width: 100%;
-		font-size: 16px;
-		text-decoration: underline;
-		text-underline-offset: 2px;
-		border-radius: 0px;
-		color: white;
-	}
-	.card-footer-container {
+  	.card-footer-container {
 		grid-row-start: 5;
-		border-top: 1px solid white;
+		/* border-top: 1px solid white; */
 		padding-top: 10px;
 		font-size: 14px;
 	}
 
-	.btn-submit,
-	.btn-explore {
-		width: 170px;
-		height: 40px;
-		text-align: center;
-		font-weight: 500;
-		cursor: pointer;
-	}
-
-
-	.btn-explore:focus,
-	.btn-submit:focus {
-    outline-color: rgb(163, 180, 255);
-    outline-offset: 3px;
-    outline-style: solid;
-    outline-width: 1px;
-    border-radius: 1.4px;
-  }
 
 	@media (min-width: 768px) {
 		.card-bg-container {
@@ -218,7 +182,7 @@
 			left: 0;
 			right: 0;
 			z-index: 100;
-			grid-template-rows: 1fr 1fr 1fr 1fr;
+			grid-template-rows: 0.1fr auto;
 			grid-template-columns: 1fr 1fr;
 			grid-template-areas:
 				'title 			title'
@@ -242,6 +206,7 @@
 			grid-area: btn-container;
 			flex-direction: column;
 			justify-content: center;
+			gap: 20px;
 		}
 
 		.card-footer-container {
