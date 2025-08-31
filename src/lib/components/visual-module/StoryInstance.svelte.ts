@@ -7,6 +7,8 @@ export default class {
   initialColor = new Color()
   selectedColor = new Color()
   color = $derived(this.initialColor.clone().lerpHSL(this.selectedColor, this.tw.current))
+
+  scaleMultiplier:number = 2
   
   // Make position and velocity properties reactive 
   // shape = $state({radius: 1, wSeg: 3, hSeg: 3})
@@ -43,7 +45,7 @@ export default class {
   get scale() {
     // Add pulsing effect to scale when pulsing
     const pulseScale = this.isPulsing ? 1 + Math.sin(this.pulseTime * Math.PI * 2 + this.pulsePhase) * this.pulseIntensity : 1
-    return (this.tw.current/5 + this.scale_init) * pulseScale
+    return (this.tw.current * this.scaleMultiplier + this.scale_init) * pulseScale
     // fix this. put a minimum max size for every single point
   }
   
