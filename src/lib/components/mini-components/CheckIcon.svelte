@@ -47,6 +47,11 @@ input[type="checkbox"] + label {
   transform: translateY(-2px);
 
 }
+
+label {
+  font-weight: 300;
+  max-width: 70ch;
+}
 	  
 input[type="checkbox"] {
   /* Add if not using autoprefixer */
@@ -91,7 +96,8 @@ input[type="checkbox"]:checked::before {
 .checkmark-container {
   display: flex;
   gap: 1rem;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 </style>

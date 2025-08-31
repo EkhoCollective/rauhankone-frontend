@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
+	import { base, resolve } from '$app/paths';
 	import { getContext, onMount } from 'svelte';
 	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
 	import Footer from '$lib/components/mini-components/Footer.svelte';
@@ -67,11 +67,10 @@
 		<!-- Buttons Container -->
 		<div class="card-btn-container">
 			<button
-				class="btn"
 				data-variant="primary"
 				onclick={() => {
 					playUISound();
-					goto(`${base}/submit`);
+					goto(resolve("/submit"));
 				}}>
 				{$_('main_btn_take_part')}
 			</button>
@@ -81,7 +80,7 @@
 				onclick={() => {
 					playUISound();
 					navigationContext.setSource('main');
-					goto(`${base}/explore`);
+					goto(resolve("/explore"));
 				}}>
 				{$_('main_btn_explore')}</button>
 		</div>
@@ -140,17 +139,19 @@
 		justify-content: center;
 	}
 	.card-description-container {
+		margin-top: var(--pad-5);
 		grid-row-start: 3;
 		font-size: 16px;
 	}
 	.card-btn-container {
-		margin-top: var(--pad-3);
+		margin-top: var(--pad-4);
+		margin-bottom: var(--pad-5);
 		display: flex;
 		flex-direction: row;
-		/* gap: 20px; */
+		max-width: 100%;
+		gap: 10px;
 		align-items: center;
-		justify-items: center;
-		justify-content: space-between;
+		justify-content: flex-start;
 	}
 
 
@@ -158,7 +159,7 @@
   	.card-footer-container {
 		grid-row-start: 5;
 		/* border-top: 1px solid white; */
-		padding-top: 10px;
+		padding-top: var(--pad-5);
 		font-size: 14px;
 	}
 

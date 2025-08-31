@@ -49,7 +49,7 @@
 		{#each languages as { code, name }, i}
 			<button
 				class="btn-lang"
-				data-selected={$locale === code}
+				data-selected={$locale?.startsWith(code)}
 				onclick={() => {
 					playUISound();
 					handleLocaleChange(code);

@@ -7,6 +7,7 @@
 	import AudioControl from '$lib/components/mini-components/AudioControl.svelte';
 	import { playBlip } from '$lib/composables/useAudio';
 	import { goto } from '$app/navigation';
+	import TopLeftBackBtn from './TopLeftBackBtn.svelte';
 
 	let { toggleLang, showLang } = $props();
 
@@ -17,17 +18,7 @@
 
 <header>
 	{#if page.url.pathname === `${resolve('/explore')}`}
-	<div class="top-left-buttons">
-		<div transition:blur>
-			<button
-				class="back-button"
-				onclick={() => {
-					playUISound();
-					goto(`${base}/`);
-				}}><ArrowLeft color="#ffffff" /> {$_('header_btn_exit')}</button
-			>
-		</div>
-		</div>
+	<TopLeftBackBtn button_text_id="header_btn_exit" rel_url="/"/>
 	{/if}
 <div class="top-right-buttons">
 	
@@ -50,16 +41,8 @@
 </header>
 
 <style>
-	.back-button {
-		width: 100%;
-		display: flex;
-		flex-direction: row;
-		white-space: nowrap;
-		gap: 0.5rem;
-		min-height: 40px;
-		margin: var(--base-margin);
-		justify-content: center;
-		align-items: center;
+	header {
+		
 	}
 
 

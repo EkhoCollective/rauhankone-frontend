@@ -21,6 +21,6 @@
 		padding-top: 50px;
 		display: flex;
 		flex-direction: column;
-		text-decoration: underline;
+		text-decoration: unset;
 	}
 </style>

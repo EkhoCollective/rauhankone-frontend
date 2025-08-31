@@ -2,6 +2,7 @@
 	import { _ } from 'svelte-i18n';
 	import { page } from '$app/state';
 	import { fly } from 'svelte/transition';
+	import { goto } from '$app/navigation';
 
 	const reloadPage = () => {
 		window.history.go(-1); // Go back
@@ -36,7 +37,7 @@
 		<p>{finalError.status}</p>
 	</div>
 	<div class="button-container">
-		<button class="btn btn-home" onclick={() => reloadPage()}>{$_('error_btn_home')}</button>
+		<button  data-variant="primary" onclick={() => goto('/')}>{$_('error_btn_home')}</button>
 	</div>
 </div>
 
@@ -58,17 +59,8 @@
 	}
 
 	.button-container {
-		margin-top: 200px;
+		margin-top: 50px;
 	}
 
-	.btn-home {
-		background-color: black;
-		border: none;
-		box-shadow: none;
-		width: 100%;
-		font-size: 16px;
-		text-decoration: underline;
-		border-radius: 0px;
-		color: white;
-	}
+
 </style>

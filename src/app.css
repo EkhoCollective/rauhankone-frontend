@@ -12,19 +12,24 @@
   --pad-1: calc(var(--base-margin) * 1);
   --pad-2: calc(var(--base-margin) * 2);
   --pad-3: calc(var(--base-margin) * 3);
+  --pad-4: calc(var(--base-margin) * 4);
+  --pad-5: calc(var(--base-margin) * 5);
+  
+  --pad-10: calc(var(--base-margin) * 10);
+  --pad-15: calc(var(--base-margin) * 15);
 }
 
 .html {
   background-color: #000000;
+
+  
+  pointer-events: auto;
 }
 
-
-button {
-  cursor: pointer;
-}
 
 button, p, label {
   font-weight: 400;
+  max-width: 70ch;
 }
 
 h1 {
@@ -51,9 +56,14 @@ p {
 }
 
 a {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 300;
-  line-height: 2;
+  line-height: 1.7;
+  text-decoration: unset;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 
@@ -69,16 +79,7 @@ main {
   min-height: 100%;
 }
 
-.map-nav-button {
-  width: 40px;
-  height: auto;
-}
 
-.map-nav-button svg.lucide-icon.lucide {
---size: 34px;
-  width: var(--size);
-  height: var(--size);
-}
 
 label {
   font-weight: 400;
@@ -123,42 +124,53 @@ label {
   }
 
 
+  .map-nav-button {
+  width: 40px;
+  height: auto;
+}
 
+.map-nav-button svg.lucide-icon.lucide {
+--size: 34px;
+  width: var(--size);
+  height: var(--size);
+}
+
+
+button {
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+  border-radius: 0px;
+  background-color: black;
+  max-width: 90%;
+  /* margin-right: auto; */
+  color: white;
+  transition: opacity 0.1s ease-in-out;
+  box-shadow: none;
+  border: none;
+}
 
 
 	button[data-variant="primary"] {
 		/*Unset all effects*/
 		all: unset;
-		background-color: black;
-		border-color: white;
 		border: 1px solid white;
 		box-shadow: none;
-		width: 100%;
-		font-size: 16px;
-		border-radius: 0px;
-		color: white;
-    transition: opacity 0.1s ease-in-out;
 	}
 
 	button[data-variant="secondary"] {
 		all: unset;
-		background-color: black;
-		border-color: none;
 		border: none;
-		box-shadow: none;
-		width: 100%;
-		font-size: 16px;
 		text-decoration: underline;
 		text-underline-offset: 2px;
-		border-radius: 0px;
-		color: white;
-    transition: opacity 0.1s ease-in-out;
 	}
 
 	button[data-variant="primary"],
 	button[data-variant="secondary"] {
-		width: 170px;
-		height: 45px;
+		/* width: 170px; */
+		/* height: 45px; */
+    min-width: 160px;
+    aspect-ratio: 3.3;
 		text-align: center;
 		font-weight: 300;
 		cursor: pointer;
@@ -182,6 +194,7 @@ label {
 
 h1, h2, h3, h4, h5, h6, label, button, a, span, input {
   color: var(--text-color, white);
+  max-width: 70ch;
 }
 
 

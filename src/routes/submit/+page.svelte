@@ -14,6 +14,8 @@
 	import { getContext } from 'svelte';
 	import { useAudio } from '$lib/composables/useAudio';
 	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
+	import Footer from '$lib/components/mini-components/Footer.svelte';
+	import TopLeftBackBtn from '$lib/components/mini-components/TopLeftBackBtn.svelte';
 	// Get navigation context from layout
 	const navigationContext = getContext('navigation') as {
 		setSource: (source: 'main' | 'submit') => void;
@@ -229,6 +231,9 @@
 	<title>{$_('main_title')} | {$_('main_subtitle')} | Oulu 2026</title>
 </svelte:head>
 
+<header>
+	<TopLeftBackBtn button_text_id="back" rel_url="/"/>
+</header>
 <div class="card-submit-container">
 	<!-- Main Text -->
 	{#if question}
@@ -321,8 +326,15 @@
 		{/if}
 	</div>
 </div>
+<div class="footer-container">
+	<Footer />
+</div>
 
 <style>
+	.footer-container {
+		padding: 10%;
+	}
+
 	.card-submit-container {
 		display: grid;
 		grid-template-areas: 
@@ -332,6 +344,7 @@
 			'actions-area'
 			;
 		grid-template-columns: 1fr;
+		grid-template-rows: auto 1fr auto auto;
 		/* gap: var(--pad-1); */
 		min-height: 100vh;
 		min-width: 100vw;
@@ -341,10 +354,10 @@
 	.question-container {
 		display: flex;
 		grid-area: question;
-		margin-top: var(--pad-3);
+		margin-top: var(--pad-5);
 		font-size: 16px;
 		max-width: 80%;
-		margin-bottom: var(--pad-3);
+		margin-bottom: var(--pad-5);
 		/* border-bottom: 1px solid white; */
 	}
 
@@ -362,7 +375,6 @@
 		font-family: 'Roboto Slab', serif;
 	}
 
-	
 
 	.suggestions-container {
 		grid-area: suggestions-area;
@@ -372,12 +384,12 @@
 	}
 	.disclaimer-container {
 		font-size: 14px;
+		line-height: 1.25;
 	}
 
 
 	.disclaimer-btn-container {
 		margin: var(--pad-1);
-		font-size: 16px;
 		align-self: end;
 	}
 
@@ -391,15 +403,23 @@
 		min-height: 100px;
 		max-width: 100%;
 		margin: auto 0;
+		padding-top: var(--pad-5);
 	}
 
 
 	.bubble {
-		max-width: 80%;
-		font-size: 16px;
+		max-width: 100%;
 		text-align: left;
-		border-radius: 10px;
-		padding: 10px;
+		border-radius: var(--pad-1);
+		margin-top: var(--pad-1);
+		margin-bottom: var(--pad-2);
+		padding: var(--pad-1);
+	}
+
+	.bubble > p {
+		max-width: 70ch;
+		font-size: 14px;
+		margin: 0;
 	}
 
 	.warning-bubble {
@@ -443,6 +463,14 @@
 
 		.actions-container {
 			margin-left: 40px;
+		}
+
+		.question-container {
+			max-width: 100%;
+		}
+
+		.bubble {
+			max-width: 100%;
 		}
 
 		.disclaimer-container {
