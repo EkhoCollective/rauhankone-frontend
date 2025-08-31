@@ -313,10 +313,14 @@
 	$effect(() => {
 		const newLocale = $locale || 'en';
 
+		if (newLocale?.length > 2) {
+			console.log('New language code exceeds 2ch:', newLocale); // Probably en-GB
+		}
+
 		// Only refetch if locale actually changed
 		if (newLocale !== previousLocale) {
-			// console.log('Language changed to:', newLocale);
-			// console.log('New language full name:', getLocaleFullName());
+			console.log('Language changed to:', newLocale);
+			console.log('New language full name:', getLocaleFullName());
 
 			// Refetch clusters when language changes
 			if (response_clusters !== null) {

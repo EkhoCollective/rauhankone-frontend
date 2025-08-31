@@ -8,7 +8,7 @@
 	import { Dialog } from 'bits-ui';
 	import { setContext } from 'svelte';
 	import { onMount } from 'svelte';
-	import { init, waitLocale, _ } from 'svelte-i18n';
+	import { init, waitLocale, _, locale } from 'svelte-i18n';
 	import { fade } from 'svelte/transition';
 	import '../app.css';
 	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
@@ -80,6 +80,13 @@
 		window.scrollTo(0, 0);
 		handleGetToken();
 		pathName = window.location.origin;
+
+		// Set the locale based on the user's preferences
+		const savedLocale = localStorage.getItem('locale');
+		console.log("Saved locale from localStorage:", savedLocale);
+		if (savedLocale) {
+			locale.set(savedLocale);
+		}
 	});
 
 	// $inspect(questions);
