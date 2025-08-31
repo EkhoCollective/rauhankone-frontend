@@ -98,20 +98,21 @@
 
 	.card-main-container {
 		margin-top: 0;
-		display: grid;
-		max-width: 100%;
+		display: flex;
+		max-height: 100%;
+		min-height: 100vh;
 		background-color: black;
 
 	}
 
 	.card-main-container-inner {
-		background-color: black;
 		display: grid;
 		grid-template-rows: auto;
 		grid-template-columns: auto;
-		justify-content: flex-start;
 		z-index: 50;
 		margin: 50px 10%;
+		min-height: 100vh;
+		max-height: 100%;
 	}
 
 
@@ -183,7 +184,7 @@
 			left: 0;
 			right: 0;
 			z-index: 100;
-			grid-template-rows: 0.1fr auto;
+			grid-template-rows: 0.1fr 0.3fr auto 0.5fr;
 			grid-template-columns: 1fr 1fr;
 			grid-template-areas:
 				'title 			title'
