@@ -127,6 +127,7 @@ label {
   .map-nav-button {
   width: 40px;
   height: auto;
+  user-select: none;
 }
 
 .map-nav-button svg.lucide-icon.lucide {

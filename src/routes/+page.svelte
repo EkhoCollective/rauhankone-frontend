@@ -101,7 +101,7 @@
 		display: flex;
 		max-height: 100%;
 		min-height: 100vh;
-		background-color: black;
+		background-color: rgb(0, 0, 0);
 
 	}
 
