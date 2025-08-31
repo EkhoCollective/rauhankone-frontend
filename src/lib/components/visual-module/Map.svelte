@@ -3,34 +3,27 @@
 	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import * as THREE from 'three';
-	import {
-		Mesh,
-		SphereGeometry,
-		MeshBasicMaterial,
-		CatmullRomCurve3,
-		BufferGeometry,
-		Vector3,
-		Color
-	} from 'three';
-
+	import { CatmullRomCurve3, Vector3, Vector2, Color } from 'three';
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { EffectComposer } from 'threlte-postprocessing';
 	import {
 		DepthOfFieldEffect,
 		BloomEffect,
-		NoiseEffect,
-		VignetteEffect
+		VignetteEffect,
+		ChromaticAberrationEffect
 	} from 'threlte-postprocessing/effects';
+	import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
 	import { T, useTask } from '@threlte/core';
 	import {
 		interactivity,
-		InstancedMeshes,
+		Instance,
+		InstancedMesh,
 		CameraControls,
 		type CameraControlsRef,
 		PerfMonitor,
-		FakeGlowMaterial,
 		MeshLineGeometry,
-		MeshLineMaterial
+		MeshLineMaterial,
+		Text3DGeometry
 	} from '@threlte/extras';
 	import { useAudio } from '$lib/composables/useAudio';
 
@@ -63,10 +56,10 @@
 
 	// State
 	const worldScale: number = 25;
-	const minSphereScale: number = 1;
-	const minMapScale: number = 0.075;
-	const maxMapScale: number = 1.5;
-	const sphereResolution: number = 16;
+	const minSphereScale: number = 2;
+	const minMapScale: number = 0.01;
+	const maxMapScale: number = 2;
+	const sphereResolution: number = 3;
 	const cameraOffset: number = 10;
 	const centroidCameraOffset: number = 40;
 	let centroid = $state(new THREE.Vector3());
@@ -79,26 +72,22 @@
 	const clusterSpread: number = 5;
 	const lineThickness: number = 0.025;
 	const clusterConnectionThickness: number = 10;
-	const clusterConnectionOpacity: number = 0.002;
-	const pointSize: number = 0.05;
+	const clusterConnectionOpacity: number = 0.0075;
+	const maxNumofPointsPerStory = 100;
 	const curviness: number = 0.35;
-	const pointCloudShrink: number = 0.5;
-	const clusterConnectionRadius: number = 35; // Global radius for cluster connections
+	const clusterCurviness: number = 0.25;
+	const clusterConnectionRadius: number = 50; // Global radius for cluster connections
 	const pointsPerStoryConnection: number = 100;
 	const pointsPerClusterConnection: number = 400;
 
 	// Jiggle movement variables
 	const storyJiggleIntensity: number = 0.02; // How much stories move
-	const pointJiggleIntensity: number = 0.1; // How much points move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
-	const pointJiggleTime: number = 1000; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
 
 	// Colours
 	const clusterConnectionColor: string = '#1457ff';
 	const storyConnectionColor: string = 'white';
-	const storyColorOuter: string = 'white';
-	const storyColorInner: string = 'white';
 
 	// Curve animation variables
 	const curveSpeed: number = 80; // Speed of curve animation
@@ -107,23 +96,13 @@
 	// Pulse animation variables
 	const pulseFrequencyMin: number = 0.5; // Minimum pulse frequency multiplier
 	const pulseFrequencyMax: number = 0.525; // Maximum pulse frequency multiplier
-	const pulseIntensityMin: number = 0.05; // Minimum pulse intensity (scale change)
-	const pulseIntensityMax: number = 0.075; // Maximum pulse intensity (scale change)
+	const pulseIntensityMin: number = 0.075; // Minimum pulse intensity (scale change)
+	const pulseIntensityMax: number = 0.1; // Maximum pulse intensity (scale change)
 
+	// Time variables
 	let noise = new SimplexNoise();
 	let time = $state(0);
-
-	const meshes = [
-		new Mesh(
-			new SphereGeometry(1, sphereResolution, sphereResolution),
-			new MeshBasicMaterial({
-				color: storyColorOuter,
-				toneMapped: false,
-				transparent: true,
-				opacity: 0.0015
-			})
-		) // MeshA - main sphere
-	];
+	let sphereTime = $state(0); // Separate time for sphere animation
 
 	// Interactivity
 	interactivity({
@@ -132,35 +111,6 @@
 			return items.slice(0, 1);
 		}
 	});
-	// Simple optimization: reuse BufferGeometry instead of creating new ones
-	const geometryCache = new Map<string, BufferGeometry>();
-
-	// Function to get or create geometry for points
-	function getPointGeometry(instance: StoryInstance): BufferGeometry {
-		// Calculate scaled points
-		const scaledPoints = instance.text_instances.map((point) => {
-			// Calculate direction vector from sphere center to point
-			const direction = point
-				.clone()
-				.sub(new Vector3(instance.positions.x, instance.positions.y, instance.positions.z));
-			// Scale the direction vector based on tween value and add back to center
-			// const scaleFactor = 1 - instance.tw.current * pointCloudShrink; // Scale from 0.5 to 1.0
-			return new Vector3(instance.positions.x, instance.positions.y, instance.positions.z).add(
-				direction.multiplyScalar(1)
-			);
-		});
-
-		const cacheKey = `${instance.cluster_id}_${instance.positions.x}_${instance.positions.y}_${instance.positions.z}`;
-		let geometry = geometryCache.get(cacheKey);
-
-		if (!geometry) {
-			geometry = new BufferGeometry();
-			geometryCache.set(cacheKey, geometry);
-		}
-
-		geometry.setFromPoints(scaledPoints);
-		return geometry;
-	}
 
 	// Function to map text length to a range from 1 to 5
 	function mapTextLengthToRange(textLength: number): number {
@@ -168,7 +118,7 @@
 		const minRange = minMapScale;
 		const maxRange = maxMapScale;
 		const minTextLength = 0;
-		const maxTextLength = 1000; // Adjust this based on your typical text lengths
+		const maxTextLength = 500; // Adjust this based on your typical text lengths
 
 		// Clamp the text length to the expected range
 		const clampedLength = Math.max(minTextLength, Math.min(maxTextLength, textLength));
@@ -189,7 +139,7 @@
 		const characters = inputText.split('');
 
 		// Define spherical distribution parameters
-		const minRadius = scale * 0.95; // Minimum distance from story center
+		const minRadius = scale * 0.35; // Minimum distance from story center
 		const maxRadius = scale; // Maximum distance from story center
 
 		// Create an instance for each character with spherical distribution
@@ -204,9 +154,10 @@
 			const y = radius * Math.sin(phi) * Math.sin(theta);
 			const z = radius * Math.cos(phi);
 
-			textInstances.push(
-				new Vector3(storyPosition.x + x, storyPosition.y + y, storyPosition.z + z)
-			);
+			textInstances.push({
+				position: new Vector3(storyPosition.x + x, storyPosition.y + y, storyPosition.z + z),
+				char: char
+			});
 		});
 
 		return textInstances;
@@ -324,8 +275,15 @@
 					vz: (Math.random() - 0.5) * 0.1
 				};
 
+				// Cap the story text to 200 characters
+
+				const cappedText =
+					story[0].text.length > maxNumofPointsPerStory
+						? story[0].text.substring(0, maxNumofPointsPerStory) + '...'
+						: story[0].text;
+
 				let text_instances = createTextInstances(
-					story[0].text,
+					cappedText,
 					scale,
 					new Vector3(story_positions.x, story_positions.y, story_positions.z)
 				);
@@ -447,7 +405,7 @@
 
 				// Only create connection if clusters are within the specified radius
 				if (distance <= clusterConnectionRadius) {
-					const offsetAmount = distance * curviness;
+					const offsetAmount = distance * clusterCurviness;
 
 					// Create midpoint at 50% between the two points
 					const midPoint = startPos.clone().lerp(endPos, 0.5);
@@ -480,7 +438,6 @@
 
 		centroid = calculateCentroid();
 		lookAtCentroid();
-		// console.log(instances);
 	}
 
 	// Calculate centroid
@@ -593,6 +550,7 @@
 	// Animation loop for jiggle movement and curve animation
 	useTask((delta) => {
 		time += delta * jiggleSpeed;
+		sphereTime += delta; // Update sphere animation time
 
 		// Update story positions with SimplexNoise jiggle
 		instances.forEach((instance, index) => {
@@ -620,41 +578,6 @@
 			instance.positions.x = instance.originalPositions.x + noiseOffsetX;
 			instance.positions.y = instance.originalPositions.y + noiseOffsetY;
 			instance.positions.z = instance.originalPositions.z + noiseOffsetZ;
-
-			// Generate random jiggle for text points
-			if (instance.text_instances && instance.text_instances.length > 0) {
-				instance.text_instances.forEach((point, pointIndex) => {
-					// Store original positions if not already stored
-					if (!point.originalPosition) {
-						point.originalPosition = point.clone();
-					}
-
-					// Apply random jiggle to each point
-					const randomOffsetX =
-						noise.noise3d(
-							pointIndex * 100,
-							time * pointJiggleTime * mapTextLengthToRange(instance.text_instances.length),
-							0
-						) * pointJiggleIntensity;
-					const randomOffsetY =
-						noise.noise3d(
-							pointIndex * 100,
-							time * pointJiggleTime * mapTextLengthToRange(instance.text_instances.length),
-							100
-						) * pointJiggleIntensity;
-					const randomOffsetZ =
-						noise.noise3d(
-							pointIndex * 100,
-							time * pointJiggleTime * mapTextLengthToRange(instance.text_instances.length),
-							200
-						) * pointJiggleIntensity;
-
-					// Add both the story's movement and the point's own jiggle
-					point.x = point.originalPosition.x + randomOffsetX + noiseOffsetX;
-					point.y = point.originalPosition.y + randomOffsetY + noiseOffsetY;
-					point.z = point.originalPosition.z + randomOffsetZ + noiseOffsetZ;
-				});
-			}
 
 			// Update curves with time-based curviness
 			if (instance.curveMetadata && instance.curveMetadata.length > 0) {
@@ -709,18 +632,10 @@
 			}
 		});
 	});
-
-	// Cleanup geometry cache on component destroy
-	onDestroy(() => {
-		geometryCache.forEach((geometry) => {
-			geometry.dispose();
-		});
-		geometryCache.clear();
-	});
 </script>
 
 <!-- <PerfMonitor anchorY="bottom" /> -->
-
+<!-- <World gravity={[0, 0, 0]}> -->
 <T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 	<CameraControls bind:ref={controls} />
 </T.PerspectiveCamera>
@@ -742,15 +657,26 @@
 <!-- Story Centers -->
 <!-- {#each clusterCentersStories as center}
 	<T.Mesh position={[center.x, center.y, center.z]}>
-		<T.BoxGeometry />
-		<T.MeshBasicMaterial color="green" />
+		<T.SphereGeometry args={[10, 16, 16]} />
+		<T.MeshBasicMaterial color={clusterConnectionColor} transparent={true} opacity={0.005} />
 	</T.Mesh>
 {/each} -->
 
 <EffectComposer>
-	<DepthOfFieldEffect focusDistance={0} focalLength={0.15} bokehScale={5} height={512} />
-	<BloomEffect luminanceThreshold={0.5} luminanceSmoothing={0.6} height={256} radius={0.65} />
+	<DepthOfFieldEffect focusDistance={0} focalLength={0.125} bokehScale={6} height={512} />
+	<BloomEffect
+		luminanceThreshold={0.5}
+		luminanceSmoothing={0.4}
+		height={256}
+		radius={0.65}
+		intensity={4}
+	/>
 	<VignetteEffect eskil={false} offset={0.05} darkness={1.1} />
+	<ChromaticAberrationEffect
+		offset={new Vector2(0.001, 0.001)}
+		radialModulation={false}
+		modulationOffset={0.15}
+	/>
 
 	<!-- Cluster Connection Lines -->
 	{#each clusterConnectionLines as linePoints}
@@ -764,115 +690,162 @@
 			/>
 		</T.Mesh>
 	{/each}
+	<!-- InstancedMesh -->
+	<InstancedMesh>
+		<T.SphereGeometry args={[0.15, 3, 2]} />
+		<T.MeshBasicMaterial color="white" toneMapped={false} />
 
-	<InstancedMeshes {meshes}>
-		{#snippet children({ components: [MeshA, MeshB, MeshC, MeshD] })}
-			{#each instances as instance}
-				<MeshA
-					position.y={instance.positions.y}
-					position.x={instance.positions.x}
-					position.z={instance.positions.z}
-					scale={instance.scale}
-					onclick={() => {
-						// Store the previous selected story before changing
-						if (selectedStory) {
-							previousSelectedStory = selectedStory;
+		{#each instances as instance}
+			<Instance
+				position.y={instance.positions.y}
+				position.x={instance.positions.x}
+				position.z={instance.positions.z}
+				scale={instance.scale}
+				onclick={() => {
+					// Store the previous selected story before changing
+					if (selectedStory) {
+						previousSelectedStory = selectedStory;
+					}
+
+					// Stop pulsing for all instances first
+					instances.forEach((inst) => {
+						inst.stopPulsing();
+					});
+
+					// Reset all other instances' selected state (including previous story)
+					instances.forEach((inst) => {
+						inst.selected = false;
+						inst.tw.set(0);
+					});
+
+					// Set this instance as selected and keep it highlighted
+					instance.selected = true;
+					instance.tw.set(1);
+
+					// Start pulsing for all stories in the same cluster with unique parameters
+					instances.forEach((inst, index) => {
+						if (inst.cluster_id === instance.cluster_id && inst !== instance) {
+							// Configure unique pulse parameters for each story using global ranges
+							const frequency =
+								pulseFrequencyMin + Math.random() * (pulseFrequencyMax - pulseFrequencyMin);
+							const intensity =
+								pulseIntensityMin + Math.random() * (pulseIntensityMax - pulseIntensityMin);
+							const phase = Math.random() * Math.PI * 2; // 0 to 2π
+
+							inst.configurePulse(frequency, intensity, phase);
+							inst.startPulsing();
 						}
+					});
 
-						// Stop pulsing for all instances first
-						instances.forEach((inst) => {
-							inst.stopPulsing();
-						});
+					// Calculate nearest and furthest stories for this instance
+					instance.calculateNearestAndFurthest(instances);
 
-						// Reset all other instances' selected state (including previous story)
-						instances.forEach((inst) => {
-							inst.selected = false;
-							inst.tw.set(0);
-						});
+					selectedStory = instance;
 
-						// Set this instance as selected and keep it highlighted
-						instance.selected = true;
+					// Play blip sound for UI interaction
+					playBlip();
+					// Play cluster-specific sound for the story
+					playClusterSound(instance.cluster_id);
+
+					// Center camera on the selected story
+					if (controls) {
+						// Move camera to look at the story with smooth transition
+						controls.setLookAt(
+							instance.positions.x,
+							instance.positions.y,
+							instance.positions.z + cameraOffset, // Camera position (offset from story)
+							instance.positions.x,
+							instance.positions.y,
+							instance.positions.z, // Look at the story position
+							true // Enable smooth transition
+						);
+					}
+					// TODO: Play cluster sound effect with new audio system
+					// soundEffects.playEffect(instance.cluster_audio_id);
+				}}
+				onpointerenter={() => {
+					// Only animate if not selected
+					if (!instance.selected) {
 						instance.tw.set(1);
+					}
+				}}
+				onpointerleave={() => {
+					// Only reset if not selected
+					if (!instance.selected) {
+						instance.tw.set(0);
+					}
+				}}
+			/>
 
-						// Start pulsing for all stories in the same cluster with unique parameters
-						instances.forEach((inst, index) => {
-							if (inst.cluster_id === instance.cluster_id && inst !== instance) {
-								// Configure unique pulse parameters for each story using global ranges
-								const frequency =
-									pulseFrequencyMin + Math.random() * (pulseFrequencyMax - pulseFrequencyMin);
-								const intensity =
-									pulseIntensityMin + Math.random() * (pulseIntensityMax - pulseIntensityMin);
-								const phase = Math.random() * Math.PI * 2; // 0 to 2π
+			<!-- <Attractor
+					range={100}
+					strength={10000}
+					position={[instance.positions.x, instance.positions.y, instance.positions.z]}
+				/> -->
 
-								inst.configurePulse(frequency, intensity, phase);
-								inst.startPulsing();
-							}
-						});
-
-						// Calculate nearest and furthest stories for this instance
-						instance.calculateNearestAndFurthest(instances);
-
-						selectedStory = instance;
-
-						// Play blip sound for UI interaction
-						playBlip();
-						// Play cluster-specific sound for the story
-						playClusterSound(instance.cluster_id);
-
-						// Center camera on the selected story
-						if (controls) {
-							// Move camera to look at the story with smooth transition
-							controls.setLookAt(
-								instance.positions.x,
-								instance.positions.y,
-								instance.positions.z + cameraOffset, // Camera position (offset from story)
-								instance.positions.x,
-								instance.positions.y,
-								instance.positions.z, // Look at the story position
-								true // Enable smooth transition
-							);
-						}
-						// TODO: Play cluster sound effect with new audio system
-						// soundEffects.playEffect(instance.cluster_audio_id);
-					}}
-					onpointerenter={() => {
-						// Only animate if not selected
-						if (!instance.selected) {
-							instance.tw.set(1);
-						}
-					}}
-					onpointerleave={() => {
-						// Only reset if not selected
-						if (!instance.selected) {
-							instance.tw.set(0);
-						}
-					}}
-				>
-					<!-- <T.SphereGeometry /> -->
+			{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
+				{#each instance.curve as pairCurvePoints}
 					<T.Mesh>
-						<T.SphereGeometry args={[instance.scale * 0.375]} />
-						<FakeGlowMaterial glowColor={storyColorInner} toneMapped={false} opacity={0.5} />
+						<MeshLineGeometry points={pairCurvePoints} />
+						<MeshLineMaterial color={storyConnectionColor} width={lineThickness} />
 					</T.Mesh>
-				</MeshA>
+				{/each}
+			{/if}
 
-				<!-- Lines outside of MeshA so they don't get scaled/moved on hover -->
-				{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
-					{#each instance.curve as pairCurvePoints}
-						<T.Mesh>
-							<MeshLineGeometry points={pairCurvePoints} />
-							<MeshLineMaterial color={storyConnectionColor} width={lineThickness} />
-						</T.Mesh>
-					{/each}
-				{/if}
+			{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
+				{#each instance.text_instances as character, index}
+					{@const { animatedX, animatedY, animatedZ } = (() => {
+						// Store original character positions if not already stored
+						if (!character.originalPosition) {
+							character.originalPosition = {
+								x: character.position.x,
+								y: character.position.y,
+								z: character.position.z
+							};
+						}
 
-				<!-- Text instance points - outside MeshA for proper radial scaling -->
-				{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
-					<T.Points>
-						<T is={getPointGeometry(instance)} />
-						<T.PointsMaterial size={pointSize} color="white" />
-					</T.Points>
-				{/if}
-			{/each}
-		{/snippet}
-	</InstancedMeshes>
+						// Use different noise seeds for each character and axis
+						const charNoiseOffsetX =
+							noise.noise3d(index * 200, time * storyJiggleTime * 2, 300) *
+							storyJiggleIntensity *
+							2.0;
+						const charNoiseOffsetY =
+							noise.noise3d(index * 200, time * storyJiggleTime * 2, 400) *
+							storyJiggleIntensity *
+							2.0;
+						const charNoiseOffsetZ =
+							noise.noise3d(index * 200, time * storyJiggleTime * 2, 500) *
+							storyJiggleIntensity *
+							2.0;
+
+						// Calculate animated position
+						return {
+							animatedX: character.originalPosition.x + charNoiseOffsetX,
+							animatedY: character.originalPosition.y + charNoiseOffsetY,
+							animatedZ: character.originalPosition.z + charNoiseOffsetZ
+						};
+					})()}
+					<!-- <RigidBody> -->
+					<!-- <Collider shape="ball" args={[0.1]} mass={10000} /> -->
+					<T.Mesh position={[animatedX, animatedY, animatedZ]}>
+						<Text3DGeometry
+							text={character.char}
+							size={0.125}
+							depth={0.01}
+							curveSegments={1}
+							bevelThickness={0}
+							bevelSize={0}
+							bevelSegments={1}
+							bevelEnabled={true}
+							smooth={0}
+						/>
+						<T.MeshBasicMaterial color="white" toneMapped={false} />
+					</T.Mesh>
+					<!-- </RigidBody> -->
+					<!-- </RigidBody> -->
+				{/each}
+			{/if}
+		{/each}
+	</InstancedMesh>
 </EffectComposer>
+<!-- </World> -->
