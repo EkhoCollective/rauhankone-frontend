@@ -200,10 +200,6 @@
 		}
 	}
 
-	function playUISound() {
-		playBlip();
-	}
-
 	function playToMapSound() {
 		playtoMap();
 	}

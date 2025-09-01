@@ -6,7 +6,7 @@ import { browser } from '$app/environment';
 import Drone1 from '$lib/components/media/audio/bg/250812_Drone 1_seamless.mp3';
 import Drone2 from '$lib/components/media/audio/bg/250812_Drone 2_seamless.mp3';
 import blipUI1 from '$lib/components/media/audio/ui/250829_UI_Click.mp3';
-import toMap from '$lib/components/media/audio/ui/250829_To_Map.mp3';
+import toMap from '$lib/components/media/audio/ui/250829_ToMapSound.mp3';
 import { tracklist } from '$lib/components/media/audio/tracklist';
 
 export type AudioPage = 'main' | 'submit' | 'explore';
