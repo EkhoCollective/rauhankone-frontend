@@ -18,8 +18,23 @@
   --pad-10: calc(var(--base-margin) * 10);
   --pad-15: calc(var(--base-margin) * 15);
 
+  --f-smalltext: 1px;
   --fb: 1px;
 
+
+  --f12: calc(var(--f-smalltext) * 12);
+  --f14: calc(var(--f-smalltext) * 14);
+  --f16: calc(var(--f-smalltext) * 16);
+  --f18: calc(var(--fb) * 18);
+  --f24: calc(var(--fb) * 24);
+  --f32: calc(var(--fb) * 32);
+  --f46: calc(var(--fb) * 46);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --fb: 0.8px;
+  }
 }
 
 html {
@@ -44,7 +59,7 @@ button, p, label {
 
 h1 {
   font-weight: 300;
-  font-size: calc(--fb * 24);
+  font-size: var(--f24);
   margin-top: var(--pad-2);
   margin-bottom: var(--pad-2);
 }
@@ -53,20 +68,20 @@ h2 {
   font-weight: 400;
   line-height: 1.25;
   font-weight: 600;
-  font-size: calc(--fb * 46);
+  font-size: var(--f46);
   margin-top: var(--pad-1);
   margin-bottom: var(--pad-1);
 }
 
 
 p {
-  font-size: calc(--fb * 16);
+  font-size: var(--f16);
   font-weight: 300;
   line-height: 1.3;
 }
 
 a {
-  font-size: 14px;
+  font-size: var(--f14);
   font-weight: 300;
   line-height: 1.7;
   text-decoration: unset;
@@ -180,7 +195,7 @@ label {
 button {
   cursor: pointer;
   width: 100%;
-  font-size: 16px;
+  font-size: var(--f16);
   border-radius: 0px;
   background-color: black;
   max-width: 90%;

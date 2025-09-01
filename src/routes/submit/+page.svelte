@@ -363,26 +363,22 @@
 	}
 
 	.card-submit-container {
-		display: grid;
-		grid-template-areas:
-			'question'
-			'input-container'
-			'suggestions-area'
-			'actions-area';
-		grid-template-columns: 1fr;
-		grid-template-rows: max-content max-content max-content auto;
-		/* gap: var(--pad-1); */
+
+
 		min-height: 100vh;
 		min-width: 100vw;
 		max-width: 100%;
 		padding: 5% 10% 5% 10%;
+		height: 100%;
+		display: flex;
+		flex-direction: row;
 	}
 	.question-container {
 		display: flex;
 		grid-area: question;
 		margin-top: var(--pad-5);
-		font-size: 16px;
-		max-width: 80%;
+		font-size: var(--f16);
+		max-width: 100%;
 		margin-bottom: var(--pad-5);
 		/* border-bottom: 1px solid white; */
 	}
@@ -396,7 +392,7 @@
 		display: flex;
 		flex-direction: column;
 		min-width: 100%;
-		font-size: 18px;
+		font-size: var(--f18);
 		font-family: 'Roboto Slab', serif;
 	}
 
@@ -405,9 +401,11 @@
 		display: flex;
 		justify-content: flex-end;
 		align-items: flex-end;
+		margin-top: var(--pad-2);
+		position: relative;
 	}
 	.disclaimer-container {
-		font-size: 14px;
+		font-size: var(--f14);
 		line-height: 1.25;
 	}
 
@@ -427,6 +425,7 @@
 		min-width: 40%;
 		margin: auto 0;
 		padding-top: var(--pad-5);
+		margin-left: 40px;
 	}
 
 	.bubble {
@@ -441,7 +440,7 @@
 
 	.bubble > p {
 		max-width: 70ch;
-		font-size: 14px;
+		font-size: var(--f14);
 		margin: 0;
 	}
 
@@ -469,35 +468,55 @@
 	}
 
 	/* Media Queries */
-	@media (min-width: 768px) {
+	@media (max-width: 768px) {
+
 		.card-submit-container {
-			height: 100%;
-			display: flex;
-			flex-direction: row;
+			display: grid;
+		grid-template-areas:
+			'left-col'
+			'actions-area';
+		grid-template-columns: 1fr;
+		grid-template-rows: max-content max-content max-content auto;
 		}
 
-		.suggestions-container {
-			margin-top: var(--pad-2);
-			position: relative;
-		}
-
-		.actions-container {
-			margin-left: 40px;
+		.card-left-col-container {
+			max-width: 100%;
+			width: 100%;
+			grid-area: left-col;
+			margin: 0;
+			padding: 0;
 		}
 
 		.question-container {
-			max-width: 100%;
+			max-width: 80%;
+		}
+		
+		.suggestions-container {
 		}
 
+		.actions-container {
+			grid-area: actions-area;
+			max-width: 100%;
+			min-width: 100%;
+			margin: var(--pad-5) 0 0 0;
+			padding: 0;
+			flex-direction: row;
+			justify-content: center;
+			gap: var(--pad-3);
+		}
+
+
+
+
 		.bubble {
-			max-width: 90%;
-			margin-left: auto;
+			/* max-width: 90%;
+			margin-left: auto; */
 		}
 
 		.disclaimer-container {
-			display: flex;
+			/* display: flex;
 			min-width: 100%;
-			margin-top: 0;
+			margin-top: 0; */
 		}
 
 		@keyframes stretchIn {
@@ -510,9 +529,6 @@
 		}
 
 
-		.disclaimer-btn-container {
-			align-self: end;
-			justify-self: end;
-		}
+
 	}
 </style>

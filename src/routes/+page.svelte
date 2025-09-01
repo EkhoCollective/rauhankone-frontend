@@ -129,16 +129,17 @@
 	}
 
 	.card-title-container h1 {
-		font-size: 24px;
+		font-size: var(--f24);
 		font-weight: 400;
 		line-height: 1.2;
 	}
 
 	.card-sub-title-container {
 		grid-row-start: 2;
-		font-size: 46px;
+		font-size: var(--f46);
 		font-weight: bold;
 		line-height: 1.25em;
+		max-width: 65%;
 		padding-bottom: var(--base-padding);
 		display: flex;
 		flex-direction: column;
@@ -147,7 +148,7 @@
 	.card-description-container {
 		margin-top: var(--pad-5);
 		grid-row-start: 3;
-		font-size: 16px;
+		font-size: var(--f16);
 	}
 	.card-btn-container {
 		margin-top: var(--pad-4);
@@ -163,10 +164,11 @@
 
 
   	.card-footer-container {
-		/* border-top: 1px solid white; */
-		padding-top: var(--pad-5);
-		font-size: 14px;
+		border-top: 1px solid white;
+		margin-top: var(--pad-5);
+		font-size: var(--f14);
 	}
+
 
 
 	@media (min-width: 768px) {

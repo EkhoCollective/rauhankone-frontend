@@ -89,7 +89,7 @@
 
 	.card-extra-container {
 		grid-row-start: 3;
-		font-size: 18px;
+		font-size: var(--f18);
 		display: flex;
 		justify-self: center;
 		align-items: start;

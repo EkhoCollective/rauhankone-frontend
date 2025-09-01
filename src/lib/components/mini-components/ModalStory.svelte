@@ -122,18 +122,7 @@
 		max-width: 150px;
 	}
 
-	/* .btn-explore {
-		background-color: black;
-		border-color: none;
-		border: none;
-		box-shadow: none;
-		width: 100%;
-		font-size: 16px;
-		text-decoration: underline;
-		text-underline-offset: 2px;
-		border-radius: 0px;
-		color: white;
-	} */
+
 
 	@media (max-width: 767px) {
 		.modal-story-content {

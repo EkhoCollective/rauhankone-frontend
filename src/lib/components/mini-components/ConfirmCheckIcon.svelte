@@ -134,4 +134,19 @@ input[type="checkbox"]:checked::before {
   margin-top: 1rem;
 }
 
+
+	@media (max-width: 768px) {
+    .checkmark-container {
+      grid-template-areas: 
+        "checkbox   label"
+        ".          button";
+      gap: 0.5rem;
+    }
+
+    .disclaimer-btn-container {
+      margin-left: auto;
+      margin-right: 0;
+    }
+  }
+
 </style>

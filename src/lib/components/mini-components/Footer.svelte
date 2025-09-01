@@ -23,4 +23,10 @@
 		flex-direction: column;
 		text-decoration: unset;
 	}
+
+		@media (max-width: 768px) {
+		.footer-container {
+			padding-top: var(--pad-4);
+		}
+	}
 </style>

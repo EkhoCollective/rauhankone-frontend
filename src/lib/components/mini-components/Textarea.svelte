@@ -1,41 +1,65 @@
+
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
-	import textAreaStyles from './Textarea.module.scss';
-	let {
-		textValue = $bindable(),
-		minHeight,
-		labelId,
-		name,
-		debounceTime = 750,
-		typingActive = $bindable(false)
-	} = $props();
+import { _ } from 'svelte-i18n';
+import textAreaStyles from './Textarea.module.scss';
+import { onMount } from 'svelte';
+let {
+	textValue = $bindable(),
+	minHeight,
+	labelId,
+	name,
+	debounceTime = 750,
+	typingActive = $bindable(false)
+} = $props();
 
-	let timer: number | null = null;
-	let textareaEl: HTMLTextAreaElement | null = null;
+let timer: number | null = null;
+let textareaEl: HTMLTextAreaElement | null = null;
 
-	const debounce = () => {
-		typingActive = true;
-		if (timer) clearTimeout(timer);
-		timer = setTimeout(() => {
-			typingActive = false;
-		}, debounceTime);
-	};
+const debounce = () => {
+	typingActive = true;
+	if (timer) clearTimeout(timer);
+	timer = setTimeout(() => {
+		typingActive = false;
+	}, debounceTime);
+};
+
+function isMobile() {
+	// Basic mobile detection
+	return typeof window !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+}
+
+function scrollTextareaIntoView() {
+	if (!textareaEl || !isMobile()) return;
+	// Get the bounding rect of the textarea
+	const rect = textareaEl.getBoundingClientRect();
+	// Calculate the scroll position so the textarea is near the top (with a small offset)
+	/* const offset = 160; // px from top
+	const scrollY = window.scrollY + rect.top - offset; */
+	window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 </script>
 
 <div class={`${textAreaStyles['input-sizer']} ${textAreaStyles['stacked']}`}>
 	<!-- <pre aria-hidden="true" style="min-height: {minHeight}">{textValue + '\n'}</pre> -->
 	<textarea
-	bind:this={textareaEl}
-	oninput={() => {
-		if (textareaEl) {
-			// Set the data-value attribute to the current value for styling purposes
-			textareaEl.parentElement?.setAttribute('data-value', textareaEl.value + '\n');
-		}
-	}}
-	onkeydown={debounce} 
-	bind:value={textValue} 
-	placeholder={$_('submit_input_placeholder')} 
-	name={labelId}></textarea>
+		bind:this={textareaEl}
+		oninput={() => {
+			if (textareaEl) {
+				// Set the data-value attribute to the current value for styling purposes
+				if (isMobile()) {
+					return;
+
+				}
+				textareaEl.parentElement?.setAttribute('data-value', textareaEl.value + '\n');
+			}
+			scrollTextareaIntoView();
+		}}
+		onkeydown={debounce}
+		onfocus={() => scrollTextareaIntoView()}
+		bind:value={textValue}
+		placeholder={$_('submit_input_placeholder')}
+		name={labelId}
+	></textarea>
 </div>
 
 <style>
@@ -53,7 +77,7 @@
 		line-height: 1.2;
 		border-radius: unset;
 		padding: 0.5em;
-		font-size: 16px;
+		font-size: var(--f16);
 		border: none;
 		border-radius: 1.4px;
 		outline: 1px solid rgb(126, 126, 126);
