@@ -46,7 +46,7 @@
 		selectedStory: any;
 		isTranslated: boolean;
 		currentLocale: string;
-		controls?: CameraControlsRef;
+		controls: CameraControlsRef;
 		onNavigateToStory?: (story: any) => void;
 		navigateToClosestStory?: () => void;
 		navigateToFurthestStory?: () => void;
@@ -68,6 +68,9 @@
 	let clusterCenters: { x: number; y: number; z: number }[] = $state([]);
 	let clusterCentersStories: { x: number; y: number; z: number }[] = $state([]);
 	let clusterConnectionLines: Vector3[][] = $state([]);
+
+	const minZoom: number = 5;
+	const maxZoom: number = 100;
 
 	const clusterSpread: number = 5;
 	const lineThickness: number = 0.025;
@@ -511,6 +514,11 @@
 		}
 	}
 
+	function setZoom() {
+		controls.minDistance = minZoom;
+		controls.maxDistance = maxZoom;
+	}
+
 	// Effect to handle modal closing - show points for previous story
 	$effect(() => {
 		if (selectedStory === null) {
@@ -526,6 +534,7 @@
 	onMount(() => {
 		// Preload sound effects for better performance
 		populateFromData();
+		setZoom();
 	});
 
 	// Function to find StoryInstance by story ID
