@@ -179,6 +179,12 @@
 			const cluster = data.clusters[i];
 			const cluster_audio_id = '';
 			const clusterCenter = data.clusters[i].som;
+			const clusterSphereResolution = [
+				Math.floor(Math.random() * 7) + 3,
+				Math.floor(Math.random() * 8) + 2
+			];
+
+			// console.log(clusterSphereResolution);
 
 			// Add cluster center to the array
 			clusterCenters.push({
@@ -352,6 +358,7 @@
 					storyObject,
 					text_length,
 					text_instances,
+					clusterSphereResolution,
 					storyPairCurves, // Pass the array of pair curves
 					story_positions,
 					story_velocities
@@ -701,8 +708,8 @@
 	{/each}
 	<!-- InstancedMesh -->
 	<InstancedMesh>
-		<T.SphereGeometry args={[0.15, 3, 2]} />
-		<T.MeshBasicMaterial color="white" toneMapped={false} />
+		<!-- <T.SphereGeometry args={[0.15, 3, 2]} />
+		<T.MeshBasicMaterial color="white" toneMapped={false} /> -->
 
 		{#each instances as instance}
 			<Instance
@@ -786,6 +793,9 @@
 				}}
 			/>
 
+			<T.SphereGeometry args={[0.15, 3, 2]} />
+			<T.MeshBasicMaterial color="white" toneMapped={false} />
+
 			<!-- <Attractor
 					range={100}
 					strength={10000}
@@ -836,7 +846,14 @@
 					})()}
 					<!-- <RigidBody> -->
 					<!-- <Collider shape="ball" args={[0.1]} mass={10000} /> -->
-					<T.Mesh position={[animatedX, animatedY, animatedZ]}>
+					<T.Mesh
+						position={[animatedX, animatedY, animatedZ]}
+						rotation={[
+							Math.random() * Math.PI * 2,
+							Math.random() * Math.PI * 2,
+							Math.random() * Math.PI * 2
+						]}
+					>
 						<Text3DGeometry
 							text={character.char}
 							size={0.125}

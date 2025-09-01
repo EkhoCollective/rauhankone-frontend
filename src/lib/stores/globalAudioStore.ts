@@ -5,7 +5,8 @@ import { browser } from '$app/environment';
 // Audio file imports
 import Drone1 from '$lib/components/media/audio/bg/250812_Drone 1_seamless.mp3';
 import Drone2 from '$lib/components/media/audio/bg/250812_Drone 2_seamless.mp3';
-import blipUI1 from '$lib/components/media/audio/ui/Blip_UI_click.mp3';
+import blipUI1 from '$lib/components/media/audio/ui/250829_UI_Click.mp3';
+import toMap from '$lib/components/media/audio/ui/250829_To_Map.mp3';
 import { tracklist } from '$lib/components/media/audio/tracklist';
 
 export type AudioPage = 'main' | 'submit' | 'explore';
@@ -17,6 +18,7 @@ interface GlobalAudioState {
 	drone1Sound: Howl | null;
 	drone2Sound: Howl | null;
 	blipSound: Howl | null;
+	toMapSound: Howl | null;
 	clusterSounds: Map<string, Howl>;
 	isInitialized: boolean;
 	crossFading: boolean;
@@ -29,6 +31,7 @@ const initialState: GlobalAudioState = {
 	drone1Sound: null,
 	drone2Sound: null,
 	blipSound: null,
+	toMapSound: null,
 	clusterSounds: new Map<string, Howl>(),
 	isInitialized: false,
 	crossFading: false
@@ -82,6 +85,14 @@ class GlobalAudioManager {
 				preload: true
 			});
 
+			const toMapSound = new Howl({
+				src: [toMap],
+				loop: false,
+				volume: 0.5,
+				html5: false, // Use Web Audio API
+				preload: true
+			});
+
 			// Initialize cluster sounds
 			const clusterSounds = new Map<string, Howl>();
 			const clusterTracks = tracklist.filter(track => track.type === 'cluster');
@@ -102,6 +113,7 @@ class GlobalAudioManager {
 				drone1Sound: drone1,
 				drone2Sound: drone2,
 				blipSound: blip,
+				toMapSound: toMapSound,
 				clusterSounds: clusterSounds,
 				isInitialized: true
 			}));
@@ -232,6 +244,21 @@ class GlobalAudioManager {
 		}
 	}
 
+	async playtoMap() {
+		const state = get(globalAudioStore);
+		
+		if (state.isGloballyMuted || !state.toMapSound || !state.isInitialized) {
+			return;
+		}
+
+		try {
+			// Play the blip sound
+			state.toMapSound.play();
+		} catch (error) {
+			console.error('Error playing to map:', error);
+		}
+	}
+
 	// Get current state
 	getState(): GlobalAudioState {
 		return get(globalAudioStore);
@@ -246,6 +273,7 @@ export const globalAudioActions = {
 	setMute: (muted: boolean) => globalAudioManager.setGlobalMute(muted),
 	switchToPage: (page: AudioPage) => globalAudioManager.switchToPage(page),
 	playBlip: () => globalAudioManager.playBlip(),
+	playtoMap: () => globalAudioManager.playtoMap(),
 	playClusterSound: (clusterId: string) => globalAudioManager.playClusterSound(clusterId),
 	getState: () => globalAudioManager.getState()
 };

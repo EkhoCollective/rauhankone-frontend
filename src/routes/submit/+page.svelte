@@ -24,7 +24,7 @@
 		clearNavigation: () => void;
 	};
 
-	const { playBlip, switchToPage } = useAudio();
+	const { playBlip, switchToPage, playtoMap } = useAudio();
 
 	// Get Questions Data from Parent Layout
 	// const getQuestionsData = getContext('questions') as () => any;
@@ -204,6 +204,10 @@
 		playBlip();
 	}
 
+	function playToMapSound() {
+		playtoMap();
+	}
+
 	// Watch for changes in the story text
 	$effect(() => {
 		handleTyping();
@@ -232,7 +236,7 @@
 </svelte:head>
 
 <header>
-	<TopLeftBackBtn button_text_id="back" rel_url="/"/>
+	<TopLeftBackBtn button_text_id="back" rel_url="/" />
 </header>
 <div class="card-submit-container">
 	<!-- Main Text -->
@@ -248,7 +252,7 @@
 		<!-- Input Area -->
 		<div class="input-container">
 			<Textarea
-				name={$_('submit_input_placeholder', {default: "Your story"})}
+				name={$_('submit_input_placeholder', { default: 'Your story' })}
 				bind:textValue={story}
 				minHeight="200px"
 				debounceTime={typingTimer}
@@ -317,7 +321,7 @@
 						disabled={!userAgreed}
 						data-variant="primary"
 						onclick={() => {
-							playUISound();
+							playToMapSound();
 							handleSubmit();
 						}}>{$_('submit_btn_submit')}</button
 					>
@@ -337,12 +341,11 @@
 
 	.card-submit-container {
 		display: grid;
-		grid-template-areas: 
+		grid-template-areas:
 			'question'
 			'input-container'
 			'suggestions-area'
-			'actions-area'
-			;
+			'actions-area';
 		grid-template-columns: 1fr;
 		grid-template-rows: auto 1fr auto auto;
 		/* gap: var(--pad-1); */
@@ -375,7 +378,6 @@
 		font-family: 'Roboto Slab', serif;
 	}
 
-
 	.suggestions-container {
 		grid-area: suggestions-area;
 		display: flex;
@@ -387,12 +389,10 @@
 		line-height: 1.25;
 	}
 
-
 	.disclaimer-btn-container {
 		margin: var(--pad-1);
 		align-self: end;
 	}
-
 
 	.actions-container {
 		grid-area: actions-area;
@@ -405,7 +405,6 @@
 		margin: auto 0;
 		padding-top: var(--pad-5);
 	}
-
 
 	.bubble {
 		max-width: 100%;
@@ -442,10 +441,10 @@
 	}
 
 	/* Media Queries */
-	@media (min-width: 768px){
+	@media (min-width: 768px) {
 		.card-submit-container {
 			height: 100%;
-    		min-height: 100vh;
+			min-height: 100vh;
 			display: grid;
 			grid-template-rows: auto min-content auto;
 			grid-template-columns: minmax(0, 1fr) 1fr;
@@ -454,7 +453,6 @@
 				'input-container 	actions-area'
 				'suggestions-area 	.';
 		}
-
 
 		.suggestions-container {
 			margin-top: var(--pad-2);
@@ -489,6 +487,5 @@
 			align-self: end;
 			justify-self: end;
 		}
-
 	}
 </style>

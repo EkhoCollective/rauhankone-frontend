@@ -14,6 +14,10 @@ export function useAudio() {
 		globalAudioActions.playBlip();
 	};
 
+	const playtoMap = () => {
+		globalAudioActions.playtoMap();
+	};
+
 	/**
 	 * Play a cluster sound based on cluster ID
 	 * Used when opening modals or story interactions
@@ -48,6 +52,7 @@ export function useAudio() {
 	return {
 		playBlip,
 		playClusterSound,
+		playtoMap,
 		switchToPage,
 		toggleMute,
 		getAudioState
