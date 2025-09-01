@@ -21,6 +21,7 @@
 		localStorage.setItem('locale', lang_code);
 		await waitLocale().then(() => {
 			closeLangCard(false);
+
 		});
 	}
 
@@ -33,6 +34,7 @@
 <DialogContent class="lang-container" trapFocus={true}>
 	<div class="top-right-buttons">
 		<Dialog.Close
+			id="close-langcard-button"
 			class="square-button"
 			onclick={() => {
 				playUISound();
@@ -54,6 +56,8 @@
 					playUISound();
 					handleLocaleChange(code);
 				}}
+				aria-pressed={$locale?.startsWith(code) ? 'true' : 'false'}
+				aria-label={$_('header_btn_language') + ' ' + name}
 			>
 				{name}
 			</button>
