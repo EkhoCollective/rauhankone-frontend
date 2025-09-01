@@ -91,19 +91,24 @@ input[type="checkbox"]::before {
   content: "✓";
   position: absolute;
   line-height: 0;
-
+  text-shadow: 
+    0 0 1px var(--checkbox-bg-color),
+    0 0 1px var(--checkbox-bg-color),
+    1px 1px 1px var(--checkbox-bg-color),
+    -1px -1px 1px var(--checkbox-bg-color);
+  
   width: 0.65em;
   height: 0.65em;
   transform: scale(0);
-  top: 50%;
-  left: 12%;
+  top: 60%;
+  left: 5%;
   right: auto;
   bottom: auto;
   transition: 60ms transform ease-in-out;
 }
 
 input[type="checkbox"]:checked::before {
-  transform: scale(1);
+  transform: scale(1.6) translateX(0.2em)
 }
 
 .checkmark-container {
