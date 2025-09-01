@@ -97,10 +97,13 @@
 	}
 
 	.card-main-container {
-		margin-top: 0;
 		display: flex;
+		margin-top: 0;
 		max-height: 100%;
-		min-height: 100vh;
+		min-height: 100%;
+		max-width: 100%;
+		min-width: 100%;
+		flex-grow: 1;
 		background-color: rgb(0, 0, 0);
 
 	}
@@ -110,9 +113,11 @@
 		grid-template-rows: auto;
 		grid-template-columns: auto;
 		z-index: 50;
-		margin: 50px 10%;
-		min-height: 100vh;
 		max-height: 100%;
+		min-height: 100%;
+		max-width: 100%;
+		min-width: 100%;
+		padding: var(--pad-3);
 	}
 
 
@@ -158,7 +163,6 @@
 
 
   	.card-footer-container {
-		grid-row-start: 5;
 		/* border-top: 1px solid white; */
 		padding-top: var(--pad-5);
 		font-size: 14px;
@@ -168,39 +172,46 @@
 	@media (min-width: 768px) {
 		.card-bg-container {
 			max-width: 100%;
+			width: 100%;
 			display: block;
 			position: absolute;
 			top: 0;
 			left: 0;
 			right: 0;
-			width: 100%;
 			z-index: 0;
 		}
 
 		.card-main-container-inner {
 			max-width: 100%;
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			z-index: 100;
-			grid-template-rows: 0.1fr 0.3fr auto 0.5fr;
-			grid-template-columns: 1fr 1fr;
+			grid-template-rows: 
+			max-content 
+			max-content
+			max-content
+			1fr;
+			--pad-side: 10%;
+			padding-top: 10%;
+			grid-template-columns: var(--pad-side) 1fr 0.5fr var(--pad-side);
 			grid-template-areas:
-				'title 			title'
-				'subtitle 		btn-container'
-				'text-area 		btn-container'
-				'footer-area 	footer-area';
+				'.	title 			btn-container		.'
+				'.	subtitle 		btn-container		.'
+				'.	text-area 		btn-container		.'
+				'footer-container	footer-container 	. .'
+				;
 		}
 		.card-title-container {
 			grid-area: title;
+			max-width: 80%;
+			margin-bottom: 15px;
 		}
 
 		.card-sub-title-container {
 			grid-area: subtitle;
+			max-width: 50%;
+			margin-bottom: 20px;
 		}
 
 		.card-description-container {
+			margin: 0;
 			grid-area: text-area;
 		}
 
@@ -212,9 +223,11 @@
 		}
 
 		.card-footer-container {
-			grid-area: footer-area;
-			border-top: none;
-			/* justify-items: start; */
+			display: flex;
+			align-items: flex-end;
+			padding-left: var(--pad-5);
+			padding-bottom: var(--pad-5);
+			grid-area: footer-container;
 		}
 	}
 </style>

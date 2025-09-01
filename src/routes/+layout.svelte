@@ -180,8 +180,11 @@
 <style>
 
 	.page-container {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;	
 		max-height: 100%;
-		min-height: 100vh;
+		min-height: 100%;
 	}
 
 </style>

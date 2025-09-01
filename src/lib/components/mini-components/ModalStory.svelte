@@ -20,7 +20,7 @@
 			</button>
 		</div>
 		<div class="modal-story-body">
-			<h1>{story}</h1>
+		<p>{story}</p>
 		</div>
 
 		<div class="modal-story-actions">
@@ -83,8 +83,9 @@
 		hyphens: auto;
 	}
 
-	.modal-story-body h1 {
+	.modal-story-body p {
 		margin: 0;
+		text-align: center;
 		line-height: 1.4;
 		white-space: pre-wrap;
 		overflow-wrap: break-word;
@@ -92,12 +93,13 @@
 
 	.modal-story-actions {
 		display: flex;
-		justify-content: end;
+		flex-direction: row;
+		justify-content: center;
 		align-items: center;
-		padding: 20px;
+		padding: clamp(10px, 2vw, 20px);
 		flex-shrink: 0;
-		gap: 15px;
-		flex-wrap: wrap;
+		gap: 10px;
+		flex-wrap: nowrap;
 	}
 
 	.btn {

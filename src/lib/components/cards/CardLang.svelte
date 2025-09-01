@@ -48,7 +48,7 @@
 	<div class="lang-card-langbuttons">
 		{#each languages as { code, name }, i}
 			<button
-				class="btn-lang"
+				data-variant="lang"
 				data-selected={$locale?.startsWith(code)}
 				onclick={() => {
 					playUISound();
@@ -84,19 +84,8 @@
 	padding-bottom: 10%;
 }
 
-	.btn-lang {
-		background-color: black;
-		border: none;
-		box-shadow: none;
-		font-size: 18px;
-		color: white;
-	}
 
 
-	.btn-lang[data-selected='true'] {
-		text-decoration: underline;
-		text-underline-offset: 2px;
-	}
 
 	.card-extra-container {
 		grid-row-start: 3;
