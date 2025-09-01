@@ -126,6 +126,19 @@ label {
 
 
 
+  @keyframes fade-outline-out {
+    from {
+      
+    }
+    to {
+      outline-color: rgba(163, 180, 255, 0);
+    } 
+  }
+  @mixin fade-outline-out-after-delay($delay) {
+    animation: fade-outline-out 1.2s cubic-bezier(0.4, 0, 0.2, 1) $delay forwards;
+    
+  }
+  
 
 
   input:focus,
@@ -134,7 +147,6 @@ label {
   button:focus,
   select:focus {
     outline-color: rgb(163, 180, 255);
-    outline-color: rgb(217, 5, 5);
     outline-offset: 3px;
     outline-style: solid;
     outline-width: 1px;
@@ -219,30 +231,10 @@ button {
     min-width: 160px;
     aspect-ratio: 3.3;
 		text-align: center;
-		font-weight: 300;
+		font-weight: 400;
 		cursor: pointer;
 	}
 
-  
-  @keyframes fade-outline-out {
-    from {
-      outline-color: rgb(163, 180, 255);
-      outline-offset: 3px;
-      outline-style: solid;
-      outline-width: 1px;
-      border-radius: 1.4px;
-    }
-    to {
-      outline-color: transparent;
-      outline-offset: 0px;
-      outline-style: solid;
-      outline-width: 0px;
-      border-radius: 0px;
-    }
-  }
-  @mixin fade-outline-out-after-delay($delay) {
-    animation: fade-outline-out 0.2s ease-in-out $delay forwards;
-  }
   
 	button[data-variant="secondary"]:focus,
 	button[data-variant="primary"]:focus,
@@ -252,6 +244,18 @@ button {
     outline-style: solid;
     outline-width: 1px;
     border-radius: 1.4px;
+  }
+
+    .top-right-buttons > button:focus,
+    button[data-variant="secondary"]:focus,
+	  button[data-variant="primary"]:focus,
+    button:focus,
+    input:focus,
+    a:focus,
+    textarea:focus,
+    select:focus
+    {
+    @include fade-outline-out-after-delay(1s);
   }
 
 
@@ -292,9 +296,8 @@ h1, h2, h3, h4, h5, h6, label, button, a, span, input {
     margin-top: 0;
   }
 
-  .top-right-buttons > button:focus {
-    @include fade-outline-out-after-delay(1s);
-  }
+
+
 
   
 
