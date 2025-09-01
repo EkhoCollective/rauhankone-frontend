@@ -283,12 +283,13 @@
 				in:slide={{ duration: transitionDuration }} 
 				out:slide={{ duration: transitionDuration }}
 				>
-					{#if story.length === 0}
-						{$_('submit_type_story')}
-					{:else}
-						{$_('submit_type_more')}
-					{/if}
-					{$_('submit_type_more')}
+					<p>
+						{#if story.length === 0}
+							{$_('submit_type_story')}
+						{:else}
+							{$_('submit_type_more')}
+						{/if}
+					</p>
 				</div>
 			{/if}
 			<!-- Show loader when waiting for suggestions -->
