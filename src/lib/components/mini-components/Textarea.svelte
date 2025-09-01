@@ -49,7 +49,7 @@
 	textarea {
 		min-width: 100%;
 		min-height: 100px;
-		font-family: inherit;
+		font-family: 'Roboto Slab Regular', serif;
 		line-height: 1.2;
 		border-radius: unset;
 		padding: 0.5em;
