@@ -2,8 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
-	import * as THREE from 'three';
-	import { CatmullRomCurve3, Vector3, Vector2, Color } from 'three';
+	/* import * as THREE from 'three'; */
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { EffectComposer } from 'threlte-postprocessing';
 	import {
@@ -26,6 +25,7 @@
 		Text3DGeometry
 	} from '@threlte/extras';
 	import { useAudio } from '$lib/composables/useAudio';
+	import { CatmullRomCurve3, Vector3, Vector2, Color } from 'three';
 
 	const { playBlip, playClusterSound } = useAudio();
 
@@ -62,7 +62,7 @@
 	const sphereResolution: number = 3;
 	const cameraOffset: number = 10;
 	const centroidCameraOffset: number = 40;
-	let centroid = $state(new THREE.Vector3());
+	let centroid = $state(new Vector3(0, 0, 0));
 	let instances: StoryInstance[] = $state([]);
 	let previousSelectedStory: StoryInstance | null = $state(null);
 	let clusterCenters: { x: number; y: number; z: number }[] = $state([]);
@@ -452,7 +452,7 @@
 
 	// Calculate centroid
 	function calculateCentroid() {
-		const centroidValue = new THREE.Vector3();
+		const centroidValue = new Vector3(0, 0, 0);
 		for (let i = 0; i < instances.length; i++) {
 			centroidValue.add(instances[i].positions);
 		}
@@ -678,21 +678,25 @@
 	</T.Mesh>
 {/each} -->
 
-<EffectComposer>
-	<DepthOfFieldEffect focusDistance={0} focalLength={0.125} bokehScale={6} height={512} />
-	<BloomEffect
+<T.Group>
+	{#if instances.length > 0}
+	<EffectComposer>
+		<DepthOfFieldEffect focusDistance={0} focalLength={0.125} bokehScale={6} height={512} />
+		<BloomEffect
 		luminanceThreshold={0.5}
 		luminanceSmoothing={0.4}
 		height={256}
 		radius={0.65}
 		intensity={4}
-	/>
-	<VignetteEffect eskil={false} offset={0.05} darkness={1.1} />
-	<ChromaticAberrationEffect
+		/>
+		<VignetteEffect eskil={false} offset={0.05} darkness={1.1} />
+		<!-- <ChromaticAberrationEffect
 		offset={new Vector2(0.001, 0.001)}
 		radialModulation={false}
 		modulationOffset={0.15}
-	/>
+		/> -->
+	</EffectComposer>
+	{/if}
 
 	<!-- Cluster Connection Lines -->
 	{#each clusterConnectionLines as linePoints}
@@ -739,7 +743,7 @@
 					instance.tw.set(1);
 
 					// Start pulsing for all stories in the same cluster with unique parameters
-					instances.forEach((inst, index) => {
+					instances.forEach((inst) => {
 						if (inst.cluster_id === instance.cluster_id && inst !== instance) {
 							// Configure unique pulse parameters for each story using global ranges
 							const frequency =
@@ -873,5 +877,5 @@
 			{/if}
 		{/each}
 	</InstancedMesh>
-</EffectComposer>
+</T.Group>
 <!-- </World> -->
