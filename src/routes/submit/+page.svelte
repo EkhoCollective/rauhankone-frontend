@@ -492,6 +492,8 @@
 		}
 		
 		.suggestions-container {
+			max-width: 80%;
+			margin-left: auto;
 		}
 
 		.actions-container {

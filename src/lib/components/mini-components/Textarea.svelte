@@ -72,14 +72,13 @@ function scrollTextareaIntoView() {
 
 	textarea {
 		min-width: 100%;
-		min-height: 100px;
 		font-family: 'Roboto Slab Regular', serif;
 		line-height: 1.2;
 		border-radius: unset;
 		padding: 0.5em;
 		font-size: var(--f16);
 		border: none;
-		border-radius: 1.4px;
+		border-radius: var(--pad-1);
 		outline: 1px solid rgb(126, 126, 126);
 		transition: outline 0.1s ease-in-out;
 		
@@ -90,22 +89,19 @@ function scrollTextareaIntoView() {
 		color: white;
 		
 		height: auto;
-		width: 100%;
+		max-width: 100%;
+
+		background-color: #101010;
 		
 	} 
 
-	textarea {
-		color: white;
-		min-height: 100px;
-		min-width: 100%;
-	}
 
 	textarea::placeholder {
 		color: #a0a0a0;
 	}
 	textarea:focus,
 	textarea:focus-within {
-		border-radius: 1.4px;
+		border-radius: var(--pad-1);
 		outline: 1px solid rgb(255, 255, 255);
 		outline-offset: unset;
 		transition: outline 0.1s ease-in-out;

@@ -1,10 +1,11 @@
 
 .input-sizer {
+  max-width: 90%;
   display: inline-grid;
   vertical-align: top;
   align-items: center;
   position: relative;
-  border: solid 1px;
+  border-radius: var(--pad-1);
   line-height: 1.2;
   /* padding: .25px .5px; */
   /* margin: 5px; */
