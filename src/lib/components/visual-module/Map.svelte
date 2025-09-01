@@ -708,7 +708,7 @@
 	{/each}
 	<!-- InstancedMesh -->
 	<InstancedMesh>
-		<T.SphereGeometry args={[0.15, 3, 2]} />
+		<T.SphereGeometry args={[0.35, 3, 2]} />
 		<T.MeshBasicMaterial color="white" toneMapped={false} />
 
 		{#each instances as instance}
