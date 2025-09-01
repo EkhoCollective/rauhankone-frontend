@@ -708,8 +708,8 @@
 	{/each}
 	<!-- InstancedMesh -->
 	<InstancedMesh>
-		<!-- <T.SphereGeometry args={[0.15, 3, 2]} />
-		<T.MeshBasicMaterial color="white" toneMapped={false} /> -->
+		<T.SphereGeometry args={[0.15, 3, 2]} />
+		<T.MeshBasicMaterial color="white" toneMapped={false} />
 
 		{#each instances as instance}
 			<Instance
@@ -759,9 +759,9 @@
 					selectedStory = instance;
 
 					// Play blip sound for UI interaction
-					playBlip();
+					// playBlip();
 					// Play cluster-specific sound for the story
-					playClusterSound(instance.cluster_id);
+					playClusterSound();
 
 					// Center camera on the selected story
 					if (controls) {
@@ -793,8 +793,8 @@
 				}}
 			/>
 
-			<T.SphereGeometry args={[0.15, 3, 2]} />
-			<T.MeshBasicMaterial color="white" toneMapped={false} />
+			<!-- <T.SphereGeometry args={[0.15, 3, 2]} />
+			<T.MeshBasicMaterial color="white" toneMapped={false} /> -->
 
 			<!-- <Attractor
 					range={100}

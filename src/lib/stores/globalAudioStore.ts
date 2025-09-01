@@ -213,7 +213,7 @@ class GlobalAudioManager {
 		}
 	}
 
-	async playClusterSound(clusterId: string) {
+	async playClusterSound() {
 		const state = get(globalAudioStore);
 		
 		if (state.isGloballyMuted || !state.isInitialized || state.clusterSounds.size === 0) {
@@ -221,19 +221,10 @@ class GlobalAudioManager {
 		}
 
 		try {
-			// Map cluster ID to a specific sound consistently
+			// Pick a random sound from cluster tracks
 			const clusterKeys = Array.from(state.clusterSounds.keys());
-			
-			// Use cluster ID hash to always get the same sound for the same cluster
-			let hash = 0;
-			for (let i = 0; i < clusterId.length; i++) {
-				const char = clusterId.charCodeAt(i);
-				hash = ((hash << 5) - hash) + char;
-				hash = hash & hash; // Convert to 32-bit integer
-			}
-			
-			const soundIndex = Math.abs(hash) % clusterKeys.length;
-			const soundKey = clusterKeys[soundIndex];
+			const randomIndex = Math.floor(Math.random() * clusterKeys.length);
+			const soundKey = clusterKeys[randomIndex];
 			const clusterSound = state.clusterSounds.get(soundKey);
 			
 			if (clusterSound) {
@@ -274,6 +265,6 @@ export const globalAudioActions = {
 	switchToPage: (page: AudioPage) => globalAudioManager.switchToPage(page),
 	playBlip: () => globalAudioManager.playBlip(),
 	playtoMap: () => globalAudioManager.playtoMap(),
-	playClusterSound: (clusterId: string) => globalAudioManager.playClusterSound(clusterId),
+	playClusterSound: () => globalAudioManager.playClusterSound(),
 	getState: () => globalAudioManager.getState()
 };

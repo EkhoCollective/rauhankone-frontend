@@ -1,12 +1,8 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
-	import { playBlip } from '$lib/composables/useAudio';
+	import { playClusterSound, playBlip } from '$lib/composables/useAudio';
 	let { story = $bindable(), closeModal, onNavigateClosest, onNavigateFurthest } = $props();
-
-	function playUISound() {
-		playBlip();
-	}
 </script>
 
 <div class="modal-story-container">
@@ -16,7 +12,7 @@
 			<button
 				class="btn btn-corner"
 				onclick={() => {
-					playUISound();
+					playBlip();
 					closeModal();
 				}}
 			>
@@ -31,7 +27,7 @@
 			<button
 				class="btn btn-action"
 				onclick={() => {
-					playUISound();
+					playClusterSound();
 					onNavigateClosest && onNavigateClosest();
 				}}
 			>
@@ -40,7 +36,7 @@
 			<button
 				class="btn btn-action"
 				onclick={() => {
-					playUISound();
+					playClusterSound();
 					onNavigateFurthest && onNavigateFurthest();
 				}}
 			>
@@ -103,8 +99,6 @@
 		gap: 15px;
 		flex-wrap: wrap;
 	}
-
-	
 
 	.btn {
 		background-color: transparent;
