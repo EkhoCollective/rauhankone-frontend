@@ -230,6 +230,7 @@
 			padding-left: var(--pad-5);
 			padding-bottom: var(--pad-5);
 			grid-area: footer-container;
+			border: none;
 		}
 	}
 </style>
