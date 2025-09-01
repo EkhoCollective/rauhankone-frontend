@@ -10,7 +10,7 @@
 	import { onMount } from 'svelte';
 	import { init, waitLocale, _, locale } from 'svelte-i18n';
 	import { fade } from 'svelte/transition';
-	import '../app.css';
+	import '../app.scss';
 	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
 	import { resolve } from '$app/paths';
 
