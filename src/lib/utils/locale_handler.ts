@@ -1,6 +1,10 @@
 export function getLocaleFullName(): string {
     const localeShort = localStorage.getItem('locale') || 'en';
-    
+    if (localeShort !== 'en' && localeShort !== 'fi') {
+        // If locale is not English or Finnish, raise an error
+        console.error(`Unsupported locale: ${localeShort}`);
+    }
+    console.log(`Current locale: ${localeShort}`);
     const localeMap: { [key: string]: string } = {
         'en': 'English',
         'fi': 'Finnish',
