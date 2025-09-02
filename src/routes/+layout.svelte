@@ -17,7 +17,7 @@
 	let { children } = $props();
 	let showLang = $state(false);
 	let transitionDuration = 100;
-	let translateStories = $state(false);
+	let translateStories = $state(true);
 	let pathName = $state<string | null>(null);
 
 	// Navigation context state
@@ -158,7 +158,10 @@
 		<!-- Lang Dialog -->
 		<Dialog.Root bind:open={showLang}>
 			<Dialog.Portal>
-				<CardLang closeLangCard={handleToggleLangDialog} bind:translate={translateStories} />
+				<CardLang 
+				closeLangCard={handleToggleLangDialog} 
+				bind:translate={translateStories} 
+				/>
 			</Dialog.Portal>
 		</Dialog.Root>
 
