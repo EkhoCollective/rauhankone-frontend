@@ -46,6 +46,9 @@
 	let suggestionFadeTimer = $state(3000);
 	let thankYouFadeTimer = $state(3000);
 	let transitionDuration: number = 500;
+
+	let localeNow = getLocaleFullName();
+	console.log("Current locale inside submit:", localeNow);
 	// let raiseError = $state(false);
 
 	// API Options
@@ -135,16 +138,18 @@
 
 	function handleGetQuestion() {
 		if (!questionContainer) {
+			console.error('Question container is null');
 			return;
 		}
-		let filteredQuestion = questionContainer.find((q: any) => q.language === getLocaleFullName());
+		let filteredQuestion = questionContainer.find((q: any) => q.language === localeNow);
 
 		// If North Sami not found, fallback to English
-		if (!filteredQuestion && getLocaleFullName() === 'North Sámi') {
+		if (!filteredQuestion && localeNow === 'North Sámi') {
 			filteredQuestion = questionContainer.find((q: any) => q.language === 'English');
 		}
 
 		if (!filteredQuestion) {
+			console.error('No suitable question found');
 			customErrorHandler($_('error_description_general'), 500);
 		}
 		question = filteredQuestion.text;
@@ -210,11 +215,15 @@
 	function playToMapSound() {
 		playtoMap();
 	}
-
-	
-
-	// Watch for changes in the story text
+	// Watch for changes in the story text and locale
 	$effect(() => {
+		$locale; // subscribe to locale changes
+		// update current locale and refresh question if we already have questions
+		localeNow = getLocaleFullName();
+		if (getQuestionsData) {
+			handleGetQuestion();
+		}
+		// run typing logic whenever story or locale changes (story is bound in Textarea)
 		handleTyping();
 	});
 
@@ -399,8 +408,8 @@
 	.suggestions-container {
 		grid-area: suggestions-area;
 		display: flex;
-		justify-content: flex-end;
-		align-items: flex-end;
+		justify-content: flex-start;
+		align-items: center;
 		margin-top: var(--pad-2);
 		position: relative;
 	}
@@ -423,8 +432,8 @@
 		min-height: 100px;
 		max-width: 40%;
 		min-width: 40%;
-		margin: auto 0;
-		padding-top: var(--pad-5);
+		margin: 0 0 auto 0;
+		padding-top: calc(var(--pad-5) + 2px);
 		margin-left: 40px;
 	}
 
@@ -476,7 +485,7 @@
 			'left-col'
 			'actions-area';
 		grid-template-columns: 1fr;
-		grid-template-rows: max-content max-content max-content auto;
+		grid-template-rows: max-content max-content;
 		}
 
 		.card-left-col-container {
@@ -488,19 +497,27 @@
 		}
 
 		.question-container {
-			max-width: 80%;
+			max-width: 95%;
+			margin-bottom: var(--pad-2);
 		}
 		
 		.suggestions-container {
-			max-width: 80%;
-			margin-left: auto;
+			max-width: 100%;
+			margin-right: auto;
+			margin-top: var(--pad-1);
+			
 		}
 
+		.input-container {
+			margin-bottom: 0;
+		}
+
+		
 		.actions-container {
 			grid-area: actions-area;
 			max-width: 100%;
 			min-width: 100%;
-			margin: var(--pad-5) 0 0 0;
+			margin: var(--pad-4) 0 0 0;
 			padding: 0;
 			flex-direction: row;
 			justify-content: center;
