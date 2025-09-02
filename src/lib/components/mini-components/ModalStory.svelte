@@ -1,12 +1,8 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
-	import { playBlip } from '$lib/composables/useAudio';
+	import { playClusterSound, playBlip } from '$lib/composables/useAudio';
 	let { story = $bindable(), closeModal, onNavigateClosest, onNavigateFurthest } = $props();
-
-	function playUISound() {
-		playBlip();
-	}
 </script>
 
 <div class="modal-story-container">
@@ -16,7 +12,7 @@
 			<button
 				class="btn btn-corner"
 				onclick={() => {
-					playUISound();
+					playBlip();
 					closeModal();
 				}}
 			>
@@ -24,14 +20,14 @@
 			</button>
 		</div>
 		<div class="modal-story-body">
-			<h1>{story}</h1>
+		<p>{story}</p>
 		</div>
 
 		<div class="modal-story-actions">
 			<button
 				class="btn btn-action"
 				onclick={() => {
-					playUISound();
+					playClusterSound();
 					onNavigateClosest && onNavigateClosest();
 				}}
 			>
@@ -40,7 +36,7 @@
 			<button
 				class="btn btn-action"
 				onclick={() => {
-					playUISound();
+					playClusterSound();
 					onNavigateFurthest && onNavigateFurthest();
 				}}
 			>
@@ -87,8 +83,9 @@
 		hyphens: auto;
 	}
 
-	.modal-story-body h1 {
+	.modal-story-body p {
 		margin: 0;
+		text-align: center;
 		line-height: 1.4;
 		white-space: pre-wrap;
 		overflow-wrap: break-word;
@@ -96,15 +93,14 @@
 
 	.modal-story-actions {
 		display: flex;
-		justify-content: end;
+		flex-direction: row;
+		justify-content: center;
 		align-items: center;
-		padding: 20px;
+		padding: clamp(10px, 2vw, 20px);
 		flex-shrink: 0;
-		gap: 15px;
-		flex-wrap: wrap;
+		gap: 10px;
+		flex-wrap: nowrap;
 	}
-
-	
 
 	.btn {
 		background-color: transparent;
@@ -126,18 +122,7 @@
 		max-width: 150px;
 	}
 
-	/* .btn-explore {
-		background-color: black;
-		border-color: none;
-		border: none;
-		box-shadow: none;
-		width: 100%;
-		font-size: 16px;
-		text-decoration: underline;
-		text-underline-offset: 2px;
-		border-radius: 0px;
-		color: white;
-	} */
+
 
 	@media (max-width: 767px) {
 		.modal-story-content {

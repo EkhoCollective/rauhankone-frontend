@@ -14,13 +14,17 @@ export function useAudio() {
 		globalAudioActions.playBlip();
 	};
 
+	const playtoMap = () => {
+		globalAudioActions.playtoMap();
+	};
+
 	/**
 	 * Play a cluster sound based on cluster ID
 	 * Used when opening modals or story interactions
 	 * Same cluster ID will always play the same sound
 	 */
-	const playClusterSound = (clusterId: string) => {
-		globalAudioActions.playClusterSound(clusterId);
+	const playClusterSound = () => {
+		globalAudioActions.playClusterSound();
 	};
 
 	/**
@@ -48,6 +52,7 @@ export function useAudio() {
 	return {
 		playBlip,
 		playClusterSound,
+		playtoMap,
 		switchToPage,
 		toggleMute,
 		getAudioState
@@ -59,3 +64,9 @@ export function useAudio() {
  * Use this for quick imports in components that only need blip functionality
  */
 export const playBlip = () => globalAudioActions.playBlip();
+
+/**
+ * Simple function to play cluster sound
+ * Use this for quick imports in components that only need cluster sound functionality
+ */
+export const playClusterSound = () => globalAudioActions.playClusterSound();

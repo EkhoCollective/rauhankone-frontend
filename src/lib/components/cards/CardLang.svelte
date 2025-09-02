@@ -21,6 +21,7 @@
 		localStorage.setItem('locale', lang_code);
 		await waitLocale().then(() => {
 			closeLangCard(false);
+
 		});
 	}
 
@@ -33,6 +34,7 @@
 <DialogContent class="lang-container" trapFocus={true}>
 	<div class="top-right-buttons">
 		<Dialog.Close
+			id="close-langcard-button"
 			class="square-button"
 			onclick={() => {
 				playUISound();
@@ -48,12 +50,14 @@
 	<div class="lang-card-langbuttons">
 		{#each languages as { code, name }, i}
 			<button
-				class="btn-lang"
+				data-variant="lang"
 				data-selected={$locale?.startsWith(code)}
 				onclick={() => {
 					playUISound();
 					handleLocaleChange(code);
 				}}
+				aria-pressed={$locale?.startsWith(code) ? 'true' : 'false'}
+				aria-label={$_('header_btn_language') + ' ' + name}
 			>
 				{name}
 			</button>
@@ -84,23 +88,12 @@
 	padding-bottom: 10%;
 }
 
-	.btn-lang {
-		background-color: black;
-		border: none;
-		box-shadow: none;
-		font-size: 18px;
-		color: white;
-	}
 
 
-	.btn-lang[data-selected='true'] {
-		text-decoration: underline;
-		text-underline-offset: 2px;
-	}
 
 	.card-extra-container {
 		grid-row-start: 3;
-		font-size: 18px;
+		font-size: var(--f18);
 		display: flex;
 		justify-self: center;
 		align-items: start;

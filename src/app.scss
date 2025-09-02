@@ -8,7 +8,7 @@
 
 :root {
   --base-margin: 8px;
-
+  font-family: Roboto, sans-serif;
   --pad-1: calc(var(--base-margin) * 1);
   --pad-2: calc(var(--base-margin) * 2);
   --pad-3: calc(var(--base-margin) * 3);
@@ -17,13 +17,38 @@
   
   --pad-10: calc(var(--base-margin) * 10);
   --pad-15: calc(var(--base-margin) * 15);
+
+  --f-smalltext: 1px;
+  --fb: 1px;
+
+
+  --f12: calc(var(--f-smalltext) * 12);
+  --f14: calc(var(--f-smalltext) * 14);
+  --f16: calc(var(--f-smalltext) * 16);
+  --f18: calc(var(--fb) * 18);
+  --f24: calc(var(--fb) * 24);
+  --f32: calc(var(--fb) * 32);
+  --f46: calc(var(--fb) * 46);
 }
 
-.html {
-  background-color: #000000;
+@media (max-width: 768px) {
+  :root {
+    --fb: 0.8px;
+  }
+}
 
-  
+html {
+  background-color: #000000;
   pointer-events: auto;
+  min-height: 100%;
+  min-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+    width:100%;
+    position:relative;
 }
 
 
@@ -34,7 +59,7 @@ button, p, label {
 
 h1 {
   font-weight: 300;
-  font-size: 42px;
+  font-size: var(--f24);
   margin-top: var(--pad-2);
   margin-bottom: var(--pad-2);
 }
@@ -43,20 +68,20 @@ h2 {
   font-weight: 400;
   line-height: 1.25;
   font-weight: 600;
-  font-size: 42px;
+  font-size: var(--f46);
   margin-top: var(--pad-1);
   margin-bottom: var(--pad-1);
 }
 
 
 p {
-  font-size: 16px;
+  font-size: var(--f16);
   font-weight: 300;
   line-height: 1.3;
 }
 
 a {
-  font-size: 14px;
+  font-size: var(--f14);
   font-weight: 300;
   line-height: 1.7;
   text-decoration: unset;
@@ -69,9 +94,21 @@ a:hover {
 
 
 body {
+  display: flex;
   background-color: #000000;
   margin: 0;
+  height: 100%;
+  width: 100%;
+  /* min-height: 150vh; */
+  /* min-width: 100vw; */
   padding: 0;
+}
+
+body > div {
+  height: 100%;
+  width: 100%;
+  min-height: 100vh;
+  min-width: 100vw;
 }
 
 main {
@@ -81,6 +118,21 @@ main {
 
 
 
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    min-width: 100%;
+    max-width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    overflow: scroll;
+    padding: 0;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+  }
+
+
 label {
   font-weight: 400;
 }
@@ -88,18 +140,20 @@ label {
 
 
 
-	.app {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-height: 100vh;
-    overflow: scroll;
-    padding-bottom: 200px;
-		color: white;
-		font-family: 'Roboto', sans-serif;
-	}
 
-
+  @keyframes fade-outline-out {
+    from {
+      
+    }
+    to {
+      outline-color: rgba(163, 180, 255, 0);
+    } 
+  }
+  @mixin fade-outline-out-after-delay($delay) {
+    animation: fade-outline-out 1.2s cubic-bezier(0.4, 0, 0.2, 1) $delay forwards;
+    
+  }
+  
 
 
   input:focus,
@@ -120,6 +174,7 @@ label {
   button,
   textarea,
   select {
+    font-family: Roboto, sans-serif;
     border-radius: 1.4px;
   }
 
@@ -140,7 +195,7 @@ label {
 button {
   cursor: pointer;
   width: 100%;
-  font-size: 16px;
+  font-size: var(--f16);
   border-radius: 0px;
   background-color: black;
   max-width: 90%;
@@ -159,8 +214,26 @@ button {
 		box-shadow: none;
 	}
 
+  button[data-variant="lang"] {
+    all: unset;
+    font-family: Roboto;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+
+    &[data-selected='true'] {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  }
+
+
 	button[data-variant="secondary"] {
 		all: unset;
+    font-family: Roboto;
 		border: none;
 		text-decoration: underline;
 		text-underline-offset: 2px;
@@ -173,19 +246,33 @@ button {
     min-width: 160px;
     aspect-ratio: 3.3;
 		text-align: center;
-		font-weight: 300;
+		font-weight: 400;
 		cursor: pointer;
 	}
 
-
+  
 	button[data-variant="secondary"]:focus,
-	button[data-variant="primary"]:focus {
+	button[data-variant="primary"]:focus,
+  button:focus {
     outline-color: rgb(163, 180, 255);
     outline-offset: 3px;
     outline-style: solid;
     outline-width: 1px;
     border-radius: 1.4px;
   }
+
+    .top-right-buttons > button:focus,
+    button[data-variant="secondary"]:focus,
+	  button[data-variant="primary"]:focus,
+    button:focus,
+    input:focus,
+    a:focus,
+    textarea:focus,
+    select:focus
+    {
+    @include fade-outline-out-after-delay(1s);
+  }
+
 
   button:disabled {
     opacity: 0.5;
@@ -223,6 +310,9 @@ h1, h2, h3, h4, h5, h6, label, button, a, span, input {
   .top-right-buttons:nth-child(2) > div button {
     margin-top: 0;
   }
+
+
+
 
   
 

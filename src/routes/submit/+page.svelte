@@ -3,19 +3,20 @@
 	import { _, locale } from 'svelte-i18n';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
+	import { base, resolve } from '$app/paths';
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import DOMPurify from 'dompurify';
 	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
 	import Loader from '$lib/components/mini-components/Loader.svelte';
-	import { blur, fade } from 'svelte/transition';
+	import { blur, fade, scale, slide } from 'svelte/transition';
 	import { getContext } from 'svelte';
 	import { useAudio } from '$lib/composables/useAudio';
 	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
 	import Footer from '$lib/components/mini-components/Footer.svelte';
 	import TopLeftBackBtn from '$lib/components/mini-components/TopLeftBackBtn.svelte';
+	import ConfirmCheckIcon from '$lib/components/mini-components/ConfirmCheckIcon.svelte';
 	// Get navigation context from layout
 	const navigationContext = getContext('navigation') as {
 		setSource: (source: 'main' | 'submit') => void;
@@ -24,7 +25,7 @@
 		clearNavigation: () => void;
 	};
 
-	const { playBlip, switchToPage } = useAudio();
+	const { playBlip, switchToPage, playtoMap } = useAudio();
 
 	// Get Questions Data from Parent Layout
 	// const getQuestionsData = getContext('questions') as () => any;
@@ -90,7 +91,7 @@
 						// console.warn('No story ID found in response:', response);
 					}
 
-					goto(`${base}/explore`);
+					goto(resolve('/explore'));
 				})
 				.catch((err) => {
 					customErrorHandler($_('error_description_general'), 500);
@@ -158,8 +159,14 @@
 			storyComplete = false;
 			return;
 		}
-		// If story is already complete (done state), don't change anything
+		// If story is already complete (done state), check that first that
+		// the user didn't delete the story content
 		if (suggestionState === 'done') {
+			if (story.length < minStoryLength) {
+				suggestionState = 'warning';
+				storyComplete = false;
+			}
+
 			return;
 		}
 		// When user is actively typing
@@ -200,9 +207,11 @@
 		}
 	}
 
-	function playUISound() {
-		playBlip();
+	function playToMapSound() {
+		playtoMap();
 	}
+
+	
 
 	// Watch for changes in the story text
 	$effect(() => {
@@ -225,6 +234,8 @@
 		// handleGetQuestionContainer();
 		// raiseError = true;
 	});
+
+
 </script>
 
 <svelte:head>
@@ -232,9 +243,10 @@
 </svelte:head>
 
 <header>
-	<TopLeftBackBtn button_text_id="back" rel_url="/"/>
+	<TopLeftBackBtn button_text_id="back" rel_url="/" />
 </header>
 <div class="card-submit-container">
+	<div class="card-left-col-container">
 	<!-- Main Text -->
 	{#if question}
 		<div
@@ -245,10 +257,11 @@
 			<span id="question-label-main">{question}</span>
 		</div>
 
-		<!-- Input Area -->
-		<div class="input-container">
+		<div class="input-container" 
+		out:slide={{ duration: transitionDuration }}
+		>
 			<Textarea
-				name={$_('submit_input_placeholder', {default: "Your story"})}
+				name={$_('submit_input_placeholder', { default: 'Your story' })}
 				bind:textValue={story}
 				minHeight="200px"
 				debounceTime={typingTimer}
@@ -256,46 +269,63 @@
 				bind:typingActive={isTyping}
 			/>
 		</div>
+		<!-- Suggestions -->
+		<div class="suggestions-container">
+			{#if suggestionState !== 'off'}
+				<div 
+				in:slide={{ duration: transitionDuration }}
+				out:slide={{ duration: transitionDuration }}
+				></div>
+			{/if}
+			<!-- Show warning if story is too short -->
+			{#if suggestionState === 'warning'}
+				<div class="warning-bubble bubble" 
+				in:slide={{ duration: transitionDuration }} 
+				out:slide={{ duration: transitionDuration }}
+				>
+					<p>
+						{#if story.length === 0}
+							{$_('submit_type_story')}
+						{:else}
+							{$_('submit_type_more')}
+						{/if}
+					</p>
+				</div>
+			{/if}
+			<!-- Show loader when waiting for suggestions -->
+			{#if suggestionState === 'loading'}
+				<div class="loader-bubble bubble" 
+				in:slide={{ duration: transitionDuration }} 
+				out:slide={{ duration: transitionDuration }}
+				>
+					<Loader color="white" pulseSize="30px" pulseTiming="1s" />
+				</div>
+			{/if}
+			<!-- Show suggestion if user has typed something -->
+			{#if suggestionState === 'ok'}
+				<div
+					in:slide={{ duration: transitionDuration }}
+					out:slide={{ duration: transitionDuration }}
+					class="suggestions-bubble bubble"
+				>
+					<p>{$_('submit_please_extend')}</p>
+					<br />
+					<p>{suggestion}</p>
+				</div>
+			{/if}
+			<!-- Show thank you message if user has finished the story -->
+			{#if suggestionState === 'done'}
+				<p
+					in:slide={{ duration: transitionDuration }}
+					out:slide={{ duration: transitionDuration }}
+					class="thank-you-bubble bubble"
+				>
+					{$_('submit_acknowlegment')}
+				</p>
+			{/if}
+		</div>
+		<!-- Input Area -->
 	{/if}
-	<!-- Suggestions -->
-	<div class="suggestions-container">
-		{#if suggestionState !== 'off'}
-			<div></div>
-		{/if}
-		<!-- Show warning if story is too short -->
-		{#if suggestionState === 'warning'}
-			<div transition:blur class="warning-bubble bubble">
-				{$_('submit_type_more')}
-			</div>
-		{/if}
-		<!-- Show loader when waiting for suggestions -->
-		{#if suggestionState === 'loading'}
-			<div transition:blur class="loader-bubble bubble">
-				<Loader color="white" pulseSize="30px" pulseTiming="1s" />
-			</div>
-		{/if}
-		<!-- Show suggestion if user has typed something -->
-		{#if suggestionState === 'ok'}
-			<div
-				in:blur
-				out:blur={{ delay: suggestionFadeTimer, duration: 500 }}
-				class="suggestions-bubble bubble"
-			>
-				<p>{$_('submit_please_extend')}</p>
-				<br />
-				<p>{suggestion}</p>
-			</div>
-		{/if}
-		<!-- Show thank you message if user has finished the story -->
-		{#if suggestionState === 'done'}
-			<p
-				in:blur={{ delay: thankYouFadeTimer, duration: 500 }}
-				out:blur
-				class="thank-you-bubble bubble"
-			>
-				{$_('submit_acknowlegment')}
-			</p>
-		{/if}
 	</div>
 	<!-- Actions -->
 
@@ -304,24 +334,12 @@
 			<!-- Disclaimer -->
 			<div transition:blur class="disclaimer-container">
 				<!-- Checkmark -->
-				<Checkmark
+				<ConfirmCheckIcon
+					handleSubmit={handleSubmit}
 					bind:checkValue={userAgreed}
 					translateIdForCheckbox={'submit_disclaimer'}
 					hideLabel={false}
 				/>
-			</div>
-			<!-- Buttons Container -->
-			<div transition:blur class="disclaimer-btn-container">
-				<div>
-					<button
-						disabled={!userAgreed}
-						data-variant="primary"
-						onclick={() => {
-							playUISound();
-							handleSubmit();
-						}}>{$_('submit_btn_submit')}</button
-					>
-				</div>
 			</div>
 		{/if}
 	</div>
@@ -331,32 +349,36 @@
 </div>
 
 <style>
+	.card-left-col-container {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		gap: 0;
+		max-width: 70%;
+		width: 100%;
+	}
+
 	.footer-container {
 		padding: 10%;
 	}
 
 	.card-submit-container {
-		display: grid;
-		grid-template-areas: 
-			'question'
-			'input-container'
-			'suggestions-area'
-			'actions-area'
-			;
-		grid-template-columns: 1fr;
-		grid-template-rows: auto 1fr auto auto;
-		/* gap: var(--pad-1); */
+
+
 		min-height: 100vh;
 		min-width: 100vw;
 		max-width: 100%;
 		padding: 5% 10% 5% 10%;
+		height: 100%;
+		display: flex;
+		flex-direction: row;
 	}
 	.question-container {
 		display: flex;
 		grid-area: question;
 		margin-top: var(--pad-5);
-		font-size: 16px;
-		max-width: 80%;
+		font-size: var(--f16);
+		max-width: 100%;
 		margin-bottom: var(--pad-5);
 		/* border-bottom: 1px solid white; */
 	}
@@ -370,29 +392,27 @@
 		display: flex;
 		flex-direction: column;
 		min-width: 100%;
-		min-height: 100%;
-		font-size: 18px;
+		font-size: var(--f18);
 		font-family: 'Roboto Slab', serif;
 	}
-
 
 	.suggestions-container {
 		grid-area: suggestions-area;
 		display: flex;
-		justify-content: flex-start;
-		align-items: flex-start;
+		justify-content: flex-end;
+		align-items: flex-end;
+		margin-top: var(--pad-2);
+		position: relative;
 	}
 	.disclaimer-container {
-		font-size: 14px;
+		font-size: var(--f14);
 		line-height: 1.25;
 	}
-
 
 	.disclaimer-btn-container {
 		margin: var(--pad-1);
 		align-self: end;
 	}
-
 
 	.actions-container {
 		grid-area: actions-area;
@@ -401,14 +421,16 @@
 		justify-content: center;
 		align-items: center;
 		min-height: 100px;
-		max-width: 100%;
+		max-width: 40%;
+		min-width: 40%;
 		margin: auto 0;
 		padding-top: var(--pad-5);
+		margin-left: 40px;
 	}
-
 
 	.bubble {
 		max-width: 100%;
+		min-width: 90%;
 		text-align: left;
 		border-radius: var(--pad-1);
 		margin-top: var(--pad-1);
@@ -418,7 +440,7 @@
 
 	.bubble > p {
 		max-width: 70ch;
-		font-size: 14px;
+		font-size: var(--f14);
 		margin: 0;
 	}
 
@@ -428,10 +450,14 @@
 	}
 
 	.loader-bubble {
+		position: absolute;
+		top: var(--pad-1);
+		left: var(--pad-1);
 		background-color: transparent;
 	}
 
 	.suggestions-bubble {
+		position: relative;
 		color: #ffe7c3;
 		background-color: #ffe7c31a;
 	}
@@ -442,53 +468,69 @@
 	}
 
 	/* Media Queries */
-	@media (min-width: 768px){
+	@media (max-width: 768px) {
+
 		.card-submit-container {
-			height: 100%;
-    		min-height: 100vh;
 			display: grid;
-			grid-template-rows: auto min-content auto;
-			grid-template-columns: minmax(0, 1fr) 1fr;
-			grid-template-areas:
-				'question 			.'
-				'input-container 	actions-area'
-				'suggestions-area 	.';
+		grid-template-areas:
+			'left-col'
+			'actions-area';
+		grid-template-columns: 1fr;
+		grid-template-rows: max-content max-content max-content auto;
 		}
 
-
-		.suggestions-container {
-			margin-top: var(--pad-2);
-			position: relative;
-		}
-
-		.actions-container {
-			margin-left: 40px;
+		.card-left-col-container {
+			max-width: 100%;
+			width: 100%;
+			grid-area: left-col;
+			margin: 0;
+			padding: 0;
 		}
 
 		.question-container {
-			max-width: 100%;
+			max-width: 80%;
+		}
+		
+		.suggestions-container {
+			max-width: 80%;
+			margin-left: auto;
 		}
 
-		.bubble {
+		.actions-container {
+			grid-area: actions-area;
 			max-width: 100%;
+			min-width: 100%;
+			margin: var(--pad-5) 0 0 0;
+			padding: 0;
+			flex-direction: row;
+			justify-content: center;
+			gap: var(--pad-3);
+		}
+
+
+
+
+		.bubble {
+			/* max-width: 90%;
+			margin-left: auto; */
 		}
 
 		.disclaimer-container {
-			display: flex;
+			/* display: flex;
 			min-width: 100%;
-			margin-top: 0;
+			margin-top: 0; */
 		}
 
-		.bubble {
-			position: absolute;
-			top: 0;
-			right: 0;
+		@keyframes stretchIn {
+			0% {
+				transform: scaleY(0);
+			}
+			100% {
+				transform: scaleY(1);
+			}
 		}
 
-		.disclaimer-btn-container {
-			align-self: end;
-			justify-self: end;
-		}
+
 
 	}
 </style>

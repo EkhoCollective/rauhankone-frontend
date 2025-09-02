@@ -15,7 +15,8 @@ import blip10 from '$lib/components/media/audio/clusters/Blip_mid_00002.mp3';
 import blip11 from '$lib/components/media/audio/clusters/Blip_mid_00003.mp3';
 import blip12 from '$lib/components/media/audio/clusters/Blip_mid_00004.mp3';
 // UI
-import blipUI1 from '$lib/components/media/audio/ui/Blip_UI_click.mp3';
+import blipUI1 from '$lib/components/media/audio/ui/250829_UI_Click.mp3';
+import toMap from '$lib/components/media/audio/ui/250829_ToMapSound.mp3';
 
 
 /**
@@ -105,6 +106,11 @@ export const tracklist = [
   {
     title: 'Blip_UI',
     src: blipUI1,
+    type: 'ui'
+  },
+  {
+    title: 'ToMap',
+    src: toMap,
     type: 'ui'
   }
 

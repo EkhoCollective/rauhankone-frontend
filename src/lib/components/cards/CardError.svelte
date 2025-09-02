@@ -43,7 +43,7 @@
 		border: none;
 		box-shadow: none;
 		width: 100%;
-		font-size: 16px;
+		font-size: var(--f16);
 		text-decoration: underline;
 		border-radius: 0px;
 		color: white;

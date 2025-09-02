@@ -9,9 +9,10 @@ export default class {
   color = $derived(this.initialColor.clone().lerpHSL(this.selectedColor, this.tw.current))
 
   scaleMultiplier:number = 2
-  
+  cluster_geo_res: any[] = $state([3, 2])
   // Make position and velocity properties reactive 
   // shape = $state({radius: 1, wSeg: 3, hSeg: 3})
+
   positions = $state({x: 0, y: 0, z: 0})
   velocities = $state({vx: 0, vy: 0, vz: 0})
   cluster_initial_position = $state({cx: 0, cy: 0, cz: 0})
@@ -125,6 +126,7 @@ export default class {
     public story: any[], 
     public story_text_length: number,
     public text_instances: any[],
+    cluster_geo_res: any[],
     curve: any,
     positions: {x: number, y: number, z: number},
     velocities: {vx: number, vy: number, vz: number},
@@ -136,6 +138,7 @@ export default class {
     // Set initial positions and velocities
     this.curve = curve
     this.text_instances = text_instances
+    this.cluster_geo_res = cluster_geo_res
     this.positions = positions
     this.velocities = velocities
     // this.cluster_initial_position = cluster_initial_position
