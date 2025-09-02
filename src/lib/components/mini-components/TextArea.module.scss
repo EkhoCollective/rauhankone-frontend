@@ -45,7 +45,7 @@
   &::after {
     content: attr(data-value) ' ';
     line-height: 1.2;
-    font-size: calc(var(--fb) * 16);
+    font-size: var(--f18);
     visibility: hidden;
     white-space: pre-wrap;
     /* When the size changes */
