@@ -3,15 +3,35 @@
 	import { X } from 'lucide-svelte';
 	import { playClusterSound, playBlip } from '$lib/composables/useAudio';
 	let { story = $bindable(), closeModal, onNavigateClosest, onNavigateFurthest } = $props();
+
+	
+	const idForDialog = crypto.randomUUID();
+	// Handle click outside
+	function handleClickOutside(event: MouseEvent) {
+		debugger;
+		const target = event.target as HTMLElement;
+		if (target.id === idForDialog) {
+			closeModal();
+		}
+	}
+
 </script>
 
-<div class="modal-story-container" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<div 
+class="modal-story-container" 
+role="dialog" 
+id={idForDialog}
+tabindex="0"
+onclick={handleClickOutside}
+aria-modal="true" aria-labelledby="modal-title">
 	<div class="modal-story-content">
 		<div class="modal-story-header">
 			<!-- <h1>{story.cluster_id}</h1> -->
 			<button
 				class="btn-close"
-				onclick={() => {
+				onclick={(e) => {
+					e.stopPropagation();
 					playBlip();
 					closeModal();
 				}}
