@@ -417,16 +417,6 @@
 		background-color: black;
 	}
 
-	.modal-story-container {
-		backdrop-filter: blur(10px);
-		background-color: rgba(0, 0, 0, 0.7);
-		position: absolute;
-		z-index: 100;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100vh;
-	}
 
 	.navigation-icons-container {
 		position: absolute;

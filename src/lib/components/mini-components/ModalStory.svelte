@@ -5,12 +5,12 @@
 	let { story = $bindable(), closeModal, onNavigateClosest, onNavigateFurthest } = $props();
 </script>
 
-<div class="modal-story-container">
+<div class="modal-story-container" role="dialog" aria-modal="true" aria-labelledby="modal-title">
 	<div class="modal-story-content">
 		<div class="modal-story-header">
 			<!-- <h1>{story.cluster_id}</h1> -->
 			<button
-				class="btn btn-corner"
+				class="btn-close"
 				onclick={() => {
 					playBlip();
 					closeModal();
@@ -47,12 +47,20 @@
 </div>
 
 <style>
+	
+	
 	.modal-story-container {
+		position: absolute;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		width: 100%;
 		height: 100%;
+		backdrop-filter: blur(10px);
+		background-color: rgba(0, 0, 0, 0.7);
+		z-index: 100;
+		top: 0;
+		left: 0;
 	}
 
 	.modal-story-content {
@@ -60,33 +68,43 @@
 		display: flex;
 		flex-direction: column;
 		/* min-height: 200px; */
-		height: 50%;
-		/* min-width: 90%; */
+		height: 90%;
+		max-height: 90%;
 		width: 100%;
-		overflow: hidden;
 	}
 
 	.modal-story-header {
+		position: relative;
 		display: flex;
 		justify-content: flex-end;
 		align-items: center;
 		padding: 10px 0 0 20px;
+		min-height: 50px;
 	}
 
 	.modal-story-body {
-		padding: 20px;
+		padding: 10px;
 		flex: 1;
 		overflow-y: auto;
-		overflow-x: hidden;
 		word-wrap: break-word;
 		word-break: break-word;
 		hyphens: auto;
 	}
 
+	.modal-story-body::-webkit-scrollbar {
+		width: 3px;
+	}
+
+	.modal-story-body::-webkit-scrollbar-thumb {
+		background-color: rgba(112, 112, 112, 0.5);
+		border-radius: 4px;
+	}
+
 	.modal-story-body p {
+		font-family: Roboto Slab Regular, serif;
 		margin: 0;
-		text-align: center;
-		line-height: 1.4;
+		text-align: left;
+		line-height: 1.5;
 		white-space: pre-wrap;
 		overflow-wrap: break-word;
 	}
@@ -103,23 +121,30 @@
 	}
 
 	.btn {
-		background-color: transparent;
-		border-radius: 0;
-		border: none;
-		box-shadow: none;
 		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		min-width: 0;
-		text-decoration: underline;
-		text-underline-offset: 2px;
+		text-underline-offset: 3px;
 		color: white;
+	}
+
+	.btn:hover {
+		text-decoration: underline;
 	}
 
 	.btn-action {
 		padding: 8px 16px;
 		min-width: 80px;
 		max-width: 150px;
+	}
+
+	.btn-close {
+		position: absolute;
+		top: 0px;
+		right: -10px;
+		width: 40px;
+		height: 40px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 
