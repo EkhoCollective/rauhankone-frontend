@@ -326,7 +326,7 @@
 			{#if suggestionState === 'done'}
 				<p
 					in:slide={{ duration: transitionDuration }}
-					out:slide={{ duration: transitionDuration }}
+					out:blur={{ duration: thankYouFadeTimer }}
 					class="thank-you-bubble bubble"
 				>
 					{$_('submit_acknowlegment')}

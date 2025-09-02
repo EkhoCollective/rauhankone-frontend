@@ -347,7 +347,7 @@
 </svelte:head>
 
 {#if navigationData.source === 'submit' && toastEnabled}
-	<div transition:blur class="toast-container">
+	<div transition:blur={{duration: 1000}} class="toast-container">
 		<p>{$_('explore_toast_from_submit')}</p>
 	</div>
 {/if}
