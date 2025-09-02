@@ -25,7 +25,8 @@ const debounce = () => {
 
 function isMobile() {
 	// Basic mobile detection
-	return typeof window !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+	let maxWidth = 768;
+	return typeof window !== 'undefined' && window.innerWidth <= maxWidth;
 }
 
 function scrollTextareaIntoView() {
