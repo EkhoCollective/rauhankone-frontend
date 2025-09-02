@@ -106,7 +106,7 @@
 		text-align: left;
 		line-height: 1.5;
 		white-space: pre-wrap;
-		overflow-wrap: break-word;
+  		word-break: break-word;
 	}
 
 	.modal-story-actions {
@@ -161,6 +161,12 @@
 
 		.modal-story-actions {
 			padding: 15px;
+		}
+
+		.btn-close {
+			left: 50%;
+			right: unset;
+			right: 50%;
 		}
 	}
 
