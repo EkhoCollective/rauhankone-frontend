@@ -1,0 +1,77 @@
+.check-icon-container {
+    display: grid;
+    grid-template-areas:
+        "checkbox label"
+        "checkbox button";
+    gap: 1rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    --checkbox-color: #ffffff;
+    --checkbox-bg-color: #000000;
+
+
+
+
+
+
+    input[type="checkbox"]+label {
+        transform: translateY(-2px);
+
+    }
+
+    label {
+        grid-area: label;
+        font-weight: 300;
+        max-width: 70ch;
+    }
+
+
+
+    
+
+
+
+    input[type="checkbox"] {
+        grid-area: checkbox;
+        /* Add if not using autoprefixer */
+        -webkit-appearance: none;
+        appearance: none;
+        /* For iOS < 15 to remove gradient background */
+        /* Not removed via appearance */
+        margin: 0;
+        cursor: pointer;
+        background-image: url("@static/luUnchecked.svg");
+        width: 1.15rem;
+        height: 1.15rem;
+        aspect-ratio: 1;
+        /* border: 1px solid white; */
+        transform: translateY(-0.075em);
+        position: relative;
+
+        &:checked {
+            background-image: url("@static/luChecked.svg");
+        }
+    }
+
+
+
+    .disclaimer-btn-container {
+        grid-area: button;
+        margin-top: 1rem;
+    }
+
+
+    @media (max-width: 768px) {
+        .checkmark-container {
+            grid-template-areas:
+                "checkbox   label"
+                ".          button";
+            gap: 0.5rem;
+        }
+
+        .disclaimer-btn-container {
+            margin-left: auto;
+            margin-right: 0;
+        }
+    }
+}

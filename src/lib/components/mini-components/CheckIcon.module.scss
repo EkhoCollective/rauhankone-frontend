@@ -1,0 +1,73 @@
+
+
+.check-icon-container {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  --checkbox-color: #ffffff;
+  --checkbox-bg-color: #000000;
+
+
+  input[type="checkbox"] + label {
+  transform: translateY(-2px);
+
+}
+
+label {
+  font-weight: 300;
+  max-width: 70ch;
+}
+input[type="checkbox"] {
+  /* Add if not using autoprefixer */
+  -webkit-appearance: none;
+  appearance: none;
+  /* For iOS < 15 to remove gradient background */
+  /* Not removed via appearance */
+  margin: 0;
+  cursor: pointer;
+  background-image: url("@static/luUnchecked.svg");
+  width: 1.15rem;
+  height: 1.15rem;
+  aspect-ratio: 1;
+  /* border: 1px solid white; */
+  transform: translateY(-0.075em);
+  position: relative;
+
+  &:checked {
+    background-image: url("@static/luChecked.svg");
+  }
+}
+
+
+
+/* 
+input[type="checkbox"]::before {
+  display: block;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  position: absolute;
+  line-height: 0;
+  content: '';
+  background-image: url("@static/luUnchecked.svg");
+  width: 0.65em;
+  height: 0.65em;
+  transform: scale(0);
+  top: 50%;
+  left: 12%;
+  right: auto;
+  bottom: auto;
+  transition: 60ms transform ease-in-out;
+} */
+
+
+/* input[type="checkbox"]:checked::before {
+  transform: scale(1);
+} */
+
+
+}
+
+
+

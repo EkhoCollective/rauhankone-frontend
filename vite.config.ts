@@ -12,6 +12,11 @@ export default defineConfig(({ mode }) => {
 				drop: [],
 				exclude: ['node_modules/**', "testing/**"]
 			},
+			resolve: {
+				alias: {
+					'@static': '/static'
+				}
+			},
 			test: {
 				workspace: [
 					{
@@ -47,6 +52,11 @@ export default defineConfig(({ mode }) => {
 				drop: ['debugger'],
 				pure: ['console.log', 'console.debug', 'console.warn', 'console.warning'],
 				exclude: ['node_modules/**', "testing/**"]
+			},
+			resolve: {
+				alias: {
+					'@static': '/static'
+				}
 			},
 			test: {
 				workspace: [

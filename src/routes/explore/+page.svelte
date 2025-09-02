@@ -411,6 +411,14 @@
 </div>
 
 <style>
+	.loader-container {
+		position: absolute;
+		top: 30%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+
 	.scene-container {
 		width: 100%;
 		height: 100vh;
