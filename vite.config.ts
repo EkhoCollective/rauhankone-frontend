@@ -44,7 +44,8 @@ export default defineConfig(({ mode }) => {
 		return {
 			plugins: [sveltekit()],
 			esbuild: {
-				drop: ['console', 'debugger'],
+				drop: ['debugger'],
+				pure: ['console.log', 'console.debug', 'console.warn', 'console.warning'],
 				exclude: ['node_modules/**', "testing/**"]
 			},
 			test: {
