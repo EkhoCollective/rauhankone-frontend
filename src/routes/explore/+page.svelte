@@ -112,9 +112,11 @@
 
 		// Determine what to send to API
 		if (getOnlyTranslated === true) {
-			requestLanguage = 'Any';
-		} else {
+			console.log("getOnlyTranslate is True, so getting only on target lang");
 			requestLanguage = getLocaleFullName();
+		} else {
+			console.log("getOnlyTranslate is False, so getting all languages");
+			requestLanguage = "Any";
 		}
 		return requestLanguage;
 	}
