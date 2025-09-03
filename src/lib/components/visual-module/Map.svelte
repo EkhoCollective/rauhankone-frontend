@@ -25,6 +25,7 @@
 		MeshLineMaterial,
 		Text3DGeometry
 	} from '@threlte/extras';
+	import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
 	import { useAudio } from '$lib/composables/useAudio';
 
 	const { playBlip, playClusterSound } = useAudio();
@@ -106,6 +107,20 @@
 	let noise = new SimplexNoise();
 	let time = $state(0);
 	let sphereTime = $state(0); // Separate time for sphere animation
+
+	// let font = useLoader(FontLoader).load('$lib/components/media/font/Roboto Thin_Regular.json')
+
+	const loader = new FontLoader();
+	let loadedFont = $state<Font | null>(null);
+
+	const font = loader.load('/Roboto_Thin_Regular_Latin.json', (font) => {
+		loadedFont = font;
+		// console.log('Font loaded successfully', loadedFont);
+		// Repopulate data now that font is loaded to get text geometries
+		// if (data) {
+		// 	populateFromData();
+		// }
+	});
 
 	// Interactivity
 	interactivity({
@@ -651,7 +666,6 @@
 </script>
 
 <!-- <PerfMonitor anchorY="bottom" /> -->
-<!-- <World gravity={[0, 0, 0]}> -->
 <T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 	<CameraControls bind:ref={controls} />
 </T.PerspectiveCamera>
@@ -706,17 +720,17 @@
 			/>
 		</T.Mesh>
 	{/each}
-	<!-- InstancedMesh -->
+
+	<!-- Story target sphere -->
 	<InstancedMesh>
-		<T.SphereGeometry args={[0.35, 3, 2]} />
-		<T.MeshBasicMaterial color="white" toneMapped={false} />
+		<T.SphereGeometry args={[1, 8, 8]} />
+		<T.MeshBasicMaterial color="white" toneMapped={false} transparent={true} opacity={0.001} />
 
 		{#each instances as instance}
 			<Instance
 				position.y={instance.positions.y}
 				position.x={instance.positions.x}
 				position.z={instance.positions.z}
-				scale={instance.scale}
 				onclick={() => {
 					// Store the previous selected story before changing
 					if (selectedStory) {
@@ -753,14 +767,8 @@
 						}
 					});
 
-					// Calculate nearest and furthest stories for this instance
-					instance.calculateNearestAndFurthest(instances);
-
 					selectedStory = instance;
-
-					// Play blip sound for UI interaction
-					// playBlip();
-					// Play cluster-specific sound for the story
+					// Play sound for the story
 					playClusterSound();
 
 					// Center camera on the selected story
@@ -776,8 +784,6 @@
 							true // Enable smooth transition
 						);
 					}
-					// TODO: Play cluster sound effect with new audio system
-					// soundEffects.playEffect(instance.cluster_audio_id);
 				}}
 				onpointerenter={() => {
 					// Only animate if not selected
@@ -792,15 +798,33 @@
 					}
 				}}
 			/>
+		{/each}
+	</InstancedMesh>
 
-			<!-- <T.SphereGeometry args={[0.15, 3, 2]} />
-			<T.MeshBasicMaterial color="white" toneMapped={false} /> -->
+	<!-- Story geometry -->
+	<InstancedMesh>
+		<T.SphereGeometry args={[0.15, 3, 2]} />
+		<T.MeshBasicMaterial color="white" toneMapped={false} />
 
-			<!-- <Attractor
-					range={100}
-					strength={10000}
-					position={[instance.positions.x, instance.positions.y, instance.positions.z]}
-				/> -->
+		{#each instances as instance}
+			<Instance
+				position.y={instance.positions.y}
+				position.x={instance.positions.x}
+				position.z={instance.positions.z}
+				scale={instance.scale}
+				onpointerenter={() => {
+					// Only animate if not selected
+					if (!instance.selected) {
+						instance.tw.set(1);
+					}
+				}}
+				onpointerleave={() => {
+					// Only reset if not selected
+					if (!instance.selected) {
+						instance.tw.set(0);
+					}
+				}}
+			/>
 
 			{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
 				{#each instance.curve as pairCurvePoints}
@@ -844,34 +868,32 @@
 							animatedZ: character.originalPosition.z + charNoiseOffsetZ
 						};
 					})()}
-					<!-- <RigidBody> -->
-					<!-- <Collider shape="ball" args={[0.1]} mass={10000} /> -->
-					<T.Mesh
-						position={[animatedX, animatedY, animatedZ]}
-						rotation={[
-							Math.random() * Math.PI * 2,
-							Math.random() * Math.PI * 2,
-							Math.random() * Math.PI * 2
-						]}
-					>
-						<Text3DGeometry
-							text={character.char}
-							size={0.125}
-							depth={0.01}
-							curveSegments={1}
-							bevelThickness={0}
-							bevelSize={0}
-							bevelSegments={1}
-							bevelEnabled={true}
-							smooth={0}
-						/>
-						<T.MeshBasicMaterial color="white" toneMapped={false} />
-					</T.Mesh>
-					<!-- </RigidBody> -->
-					<!-- </RigidBody> -->
+					{#if loadedFont}
+						<T.Mesh
+							position={[animatedX, animatedY, animatedZ]}
+							rotation={[
+								Math.random() * Math.PI * 2,
+								Math.random() * Math.PI * 2,
+								Math.random() * Math.PI * 2
+							]}
+						>
+							<Text3DGeometry
+								font={loadedFont}
+								text={character.char}
+								size={0.125}
+								depth={0.01}
+								curveSegments={1}
+								bevelThickness={0}
+								bevelSize={0}
+								bevelSegments={1}
+								bevelEnabled={true}
+								smooth={0}
+							/>
+							<T.MeshBasicMaterial color="white" toneMapped={false} />
+						</T.Mesh>
+					{/if}
 				{/each}
 			{/if}
 		{/each}
 	</InstancedMesh>
 </EffectComposer>
-<!-- </World> -->
