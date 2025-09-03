@@ -195,7 +195,7 @@
 		.modal-story-actions {
 			position: absolute;
 			padding: 15px 15px 15px 15px;
-			bottom: 15%;
+			bottom: 8%;
 			justify-content: flex-start;
 		}
 		.modal-story-header {
