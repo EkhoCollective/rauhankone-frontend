@@ -360,9 +360,7 @@
 
 <div class="scene-container">
 	<div>
-		{#if selectedStory}<div
-				in:blur={{ duration: 500 }}
-				out:blur={{ duration: 500 }}>
+		{#if selectedStory}<div>
 				<ModalStory
 					story={selectedStoryLanguageText}
 					closeModal={() => (selectedStory = null)}
@@ -426,7 +424,6 @@
 
 	.navigation-icons-container {
 		position: absolute;
-		z-index: 200;
 		bottom: 20px;
 		right: 20px;
 	}

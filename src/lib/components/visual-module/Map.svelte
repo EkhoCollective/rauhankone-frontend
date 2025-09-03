@@ -490,20 +490,27 @@
 
 	// Navigate to closest story
 	function navigateToClosest() {
+		console.log("Navigating to closest story");
 		if (selectedStory && selectedStory.closestStory) {
+			console.log("Calling navigateToClosestStory function");	
 			navigateToStory(selectedStory.closestStory);
+		} else {
+			console.log("navigateToClosestStory function is undefined or selectedStory.closestStory is undefined");
 		}
 	}
 
 	// Navigate to furthest story
 	function navigateToFurthest() {
+		console.log("Navigating to furthest story");
 		if (selectedStory && selectedStory.furthestStory) {
+			console.log("Calling navigateToFurthestStory function");
 			navigateToStory(selectedStory.furthestStory);
 		}
 	}
 
 	// Navigate to a specific story with camera transition
 	function navigateToStory(targetStory: any) {
+		console.log("In navigateToStory function");
 		if (!targetStory || !controls) return;
 
 		// Reset all instances' selected state

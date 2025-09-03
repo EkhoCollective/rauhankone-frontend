@@ -82,7 +82,7 @@
 		pathName = window.location.origin;
 
 		// Set the locale based on the user's preferences
-		const savedLocale = localStorage.getItem('locale');
+		const savedLocale = localStorage.getItem('locale') || 'en';
 		console.log("Saved locale from localStorage:", savedLocale);
 		if (savedLocale) {
 			locale.set(savedLocale);

@@ -2,9 +2,9 @@
 	import { _ } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
 	import { playClusterSound, playBlip } from '$lib/composables/useAudio';
+	import { blur } from 'svelte/transition';
 	let { story = $bindable(), closeModal, onNavigateClosest, onNavigateFurthest } = $props();
 
-	
 	const idForDialog = crypto.randomUUID();
 	// Handle click outside
 	function handleClickOutside(event: MouseEvent) {
@@ -13,61 +13,64 @@
 			closeModal();
 		}
 	}
-
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
-<div 
-class="modal-story-container" 
-role="dialog" 
-id={idForDialog}
-tabindex="0"
-onclick={handleClickOutside}
-aria-modal="true" aria-labelledby="modal-title">
-	<div class="modal-story-content">
-		<div class="modal-story-header">
-			<!-- <h1>{story.cluster_id}</h1> -->
-			<button
-				class="btn-close"
-				onclick={(e) => {
-					e.stopPropagation();
-					playBlip();
-					closeModal();
-				}}
-			>
-				<X color="#ffffff" />
-			</button>
-		</div>
-		<div class="modal-story-body">
-		<p>{story}</p>
-		</div>
+<div
+	class="modal-story-container"
+	role="dialog"
+	in:blur={{ duration: 500 }}
+	out:blur={{ duration: 500 }}
+	id={idForDialog}
+	tabindex="0"
+	onclick={handleClickOutside}
+	aria-modal="true"
+	aria-label="Modal for story {story}"
+>
+	{#if story}
+		<div class="modal-story-content">
+			<div class="modal-story-header">
+				<!-- <h1>{story.cluster_id}</h1> -->
+				<button
+					class="btn-close"
+					onclick={(e) => {
+						e.stopPropagation();
+						playBlip();
+						closeModal();
+					}}
+				>
+					<X color="#ffffff" />
+				</button>
+			</div>
+			<div class="modal-story-body">
+				<p>{story}</p>
+			</div>
 
-		<div class="modal-story-actions">
-			<button
-				class="btn btn-action"
-				onclick={() => {
-					playClusterSound();
-					onNavigateClosest && onNavigateClosest();
-				}}
-			>
-				{$_('explore_modal_btn_closest')}
-			</button>
-			<button
-				class="btn btn-action"
-				onclick={() => {
-					playClusterSound();
-					onNavigateFurthest && onNavigateFurthest();
-				}}
-			>
-				{$_('explore_modal_btn_furthest')}
-			</button>
+			<div class="modal-story-actions">
+				<button
+					class="btn btn-action"
+					onclick={() => {
+						playClusterSound();
+						onNavigateClosest && onNavigateClosest();
+					}}
+				>
+					{$_('explore_modal_btn_closest')}
+				</button>
+				<button
+					class="btn btn-action"
+					onclick={() => {
+						playClusterSound();
+						onNavigateFurthest && onNavigateFurthest();
+					}}
+				>
+					{$_('explore_modal_btn_furthest')}
+				</button>
+			</div>
 		</div>
-	</div>
+	{/if}
 </div>
 
 <style>
-	
-	
 	.modal-story-container {
 		position: absolute;
 		display: flex;
@@ -77,11 +80,10 @@ aria-modal="true" aria-labelledby="modal-title">
 		height: 100%;
 		backdrop-filter: blur(10px);
 		background-color: rgba(0, 0, 0, 0.7);
-		z-index: 100;
+		z-index: 10;
 		top: 0;
 		left: 0;
 	}
-
 
 	.modal-story-content {
 		/* background-color: red; */
@@ -122,12 +124,14 @@ aria-modal="true" aria-labelledby="modal-title">
 	}
 
 	.modal-story-body p {
-		font-family: Roboto Slab Regular, serif;
+		font-family:
+			Roboto Slab Regular,
+			serif;
 		margin: 0;
 		text-align: left;
 		line-height: 1.5;
 		white-space: pre-wrap;
-  		word-break: break-word;
+		word-break: break-word;
 	}
 
 	.modal-story-actions {
@@ -149,14 +153,12 @@ aria-modal="true" aria-labelledby="modal-title">
 		font-weight: 200;
 	}
 
-	.btn:hover {
-	}
-
 	.btn-action {
-		padding: 8px 10px 8px 0;
-		text-align: left;
+		padding: 8px 10px 8px 10px;
+		text-align: center;
 		min-width: 80px;
 		max-width: 100px;
+		transform: translateX(-20px);
 	}
 
 	.btn-close {
@@ -170,45 +172,40 @@ aria-modal="true" aria-labelledby="modal-title">
 		align-items: center;
 	}
 
-
-
 	@media (max-width: 767px) {
 		.modal-story-content {
-					position: absolute;
-		top: 0;
-		bottom: 0;
-		right: 0;
-		left: 0;
-				min-height: 100%;
-		max-height: 100vh;
-			max-width: 95%;
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			right: auto;
+			left: auto;
+			min-height: 100%;
+			max-height: 100vh;
+			max-width: 85%;
 			max-height: 70%;
 			justify-content: flex-start;
+			gap: 8px;
 		}
 
 		.modal-story-body {
 			padding: 15px;
-			max-height: 50%;
-			margin-bottom: auto;
-			margin-top: 0;
-					position: absolute;
-		top: 50px;
+			max-height: 50vh;
 		}
 
 		.modal-story-actions {
 			position: absolute;
-			padding: 15px;
+			padding: 15px 15px 15px 15px;
 			bottom: 15%;
 			justify-content: flex-start;
 		}
 		.modal-story-header {
-			position: absolute;
+			min-height: 150px;
+			align-items: flex-end;
 		}
 
 		.btn-close {
-			left: auto;
-			top: 8px;
-			right: 0%;
+			position: unset;
+			margin-right: 15px;
 		}
 	}
 

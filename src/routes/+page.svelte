@@ -120,7 +120,7 @@
 		display: grid;
 		grid-template-rows: auto;
 		grid-template-columns: auto;
-		z-index: 50;
+		z-index: 0;
 		max-height: 100%;
 		min-height: 100%;
 		max-width: 100%;
