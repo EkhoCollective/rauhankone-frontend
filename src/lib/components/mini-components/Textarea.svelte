@@ -76,7 +76,7 @@ function scrollTextareaIntoView() {
 		line-height: 1.2;
 		border-radius: unset;
 		padding: var(--pad-3);
-		font-size: var(--f18);
+		font-size: var(--f16);
 		border: none;
 		border-radius: var(--pad-1);
 		transition: outline 0.1s ease-in-out;
