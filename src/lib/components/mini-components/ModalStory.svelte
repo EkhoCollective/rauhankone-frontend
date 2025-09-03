@@ -82,6 +82,7 @@ aria-modal="true" aria-labelledby="modal-title">
 		left: 0;
 	}
 
+
 	.modal-story-content {
 		/* background-color: red; */
 		display: flex;
@@ -173,23 +174,41 @@ aria-modal="true" aria-labelledby="modal-title">
 
 	@media (max-width: 767px) {
 		.modal-story-content {
+					position: absolute;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		left: 0;
+				min-height: 100%;
+		max-height: 100vh;
 			max-width: 95%;
-			max-height: 85%;
+			max-height: 70%;
+			justify-content: flex-start;
 		}
 
 		.modal-story-body {
 			padding: 15px;
+			max-height: 50%;
+			margin-bottom: auto;
+			margin-top: 0;
+					position: absolute;
+		top: 50px;
 		}
 
 		.modal-story-actions {
+			position: absolute;
 			padding: 15px;
+			bottom: 15%;
 			justify-content: flex-start;
+		}
+		.modal-story-header {
+			position: absolute;
 		}
 
 		.btn-close {
-			left: 50%;
-			right: unset;
-			right: 50%;
+			left: auto;
+			top: 8px;
+			right: 0%;
 		}
 	}
 

@@ -361,10 +361,8 @@
 <div class="scene-container">
 	<div>
 		{#if selectedStory}<div
-				class="modal-story-container"
 				in:blur={{ duration: 500 }}
-				out:blur={{ duration: 500 }}
-			>
+				out:blur={{ duration: 500 }}>
 				<ModalStory
 					story={selectedStoryLanguageText}
 					closeModal={() => (selectedStory = null)}

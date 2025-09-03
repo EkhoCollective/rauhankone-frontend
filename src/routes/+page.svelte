@@ -159,6 +159,7 @@
 		gap: 10px;
 		align-items: center;
 		justify-content: flex-start;
+		flex-wrap: wrap;
 	}
 
 
