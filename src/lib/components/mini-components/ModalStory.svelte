@@ -2,6 +2,7 @@
 	import { _ } from 'svelte-i18n';
 	import { X } from 'lucide-svelte';
 	import { playClusterSound, playBlip } from '$lib/composables/useAudio';
+	import { blur } from 'svelte/transition';
 	let { story = $bindable(), closeModal, onNavigateClosest, onNavigateFurthest } = $props();
 
 	
@@ -20,11 +21,15 @@
 <div 
 class="modal-story-container" 
 role="dialog" 
+in:blur={{ duration: 500 }}
+out:blur={{ duration: 500 }}
 id={idForDialog}
 tabindex="0"
 onclick={handleClickOutside}
-aria-modal="true" aria-labelledby="modal-title">
-	<div class="modal-story-content">
+aria-modal="true" 
+aria-label="Modal for story {story}">
+{#if story}
+<div class="modal-story-content">
 		<div class="modal-story-header">
 			<!-- <h1>{story.cluster_id}</h1> -->
 			<button
@@ -63,6 +68,7 @@ aria-modal="true" aria-labelledby="modal-title">
 			</button>
 		</div>
 	</div>
+	{/if}
 </div>
 
 <style>
@@ -77,7 +83,7 @@ aria-modal="true" aria-labelledby="modal-title">
 		height: 100%;
 		backdrop-filter: blur(10px);
 		background-color: rgba(0, 0, 0, 0.7);
-		z-index: 100;
+		z-index: 10;
 		top: 0;
 		left: 0;
 	}
@@ -154,9 +160,10 @@ aria-modal="true" aria-labelledby="modal-title">
 
 	.btn-action {
 		padding: 8px 10px 8px 0;
-		text-align: left;
+		text-align: center;
 		min-width: 80px;
 		max-width: 100px;
+		transform: translateX(-16px);
 	}
 
 	.btn-close {
