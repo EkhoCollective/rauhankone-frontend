@@ -7,7 +7,6 @@
 	import { apiRequest } from '$lib/utils/api_request';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import DOMPurify from 'dompurify';
-	import Checkmark from '$lib/components/mini-components/CheckIcon.svelte';
 	import Textarea from '$lib/components/mini-components/Textarea.svelte';
 	import Loader from '$lib/components/mini-components/Loader.svelte';
 	import { blur, fade, scale, slide } from 'svelte/transition';
