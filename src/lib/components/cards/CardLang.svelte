@@ -25,13 +25,20 @@
 		});
 	}
 
+	function handleClickOutside(event: MouseEvent) {
+		const target = event.target as HTMLElement;
+		if (target.id === "lang-card-outside-area") {
+			closeLangCard(false);
+		}
+	}
+
 	function playUISound() {
 		playBlip();
 	}
 </script>
 
 <!-- Header/Language Selector -->
-<DialogContent class="lang-container" trapFocus={true}>
+<DialogContent class="lang-container" id="lang-card-outside-area"trapFocus={true} onclick={handleClickOutside}>
 	<div class="top-right-buttons">
 		<Dialog.Close
 			id="close-langcard-button"
@@ -80,7 +87,9 @@
 	grid-row-start: 2;
 	display: flex;
 	height: 100%;
-	width: 100%;
+	width: fit-content;
+	margin-left: auto;
+	margin-right: auto;
 	flex-direction: column;
 	gap: 30px;
 	align-items: center;
