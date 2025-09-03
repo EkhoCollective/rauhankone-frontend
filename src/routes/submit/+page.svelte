@@ -271,7 +271,6 @@
 			<Textarea
 				name={$_('submit_input_placeholder', { default: 'Your story' })}
 				bind:textValue={story}
-				minHeight="200px"
 				debounceTime={typingTimer}
 				labelId="question-label-main"
 				bind:typingActive={isTyping}

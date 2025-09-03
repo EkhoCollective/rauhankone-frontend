@@ -5,7 +5,6 @@ import textAreaStyles from './Textarea.module.scss';
 import { onMount } from 'svelte';
 let {
 	textValue = $bindable(),
-	minHeight,
 	labelId,
 	name,
 	debounceTime = 750,
@@ -76,24 +75,21 @@ function scrollTextareaIntoView() {
 		font-family: 'Roboto Slab Regular', serif;
 		line-height: 1.2;
 		border-radius: unset;
-		padding: 0.5em;
+		padding: var(--pad-2);
 		font-size: var(--f18);
 		border: none;
 		border-radius: var(--pad-1);
-		outline: 1px solid rgb(126, 126, 126);
 		transition: outline 0.1s ease-in-out;
 		
 		overflow-y: scroll;
 		overflow-x: hidden;
 		
-		background-color: black;
 		color: white;
 		
 		height: auto;
 		max-width: 100%;
 
 		background-color: #101010;
-		
 	} 
 
 
@@ -102,9 +98,14 @@ function scrollTextareaIntoView() {
 	}
 	textarea:focus,
 	textarea:focus-within {
+        border: none;
+		outline-offset: 0;
+		outline: 1px solid rgb(226, 226, 226);
 		border-radius: var(--pad-1);
-		outline: 1px solid rgb(255, 255, 255);
+		/* outline: unset;
 		outline-offset: unset;
-		transition: outline 0.1s ease-in-out;
+		outline: 1px solid rgb(126, 126, 126); */
+		/* transition: outline 0.2s ease-in-out; */
+		/* outline: 1px solid rgb(255, 255, 255); */
 	}
 </style>

@@ -158,7 +158,7 @@ label {
 
   input:focus,
   a:focus,
-  textarea:focus,
+  /* textarea:focus, */
   button:focus,
   select:focus {
     outline-color: rgb(163, 180, 255);
@@ -172,10 +172,10 @@ label {
 
   input, 
   button,
-  textarea,
+  /* textarea, */
   select {
     font-family: Roboto, sans-serif;
-    border-radius: 1.4px;
+    /* border-radius: 1.4px; */
   }
 
 
@@ -279,7 +279,7 @@ button > svg {
     button:focus,
     input:focus,
     a:focus,
-    textarea:focus,
+    /* textarea:focus, */
     select:focus
     {
     @include fade-outline-out-after-delay(1s);
