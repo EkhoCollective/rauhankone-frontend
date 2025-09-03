@@ -8,7 +8,6 @@
 	const idForDialog = crypto.randomUUID();
 	// Handle click outside
 	function handleClickOutside(event: MouseEvent) {
-		debugger;
 		const target = event.target as HTMLElement;
 		if (target.id === idForDialog) {
 			closeModal();
