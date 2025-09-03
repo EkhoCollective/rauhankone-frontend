@@ -26,32 +26,36 @@
 		};
 	}
 
-	console.log('bgImage', bgImage);
+	/* console.log('bgImage', bgImage); */
 	$inspect(coords);
 </script>
 
 <div class="bg-container">
 	<div
 		class="bg-mouse"
-		style="--x: {-coords.current.x}px; --y: {-coords.current
-			.y}px; background-image: url('{bgImage}');"
+		style="--x: {-coords.current.x}px; --y: {-coords.current.y}px; background-image: url('{bgImage}');"
 		role="presentation"
 	></div>
 </div>
 
 <style>
 	.bg-container {
+		display: flex;
+		content: "x";
 		position: absolute;
 		top: 0;
 		left: 0;
+		bottom: 0;
+		right: 0;
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
 	}
 
 	.bg-mouse {
-		--x: 0px;
-		--y: 0px;
+		display: flex;
+		--x: 1px;
+		--y: 1px;
 		width: 110%;
 		height: 110%;
 		/* background-image: url('../media/images/EKHO_Sketch_bg.webp'); */
