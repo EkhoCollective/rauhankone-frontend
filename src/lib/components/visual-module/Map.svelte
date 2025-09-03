@@ -774,6 +774,9 @@
 						}
 					});
 
+					// Calculate nearest and furthest stories for navigation
+					instance.calculateNearestAndFurthest(instances);
+
 					selectedStory = instance;
 					// Play sound for the story
 					playClusterSound();
