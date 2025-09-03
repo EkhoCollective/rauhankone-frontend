@@ -16,6 +16,7 @@
 	import Footer from '$lib/components/mini-components/Footer.svelte';
 	import TopLeftBackBtn from '$lib/components/mini-components/TopLeftBackBtn.svelte';
 	import ConfirmCheckIcon from '$lib/components/mini-components/ConfirmCheckIcon.svelte';
+	import BackgroundMouse from '$lib/components/mini-components/BackgroundMouse.svelte';
 	// Get navigation context from layout
 	const navigationContext = getContext('navigation') as {
 		setSource: (source: 'main' | 'submit') => void;
@@ -47,7 +48,7 @@
 	let transitionDuration: number = 500;
 
 	let localeNow = getLocaleFullName();
-	console.log("Current locale inside submit:", localeNow);
+	console.log('Current locale inside submit:', localeNow);
 	// let raiseError = $state(false);
 
 	// API Options
@@ -72,6 +73,14 @@
 			language: getLocaleFullName()
 		}
 	});
+
+	let backgroundRef: BackgroundMouse | undefined = $state();
+
+	function handleMouseMove(e: MouseEvent) {
+		if (backgroundRef) {
+			backgroundRef.updateCoords(e);
+		}
+	}
 
 	// Functions
 	async function handleSubmit() {
@@ -242,8 +251,6 @@
 		// handleGetQuestionContainer();
 		// raiseError = true;
 	});
-
-
 </script>
 
 <svelte:head>
@@ -253,87 +260,97 @@
 <header>
 	<TopLeftBackBtn button_text_id="back" rel_url="/" />
 </header>
-<div class="card-submit-container">
-	<div class="card-left-col-container">
-	<!-- Main Text -->
-	{#if question}
-		<div
-			in:fade={{ duration: transitionDuration }}
-			out:fade={{ duration: transitionDuration }}
-			class="question-container"
-		>
-			<span id="question-label-main">{question}</span>
-		</div>
 
-		<div class="input-container" 
-		out:slide={{ duration: transitionDuration }}
-		>
-			<Textarea
-				name={$_('submit_input_placeholder', { default: 'Your story' })}
-				bind:textValue={story}
-				minHeight="200px"
-				debounceTime={typingTimer}
-				labelId="question-label-main"
-				bind:typingActive={isTyping}
-			/>
-		</div>
-		<!-- Suggestions -->
-		<div class="suggestions-container">
-			{#if suggestionState !== 'off'}
-				<div 
-				in:slide={{ duration: transitionDuration }}
-				out:slide={{ duration: transitionDuration }}
-				></div>
-			{/if}
-			<!-- Show warning if story is too short -->
-			{#if suggestionState === 'warning'}
-				<div class="warning-bubble bubble" 
-				in:slide={{ duration: transitionDuration }} 
-				out:slide={{ duration: transitionDuration }}
-				>
-					<p>
-						{#if story.length === 0}
-							{$_('submit_type_story')}
-						{:else}
-							{$_('submit_type_more')}
-						{/if}
+<div class="card-submit-container" onmousemove={handleMouseMove} role="presentation">
+	<div class="card-bg-container">
+		<BackgroundMouse
+			bind:this={backgroundRef}
+			maxMovement={75}
+			stiffness={0.05}
+			damping={0.95}
+			bgImage="/submit_bg.png"
+		/>
+	</div>
+	<div class="card-left-col-container">
+		<!-- Main Text -->
+		{#if question}
+			<div
+				in:fade={{ duration: transitionDuration }}
+				out:fade={{ duration: transitionDuration }}
+				class="question-container"
+			>
+				<span id="question-label-main">{question}</span>
+			</div>
+
+			<div class="input-container" out:slide={{ duration: transitionDuration }}>
+				<Textarea
+					name={$_('submit_input_placeholder', { default: 'Your story' })}
+					bind:textValue={story}
+					minHeight="200px"
+					debounceTime={typingTimer}
+					labelId="question-label-main"
+					bind:typingActive={isTyping}
+				/>
+			</div>
+			<!-- Suggestions -->
+			<div class="suggestions-container">
+				{#if suggestionState !== 'off'}
+					<div
+						in:slide={{ duration: transitionDuration }}
+						out:slide={{ duration: transitionDuration }}
+					></div>
+				{/if}
+				<!-- Show warning if story is too short -->
+				{#if suggestionState === 'warning'}
+					<div
+						class="warning-bubble bubble"
+						in:slide={{ duration: transitionDuration }}
+						out:slide={{ duration: transitionDuration }}
+					>
+						<p>
+							{#if story.length === 0}
+								{$_('submit_type_story')}
+							{:else}
+								{$_('submit_type_more')}
+							{/if}
+						</p>
+					</div>
+				{/if}
+				<!-- Show loader when waiting for suggestions -->
+				{#if suggestionState === 'loading'}
+					<div
+						class="loader-bubble bubble"
+						in:slide={{ duration: transitionDuration }}
+						out:slide={{ duration: transitionDuration }}
+					>
+						<Loader color="white" pulseSize="30px" pulseTiming="1s" />
+					</div>
+				{/if}
+				<!-- Show suggestion if user has typed something -->
+				{#if suggestionState === 'ok'}
+					<div
+						in:slide={{ duration: transitionDuration }}
+						out:slide={{ duration: transitionDuration }}
+						class="suggestions-bubble bubble"
+					>
+						<p>{$_('submit_please_extend')}</p>
+						<br />
+						<p>{suggestion}</p>
+					</div>
+				{/if}
+				<!-- Show thank you message if user has finished the story -->
+				{#if suggestionState === 'done'}
+					<p
+						in:slide={{ duration: transitionDuration }}
+						out:blur={{ duration: thankYouFadeTimer }}
+						class="thank-you-bubble bubble"
+					>
+						{$_('submit_acknowlegment')}
 					</p>
-				</div>
-			{/if}
-			<!-- Show loader when waiting for suggestions -->
-			{#if suggestionState === 'loading'}
-				<div class="loader-bubble bubble" 
-				in:slide={{ duration: transitionDuration }} 
-				out:slide={{ duration: transitionDuration }}
-				>
-					<Loader color="white" pulseSize="30px" pulseTiming="1s" />
-				</div>
-			{/if}
-			<!-- Show suggestion if user has typed something -->
-			{#if suggestionState === 'ok'}
-				<div
-					in:slide={{ duration: transitionDuration }}
-					out:slide={{ duration: transitionDuration }}
-					class="suggestions-bubble bubble"
-				>
-					<p>{$_('submit_please_extend')}</p>
-					<br />
-					<p>{suggestion}</p>
-				</div>
-			{/if}
-			<!-- Show thank you message if user has finished the story -->
-			{#if suggestionState === 'done'}
-				<p
-					in:slide={{ duration: transitionDuration }}
-					out:blur={{ duration: thankYouFadeTimer }}
-					class="thank-you-bubble bubble"
-				>
-					{$_('submit_acknowlegment')}
-				</p>
-			{/if}
-		</div>
-		<!-- Input Area -->
-	{/if}
+				{/if}
+			</div>
+			<!-- Input Area -->
+		{/if}
 	</div>
 	<!-- Actions -->
 
@@ -343,7 +360,7 @@
 			<div transition:blur class="disclaimer-container">
 				<!-- Checkmark -->
 				<ConfirmCheckIcon
-					handleSubmit={handleSubmit}
+					{handleSubmit}
 					bind:checkValue={userAgreed}
 					translateIdForCheckbox={'submit_disclaimer'}
 					hideLabel={false}
@@ -353,8 +370,10 @@
 	</div>
 </div>
 
-
 <style>
+	.card-bg-container {
+		display: none;
+	}
 	.card-left-col-container {
 		display: flex;
 		flex-direction: column;
@@ -364,13 +383,11 @@
 		width: 100%;
 	}
 
-	.footer-container {
+	/* .footer-container {
 		padding: 10%;
-	}
+	} */
 
 	.card-submit-container {
-
-
 		min-height: 100vh;
 		min-width: 100vw;
 		max-width: 100%;
@@ -415,10 +432,10 @@
 		line-height: 1.25;
 	}
 
-	.disclaimer-btn-container {
+	/* .disclaimer-btn-container {
 		margin: var(--pad-1);
 		align-self: end;
-	}
+	} */
 
 	.actions-container {
 		grid-area: actions-area;
@@ -475,14 +492,13 @@
 
 	/* Media Queries */
 	@media (max-width: 768px) {
-
 		.card-submit-container {
 			display: grid;
-		grid-template-areas:
-			'left-col'
-			'actions-area';
-		grid-template-columns: 1fr;
-		grid-template-rows: max-content max-content;
+			grid-template-areas:
+				'left-col'
+				'actions-area';
+			grid-template-columns: 1fr;
+			grid-template-rows: max-content max-content;
 		}
 
 		.card-left-col-container {
@@ -497,19 +513,17 @@
 			max-width: 95%;
 			margin-bottom: var(--pad-2);
 		}
-		
+
 		.suggestions-container {
 			max-width: 100%;
 			margin-right: auto;
 			margin-top: var(--pad-1);
-			
 		}
 
 		.input-container {
 			margin-bottom: 0;
 		}
 
-		
 		.actions-container {
 			grid-area: actions-area;
 			max-width: 100%;
@@ -520,9 +534,6 @@
 			justify-content: center;
 			gap: var(--pad-3);
 		}
-
-
-
 
 		.bubble {
 			/* max-width: 90%;
@@ -543,8 +554,5 @@
 				transform: scaleY(1);
 			}
 		}
-
-
-
 	}
 </style>

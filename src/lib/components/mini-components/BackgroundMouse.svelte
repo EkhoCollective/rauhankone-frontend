@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Spring } from 'svelte/motion';
 
-	let { maxMovement = 100, stiffness = 0.05, damping = 0.95 } = $props();
+	let { maxMovement = 100, stiffness = 0.05, damping = 0.95, bgImage = $bindable() } = $props();
 
 	let coords = new Spring(
 		{ x: 0, y: 0 },
@@ -25,12 +25,16 @@
 			y: normalizedY * maxMovement
 		};
 	}
+
+	console.log('bgImage', bgImage);
+	$inspect(coords);
 </script>
 
 <div class="bg-container">
 	<div
 		class="bg-mouse"
-		style="--x: {-coords.current.x}px; --y: {-coords.current.y}px"
+		style="--x: {-coords.current.x}px; --y: {-coords.current
+			.y}px; background-image: url('{bgImage}');"
 		role="presentation"
 	></div>
 </div>
@@ -50,10 +54,11 @@
 		--y: 0px;
 		width: 110%;
 		height: 110%;
-		background-image: url('../media/images/EKHO_Sketch_bg.webp');
+		/* background-image: url('../media/images/EKHO_Sketch_bg.webp'); */
 		background-position: var(--x) var(--y);
 		background-size: cover;
 		background-repeat: no-repeat;
 		overflow: hidden;
+		filter: blur(10px);
 	}
 </style>
