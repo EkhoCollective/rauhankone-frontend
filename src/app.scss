@@ -29,6 +29,8 @@
   --f24: calc(var(--fb) * 24);
   --f32: calc(var(--fb) * 32);
   --f46: calc(var(--fb) * 46);
+
+  --bg-gray: #101010;
 }
 
 @media (max-width: 768px) {
@@ -287,9 +289,12 @@ button > svg {
 
 
   button:disabled {
-    opacity: 0.5;
+    color: #6060605d;
+    background-color: var(--bg-gray);
     pointer-events: none;
     transition: opacity 0.1s ease-in-out;
+    border: none;
+    transition: all 0.1s ease-in-out;
   }
 
 h1, h2, h3, h4, h5, h6, label, button, a, span, input {
