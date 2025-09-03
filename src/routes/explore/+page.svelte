@@ -174,9 +174,31 @@
 		isInContinuousPress = false;
 	}
 
+	// Track previous translation toggle to avoid constant refetching
+	let previousTranslated = getOnlyTranslated;
+
 	$effect(() => {
 		handleNavButton(navButtonValue);
-	});
+		const newLocale = $locale || 'en';
+		const newTranslated = getOnlyTranslated;
+
+		if (newLocale?.length > 2) {
+			console.log('New language code exceeds 2ch:', newLocale); // Probably en-GB
+		}
+
+		// Refetch when locale OR translate flag actually changed
+		if (newLocale !== previousLocale || newTranslated !== previousTranslated) {
+			console.log('Language or translation toggle changed:', { newLocale, newTranslated });
+			// Reset clusters and refetch
+			if (response_clusters !== null) {
+				response_clusters = null;
+				fetchClusters();
+			}
+
+			previousLocale = newLocale;
+			previousTranslated = newTranslated;
+		}
+		});
 
 	// Effect to stop sound when modal closes or track sound when modal opens
 	$effect(() => {
