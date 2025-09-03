@@ -302,7 +302,6 @@ h1, h2, h3, h4, h5, h6, label, button, a, span, input {
 /* Header buttons for language selection and audio control */
   .top-right-buttons {
     position: absolute;
-		z-index: 1000;
     width: 100px;
     height: auto;
     right: 0;
@@ -330,7 +329,7 @@ h1, h2, h3, h4, h5, h6, label, button, a, span, input {
 
   .top-left-buttons {
     position: absolute;
-    z-index: 1000;
+    z-index: 101;
     width: 100px;
     height: auto;
     left: 0;
@@ -371,7 +370,7 @@ h1, h2, h3, h4, h5, h6, label, button, a, span, input {
 	display: grid;
 	width: 100%;
 	height: 100%;
-	z-index: 3000;
+	z-index: 100;
 	background-color: black;
 	grid-template-rows: 0.2fr 1fr 1fr;
 }
