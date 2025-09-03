@@ -352,9 +352,7 @@
 		{/if}
 	</div>
 </div>
-<div class="footer-container">
-	<Footer />
-</div>
+
 
 <style>
 	.card-left-col-container {
