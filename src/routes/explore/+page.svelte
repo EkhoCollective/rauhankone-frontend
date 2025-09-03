@@ -424,8 +424,8 @@
 
 	.navigation-icons-container {
 		position: absolute;
-		bottom: 20px;
-		right: 20px;
+		bottom: 12%;
+		right: 5%;
 	}
 
 	.toast-container {
