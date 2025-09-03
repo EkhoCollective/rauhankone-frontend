@@ -75,7 +75,7 @@ function scrollTextareaIntoView() {
 		font-family: 'Roboto Slab Regular', serif;
 		line-height: 1.2;
 		border-radius: unset;
-		padding: var(--pad-2);
+		padding: var(--pad-3);
 		font-size: var(--f18);
 		border: none;
 		border-radius: var(--pad-1);
@@ -89,7 +89,7 @@ function scrollTextareaIntoView() {
 		height: auto;
 		max-width: 100%;
 
-		background-color: #101010;
+		background-color: var(--bg-gray);
 	} 
 
 
