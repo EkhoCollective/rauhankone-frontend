@@ -47,9 +47,15 @@
 	<title>{$_('main_title')} | {$_('main_subtitle')} | Oulu 2026</title>
 </svelte:head>
 
-<main class="card-main-container" onmousemove={handleMouseMove}>
+<main class="card-main-container" onmousemove={handleMouseMove} role="presentation">
 	<div class="card-bg-container">
-		<BackgroundMouse bind:this={backgroundRef} maxMovement={75} stiffness={0.05} damping={0.95} />
+		<BackgroundMouse
+			bind:this={backgroundRef}
+			maxMovement={75}
+			stiffness={0.05}
+			damping={0.95}
+			bgImage="/main_bg.png"
+		/>
 	</div>
 	<div class="card-main-container-inner">
 		<!-- Title -->
@@ -70,8 +76,9 @@
 				data-variant="primary"
 				onclick={() => {
 					playUISound();
-					goto(resolve("/submit"));
-				}}>
+					goto(resolve('/submit'));
+				}}
+			>
 				{$_('main_btn_take_part')}
 			</button>
 			<button
@@ -80,16 +87,18 @@
 				onclick={() => {
 					playUISound();
 					navigationContext.setSource('main');
-					goto(resolve("/explore"));
-				}}>
-				{$_('main_btn_explore')}</button>
+					goto(resolve('/explore'));
+				}}
+			>
+				{$_('main_btn_explore')}</button
+			>
 		</div>
 		<!-- Footer -->
 		<div class="card-footer-container">
 			<Footer />
 		</div>
 	</div>
-	</main>
+</main>
 
 <style>
 	.card-bg-container {
@@ -104,8 +113,7 @@
 		max-width: 100%;
 		min-width: 100%;
 		flex-grow: 1;
-		background-color: rgb(0, 0, 0);
-
+		/* background-color: rgb(0, 0, 0); */
 	}
 
 	.card-main-container-inner {
@@ -119,7 +127,6 @@
 		min-width: 100%;
 		padding: var(--pad-3);
 	}
-
 
 	.card-title-container {
 		grid-row-start: 1;
@@ -162,15 +169,11 @@
 		flex-wrap: wrap;
 	}
 
-
-
-  	.card-footer-container {
+	.card-footer-container {
 		border-top: 1px solid white;
 		margin-top: var(--pad-5);
 		font-size: var(--f14);
 	}
-
-
 
 	@media (min-width: 768px) {
 		.card-bg-container {
@@ -186,11 +189,11 @@
 
 		.card-main-container-inner {
 			max-width: 100%;
-			grid-template-rows: 
-			max-content 
-			max-content
-			max-content
-			1fr;
+			grid-template-rows:
+				max-content
+				max-content
+				max-content
+				1fr;
 			--pad-side: 10%;
 			padding-top: 10%;
 			grid-template-columns: var(--pad-side) 1fr 0.5fr var(--pad-side);
@@ -198,8 +201,7 @@
 				'.	title 			btn-container		.'
 				'.	subtitle 		btn-container		.'
 				'.	text-area 		btn-container		.'
-				'footer-container	footer-container 	. .'
-				;
+				'footer-container	footer-container 	. .';
 		}
 		.card-title-container {
 			grid-area: title;
