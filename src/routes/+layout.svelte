@@ -8,7 +8,7 @@
 	import { Dialog } from 'bits-ui';
 	import { setContext } from 'svelte';
 	import { onMount } from 'svelte';
-	import { init, waitLocale, _, locale } from 'svelte-i18n';
+	import { waitLocale, _, locale } from 'svelte-i18n';
 	import { fade } from 'svelte/transition';
 	import '../app.scss';
 	import { customErrorHandler } from '$lib/utils/customErrrorHandler';
@@ -55,10 +55,9 @@
 	// Set context at component initialization
 	// setContext('questions', () => questions);
 
-	init({
-		fallbackLocale: 'en',
-		initialLocale: navigator.languages[1]
-	});
+
+
+
 
 	async function handleGetToken() {
 		await getAuthToken().catch((err) => {
@@ -76,12 +75,6 @@
 		handleGetToken();
 		pathName = window.location.origin;
 
-		// Set the locale based on the user's preferences
-		const savedLocale = localStorage.getItem('locale') || 'en';
-		console.log('Saved locale from localStorage:', savedLocale);
-		if (savedLocale) {
-			locale.set(savedLocale);
-		}
 	});
 
 	// $inspect(questions);

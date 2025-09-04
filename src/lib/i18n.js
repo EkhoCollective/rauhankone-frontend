@@ -1,5 +1,6 @@
 // import { browser } from '$app/environment';
-import { register, init, getLocaleFromNavigator } from 'svelte-i18n';
+import { browser } from '$app/environment';
+import { register, getLocaleFromNavigator, init } from 'svelte-i18n';
 
 const defaultLocale = 'en';
 
@@ -13,12 +14,23 @@ register('fi', () => import('$lib/translations/fi.json'));
 
 const supportedLocales = ['en', 'fi', 'en-GB'];
 
-const getLocaleFromNavigatorSafe = () => {
-	const locale = getLocaleFromNavigator()?.slice(0, 2) || defaultLocale;
-	return supportedLocales.includes(locale) ? locale : defaultLocale;
+export const getLocaleFromNavigatorSafe = () => {
+	if (browser) {
+		const possibleSavedLocale = localStorage.getItem('locale');
+		const localeFromBrowser = getLocaleFromNavigator()?.slice(0, 2) || defaultLocale;
+		const finalLocale = possibleSavedLocale || localeFromBrowser;
+		return supportedLocales.includes(finalLocale) ? finalLocale : defaultLocale;
+	}
+	return defaultLocale;
 }
 
+		// Set the locale based on the user's preferences
 init({
-	initialLocale: getLocaleFromNavigatorSafe(),
-	fallbackLocale: defaultLocale
+initialLocale: (() => {
+	let initLocaleFromNavSafe = getLocaleFromNavigatorSafe();
+	console.log("Setting initial locale in i18n.js");
+	console.log(initLocaleFromNavSafe);
+	return initLocaleFromNavSafe;
+})(),
+fallbackLocale: "en"
 });
