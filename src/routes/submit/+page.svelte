@@ -282,74 +282,74 @@
 				<span id="question-label-main">{question}</span>
 			</div>
 
-		<div class="input-container" 
-		out:slide={{ duration: transitionDuration }}
-		>
-			<Textarea
-				name={$_('submit_input_placeholder', { default: 'Your story' })}
-				bind:textValue={story}
-				debounceTime={typingTimer}
-				labelId="question-label-main"
-				bind:typingActive={isTyping}
-			/>
-		</div>
-		<!-- Suggestions -->
-		<div class="suggestions-container">
-			{#if suggestionState !== 'off'}
-				<div 
-				in:slide={{ duration: transitionDuration }}
-				out:slide={{ duration: transitionDuration }}
-				></div>
-			{/if}
-			<!-- Show warning if story is too short -->
-			{#if suggestionState === 'warning'}
-				<div class="warning-bubble bubble" 
-				in:slide={{ duration: transitionDuration }} 
-				out:slide={{ duration: transitionDuration }}
-				>
-					<p>
-						{#if story.length === 0}
-							{$_('submit_type_story')}
-						{:else}
-							{$_('submit_type_more')}
-						{/if}
+			<div class="input-container" out:slide={{ duration: transitionDuration }}>
+				<Textarea
+					name={$_('submit_input_placeholder', { default: 'Your story' })}
+					bind:textValue={story}
+					debounceTime={typingTimer}
+					labelId="question-label-main"
+					bind:typingActive={isTyping}
+				/>
+			</div>
+			<!-- Suggestions -->
+			<div class="suggestions-container">
+				{#if suggestionState !== 'off'}
+					<div
+						in:slide={{ duration: transitionDuration }}
+						out:slide={{ duration: transitionDuration }}
+					></div>
+				{/if}
+				<!-- Show warning if story is too short -->
+				{#if suggestionState === 'warning'}
+					<div
+						class="warning-bubble bubble"
+						in:slide={{ duration: transitionDuration }}
+						out:slide={{ duration: transitionDuration }}
+					>
+						<p>
+							{#if story.length === 0}
+								{$_('submit_type_story')}
+							{:else}
+								{$_('submit_type_more')}
+							{/if}
+						</p>
+					</div>
+				{/if}
+				<!-- Show loader when waiting for suggestions -->
+				{#if suggestionState === 'loading'}
+					<div
+						class="loader-bubble bubble"
+						in:slide={{ duration: transitionDuration }}
+						out:slide={{ duration: transitionDuration }}
+					>
+						<Loader color="white" pulseSize="30px" pulseTiming="1s" />
+					</div>
+				{/if}
+				<!-- Show suggestion if user has typed something -->
+				{#if suggestionState === 'ok'}
+					<div
+						in:slide={{ duration: transitionDuration }}
+						out:slide={{ duration: transitionDuration }}
+						class="suggestions-bubble bubble"
+					>
+						<p>{$_('submit_please_extend')}</p>
+						<br />
+						<p>{suggestion}</p>
+					</div>
+				{/if}
+				<!-- Show thank you message if user has finished the story -->
+				{#if suggestionState === 'done'}
+					<p
+						in:slide={{ duration: transitionDuration }}
+						out:blur={{ duration: thankYouFadeTimer }}
+						class="thank-you-bubble bubble"
+					>
+						{$_('submit_acknowlegment')}
 					</p>
-				</div>
-			{/if}
-			<!-- Show loader when waiting for suggestions -->
-			{#if suggestionState === 'loading'}
-				<div class="loader-bubble bubble" 
-				in:slide={{ duration: transitionDuration }} 
-				out:slide={{ duration: transitionDuration }}
-				>
-					<Loader color="white" pulseSize="30px" pulseTiming="1s" />
-				</div>
-			{/if}
-			<!-- Show suggestion if user has typed something -->
-			{#if suggestionState === 'ok'}
-				<div
-					in:slide={{ duration: transitionDuration }}
-					out:slide={{ duration: transitionDuration }}
-					class="suggestions-bubble bubble"
-				>
-					<p>{$_('submit_please_extend')}</p>
-					<br />
-					<p>{suggestion}</p>
-				</div>
-			{/if}
-			<!-- Show thank you message if user has finished the story -->
-			{#if suggestionState === 'done'}
-				<p
-					in:slide={{ duration: transitionDuration }}
-					out:blur={{ duration: thankYouFadeTimer }}
-					class="thank-you-bubble bubble"
-				>
-					{$_('submit_acknowlegment')}
-				</p>
-			{/if}
-		</div>
-		<!-- Input Area -->
-	{/if}
+				{/if}
+			</div>
+			<!-- Input Area -->
+		{/if}
 	</div>
 	<!-- Actions -->
 
@@ -498,6 +498,22 @@
 				'actions-area';
 			grid-template-columns: 1fr;
 			grid-template-rows: max-content max-content;
+		}
+
+		.card-bg-container {
+			display: flex;
+			flex: 1;
+			max-width: 100%;
+			width: 100%;
+			max-height: 100%;
+			min-height: 100vh;
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+
+			z-index: 0;
 		}
 
 		.card-left-col-container {
