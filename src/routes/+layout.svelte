@@ -24,8 +24,6 @@
 	let navigationSource = $state<'main' | 'submit' | null>(null);
 	let submittedStoryId = $state<string | null>(null);
 
-
-
 	// Set navigation context
 	setContext('navigation', {
 		setSource: (source: 'main' | 'submit') => {
@@ -59,7 +57,7 @@
 
 	init({
 		fallbackLocale: 'en',
-		initialLocale: 'en'
+		initialLocale: navigator.languages[1]
 	});
 
 	async function handleGetToken() {
@@ -73,9 +71,6 @@
 		showLang = !showLang;
 	};
 
-  	
-
-
 	onMount(() => {
 		window.scrollTo(0, 0);
 		handleGetToken();
@@ -83,7 +78,7 @@
 
 		// Set the locale based on the user's preferences
 		const savedLocale = localStorage.getItem('locale') || 'en';
-		console.log("Saved locale from localStorage:", savedLocale);
+		console.log('Saved locale from localStorage:', savedLocale);
 		if (savedLocale) {
 			locale.set(savedLocale);
 		}
@@ -158,10 +153,7 @@
 		<!-- Lang Dialog -->
 		<Dialog.Root bind:open={showLang}>
 			<Dialog.Portal>
-				<CardLang 
-				closeLangCard={handleToggleLangDialog} 
-				bind:translate={translateStories} 
-				/>
+				<CardLang closeLangCard={handleToggleLangDialog} bind:translate={translateStories} />
 			</Dialog.Portal>
 		</Dialog.Root>
 
@@ -170,7 +162,8 @@
 
 		<!-- Pages -->
 		{#key page.url.pathname}
-			<div class="page-container"
+			<div
+				class="page-container"
 				in:fade={{ duration: transitionDuration }}
 				out:fade={{ duration: transitionDuration }}
 			>
@@ -181,13 +174,11 @@
 </div>
 
 <style>
-
 	.page-container {
 		display: flex;
 		flex-direction: column;
-		flex-grow: 1;	
+		flex-grow: 1;
 		max-height: 100%;
 		min-height: 100%;
 	}
-
 </style>
