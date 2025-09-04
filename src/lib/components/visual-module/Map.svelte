@@ -463,6 +463,7 @@
 
 		centroid = calculateCentroid();
 		lookAtCentroid();
+		// createStoryCenterCurve();
 	}
 
 	// Calculate centroid
@@ -490,27 +491,29 @@
 
 	// Navigate to closest story
 	function navigateToClosest() {
-		console.log("Navigating to closest story");
+		console.log('Navigating to closest story');
 		if (selectedStory && selectedStory.closestStory) {
-			console.log("Calling navigateToClosestStory function");	
+			console.log('Calling navigateToClosestStory function');
 			navigateToStory(selectedStory.closestStory);
 		} else {
-			console.log("navigateToClosestStory function is undefined or selectedStory.closestStory is undefined");
+			console.log(
+				'navigateToClosestStory function is undefined or selectedStory.closestStory is undefined'
+			);
 		}
 	}
 
 	// Navigate to furthest story
 	function navigateToFurthest() {
-		console.log("Navigating to furthest story");
+		console.log('Navigating to furthest story');
 		if (selectedStory && selectedStory.furthestStory) {
-			console.log("Calling navigateToFurthestStory function");
+			console.log('Calling navigateToFurthestStory function');
 			navigateToStory(selectedStory.furthestStory);
 		}
 	}
 
 	// Navigate to a specific story with camera transition
 	function navigateToStory(targetStory: any) {
-		console.log("In navigateToStory function");
+		console.log('In navigateToStory function');
 		if (!targetStory || !controls) return;
 
 		// Reset all instances' selected state
@@ -670,6 +673,26 @@
 			}
 		});
 	});
+
+	// create a smooth curve from story centers
+	// let randomPointsP = $state<THREE.Vector3[]>([]);
+
+	// function createStoryCenterCurve() {
+	// 	if (clusterCentersStories.length === 0) return;
+
+	// 	const randomCurvePoints = [];
+	// 	for (let i = 0; i < clusterCentersStories.length; i++) {
+	// 		randomCurvePoints.push(
+	// 			new Vector3(
+	// 				clusterCentersStories[i].x,
+	// 				clusterCentersStories[i].y,
+	// 				clusterCentersStories[i].z
+	// 			)
+	// 		);
+	// 	}
+	// 	const curve = new CatmullRomCurve3(randomCurvePoints);
+	// 	randomPointsP = curve.getPoints(1000);
+	// }
 </script>
 
 <!-- <PerfMonitor anchorY="bottom" /> -->
@@ -727,6 +750,16 @@
 			/>
 		</T.Mesh>
 	{/each}
+
+	<!-- <T.Mesh>
+		<MeshLineGeometry points={randomPointsP} />
+		<MeshLineMaterial
+			color={clusterConnectionColor}
+			width={clusterConnectionThickness}
+			opacity={clusterConnectionOpacity}
+			transparent={true}
+		/>
+	</T.Mesh> -->
 
 	<!-- Story target sphere -->
 	<InstancedMesh>
