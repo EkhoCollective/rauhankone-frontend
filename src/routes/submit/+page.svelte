@@ -52,27 +52,42 @@
 	// let raiseError = $state(false);
 
 	// API Options
-	const API_QUESTIONS_OPTIONS = () => ({
-		API_ENDPOINT: '/get_questions',
-		API_METHOD: 'POST',
-		REQUEST_BODY: { question_type: 'starter' }
-	});
+	const API_QUESTIONS_OPTIONS = () => {
+		console.log('Setting API_QUESTIONS_OPTIONS');
+		return {
+			API_ENDPOINT: '/get_questions',
+			API_METHOD: 'POST',
+			REQUEST_BODY: { question_type: 'starter' }
+		};
+	};
 
-	const API_SUGGESTION_OPTIONS = () => ({
-		API_ENDPOINT: '/suggestion',
-		API_METHOD: 'POST',
-		REQUEST_BODY: { language: getLocaleFullName(), story: story }
-	});
+	const API_SUGGESTION_OPTIONS = () => {
+		console.log("Setting API_SUGGESTION_OPTIONS");
+		let curLang = getLocaleFullName();
+		console.log("Will use lang:", curLang);
+		return {
+			API_ENDPOINT: '/suggestion',
+			API_METHOD: 'POST',
+			REQUEST_BODY: { language: curLang, story: story }
+		};
+	};
 
-	const API_ADD_STORY_OPTIONS = () => ({
-		API_ENDPOINT: '/add_story',
-		API_METHOD: 'POST',
-		REQUEST_BODY: {
-			text: DOMPurify.sanitize(story),
-			question: questionOriginalId,
-			language: getLocaleFullName()
-		}
-	});
+	const API_ADD_STORY_OPTIONS = () => {
+		console.log("Setting API_ADD_STORY_OPTIONS");
+		console.debug("Current story content:", story);
+		console.debug("Sanitized story content:", DOMPurify.sanitize(story));
+		let curLang = getLocaleFullName();
+		console.log("Will use lang:", curLang);
+		return {
+			API_ENDPOINT: '/add_story',
+			API_METHOD: 'POST',
+			REQUEST_BODY: {
+				text: DOMPurify.sanitize(story),
+				question: questionOriginalId,
+				language: curLang
+			}
+		};
+	};
 
 	let backgroundRef: BackgroundMouse | undefined = $state();
 
@@ -134,14 +149,21 @@
 			});
 	}
 
-	function handleGetQuestionContainer() {
-		// const questionsData = getQuestionsData();
-		if (!getQuestionsData) {
+	function handleGetQuestionContainer(forceNewGroup = false) {
+		console.log('getQuestionsData:', $state.snapshot(getQuestionsData));
+		if (!getQuestionsData || !getQuestionsData.questions || getQuestionsData.questions.length === 0) {
 			customErrorHandler($_('error_description_general'), 500);
+			return;
 		}
-		const randomGroupIndex = Math.floor(Math.random() * getQuestionsData.questions.length);
-		questionContainer = getQuestionsData.questions[randomGroupIndex];
+		// Always select a new random group if forced or if no current group
+		if (forceNewGroup || !questionContainer) {
+			console.log('Locale changed, getting new question container inside handleGetQuestionContainer');
+			const randomGroupIndex = Math.floor(Math.random() * getQuestionsData.questions.length);
+			questionContainer = getQuestionsData.questions[randomGroupIndex];
+		}
+		console.debug('Selected question container:', $state.snapshot(questionContainer));
 		handleGetQuestion();
+		console.debug('Question container after handleGetQuestion:', $state.snapshot(questionContainer));
 	}
 
 	function handleGetQuestion() {
@@ -149,16 +171,20 @@
 			console.error('Question container is null');
 			return;
 		}
+		// Try to find a question in the current locale
 		let filteredQuestion = questionContainer.find((q: any) => q.language === localeNow);
-
-		// If North Sami not found, fallback to English
-		if (!filteredQuestion && localeNow === 'North Sámi') {
+		// Fallback to English if not found
+		if (!filteredQuestion) {
 			filteredQuestion = questionContainer.find((q: any) => q.language === 'English');
 		}
-
+		// Fallback to any available question if still not found
+		if (!filteredQuestion && questionContainer.length > 0) {
+			filteredQuestion = questionContainer[0];
+		}
 		if (!filteredQuestion) {
 			console.error('No suitable question found');
 			customErrorHandler($_('error_description_general'), 500);
+			return;
 		}
 		question = filteredQuestion.text;
 		questionOriginalId = filteredQuestion.original_id;
@@ -226,22 +252,15 @@
 	// Watch for changes in the story text and locale
 	$effect(() => {
 		$locale; // subscribe to locale changes
-		// update current locale and refresh question if we already have questions
 		localeNow = getLocaleFullName();
+		console.log('Locale changed to:', localeNow);
+		// On locale change, always select a new random group and update question
 		if (getQuestionsData) {
-			handleGetQuestion();
+			console.log('Locale changed, getting new question container for language:', localeNow);
+			handleGetQuestionContainer(true);
 		}
 		// run typing logic whenever story or locale changes (story is bound in Textarea)
 		handleTyping();
-	});
-
-	// Watch for locale changes and update question
-	$effect(() => {
-		$locale;
-		// console.log('locale changed', localStorage.getItem('locale'));
-		if (getQuestionsData) {
-			handleGetQuestion();
-		}
 	});
 
 	// On Mount
