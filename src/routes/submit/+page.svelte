@@ -225,12 +225,12 @@
 	}
 	// Watch for changes in the story text and locale
 	$effect(() => {
-		$locale; // subscribe to locale changes
-		// update current locale and refresh question if we already have questions
-		localeNow = getLocaleFullName();
-		if (getQuestionsData) {
-			handleGetQuestion();
-		}
+		// $locale; // subscribe to locale changes
+		// // update current locale and refresh question if we already have questions
+		// localeNow = getLocaleFullName();
+		// if (getQuestionsData) {
+		// 	handleGetQuestion();
+		// }
 		// run typing logic whenever story or locale changes (story is bound in Textarea)
 		handleTyping();
 	});
