@@ -262,7 +262,7 @@
 </header>
 
 <div class="card-submit-container" onmousemove={handleMouseMove} role="presentation">
-	<!-- <div class="card-bg-container">
+	<div class="card-bg-container">
 		<BackgroundMouse
 			bind:this={backgroundRef}
 			maxMovement={75}
@@ -270,7 +270,7 @@
 			damping={0.95}
 			bgImage="/submit_bg.png"
 		/>
-	</div> -->
+	</div>
 	<div class="card-left-col-container">
 		<!-- Main Text -->
 		{#if question}
@@ -380,6 +380,8 @@
 		gap: 0;
 		max-width: 70%;
 		width: 100%;
+		z-index: 1;
+		position: relative;
 	}
 
 	/* .footer-container {
@@ -448,6 +450,8 @@
 		margin: 0 0 auto 0;
 		padding-top: calc(var(--pad-5) + 2px);
 		margin-left: 40px;
+		z-index: 1;
+		position: relative;
 	}
 
 	.bubble {
@@ -490,16 +494,7 @@
 	}
 
 	/* Media Queries */
-	@media (max-width: 768px) {
-		.card-submit-container {
-			display: grid;
-			grid-template-areas:
-				'left-col'
-				'actions-area';
-			grid-template-columns: 1fr;
-			grid-template-rows: max-content max-content;
-		}
-
+	@media (min-width: 768px) {
 		.card-bg-container {
 			display: flex;
 			flex: 1;
@@ -512,8 +507,18 @@
 			left: 0;
 			right: 0;
 			bottom: 0;
-
 			z-index: 0;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.card-submit-container {
+			display: grid;
+			grid-template-areas:
+				'left-col'
+				'actions-area';
+			grid-template-columns: 1fr;
+			grid-template-rows: max-content max-content;
 		}
 
 		.card-left-col-container {
