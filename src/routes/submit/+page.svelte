@@ -262,7 +262,7 @@
 </header>
 
 <div class="card-submit-container" onmousemove={handleMouseMove} role="presentation">
-	<div class="card-bg-container">
+	<!-- <div class="card-bg-container">
 		<BackgroundMouse
 			bind:this={backgroundRef}
 			maxMovement={75}
@@ -270,7 +270,7 @@
 			damping={0.95}
 			bgImage="/submit_bg.png"
 		/>
-	</div>
+	</div> -->
 	<div class="card-left-col-container">
 		<!-- Main Text -->
 		{#if question}
