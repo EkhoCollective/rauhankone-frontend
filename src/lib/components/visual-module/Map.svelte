@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import * as THREE from 'three';
@@ -12,7 +12,7 @@
 		VignetteEffect,
 		ChromaticAberrationEffect
 	} from 'threlte-postprocessing/effects';
-	import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
+	// import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
 	import { T, useTask } from '@threlte/core';
 	import {
 		interactivity,
@@ -28,7 +28,7 @@
 	import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
 	import { useAudio } from '$lib/composables/useAudio';
 
-	const { playBlip, playClusterSound } = useAudio();
+	const { playClusterSound } = useAudio();
 
 	// Props
 	let {
@@ -55,37 +55,43 @@
 		findStoryInstanceByStoryIdProp?: (storyId: string) => StoryInstance | null;
 	} = $props();
 
-	// State
+	// World constants
 	const worldScale: number = 25;
+	const cameraOffset: number = 10; // Camera offset for selected story
+	const centroidCameraOffset: number = 40; // Camera offset for world centroid
+	const minZoom: number = 5;
+	const maxZoom: number = 100;
+
+	// Cluster constants
+	const clusterSpread: number = 5;
+	const clusterConnectionThickness: number = 10;
+	const clusterConnectionOpacity: number = 0.0075;
+	const clusterCurviness: number = 0.25;
+	const clusterConnectionRadius: number = 50; // Global radius for cluster connections
+	const pointsPerClusterConnection: number = 400;
+
+	// Story constants
 	const minStoryGeometrySize: number = 0.15;
+	const maxStoryTouchSize: number = 1.25;
 	const minStoryScalingFactor: number = 1;
-	const minMapScale: number = 0.01;
-	const maxMapScale: number = 5;
-	// const sphereResolution: number = 3;
-	const cameraOffset: number = 10;
-	const centroidCameraOffset: number = 40;
+	const minStoryScale: number = 0.01;
+	const maxStoryScale: number = 5;
+	const curviness: number = 0.35; // Curviness for story connections
+	const lineThickness: number = 0.025; // Thickness for story connections
+	const pointsPerStoryConnection: number = 100;
+
+	// Character constants
+	const maxNumofPointsPerStory = 200;
+	const minPointDistancefromStory: number = 0.4;
+	const maxPointDistancefromStory: number = 0.65;
+
+	// State
 	let centroid = $state(new THREE.Vector3());
 	let instances: StoryInstance[] = $state([]);
 	let previousSelectedStory: StoryInstance | null = $state(null);
 	let clusterCenters: { x: number; y: number; z: number }[] = $state([]);
 	let clusterCentersStories: { x: number; y: number; z: number }[] = $state([]);
 	let clusterConnectionLines: Vector3[][] = $state([]);
-
-	const minZoom: number = 5;
-	const maxZoom: number = 100;
-
-	const clusterSpread: number = 5;
-	const lineThickness: number = 0.025;
-	const clusterConnectionThickness: number = 10;
-	const clusterConnectionOpacity: number = 0.0075;
-	const maxNumofPointsPerStory = 200;
-	const minPointDistancefromStory: number = 0.45;
-	const maxPointDistancefromStory: number = 0.65;
-	const curviness: number = 0.35;
-	const clusterCurviness: number = 0.25;
-	const clusterConnectionRadius: number = 50; // Global radius for cluster connections
-	const pointsPerStoryConnection: number = 100;
-	const pointsPerClusterConnection: number = 400;
 
 	// Jiggle movement variables
 	const storyJiggleIntensity: number = 0.02; // How much stories move
@@ -113,23 +119,16 @@
 	let time = $state(0);
 	let sphereTime = $state(0); // Separate time for sphere animation
 
-	// Rotation adjustment sliders
+	// Character Rotation adjustment
 	let rotYOffset = $state(Math.PI); // animatedTheta - Math.PI / 2
 	let rotXOffset = $state(0); // animatedPhi
 	let rotZOffset = $state(0);
 
-	// let font = useLoader(FontLoader).load('$lib/components/media/font/Roboto Thin_Regular.json')
-
+	// Character font
 	const loader = new FontLoader();
 	let loadedFont = $state<Font | null>(null);
-
 	const font = loader.load('/Roboto_Thin_Regular_Latin.json', (font) => {
 		loadedFont = font;
-		// console.log('Font loaded successfully', loadedFont);
-		// Repopulate data now that font is loaded to get text geometries
-		// if (data) {
-		// 	populateFromData();
-		// }
 	});
 
 	// Interactivity
@@ -143,8 +142,8 @@
 	// Function to map text length to a range from 1 to 5
 	function mapTextLengthToRange(textLength: number): number {
 		// Define the expected range of text lengths (you may need to adjust these based on your data)
-		const minRange = minMapScale;
-		const maxRange = maxMapScale;
+		const minRange = minStoryScale;
+		const maxRange = maxStoryScale;
 		const minTextLength = 0;
 		const maxTextLength = maxNumofPointsPerStory; // Adjust this based on your typical text lengths
 
@@ -487,7 +486,6 @@
 
 		centroid = calculateCentroid();
 		lookAtCentroid();
-		// createStoryCenterCurve();
 	}
 
 	// Calculate centroid
@@ -697,32 +695,13 @@
 			}
 		});
 	});
-
-	// create a smooth curve from story centers
-	// let randomPointsP = $state<THREE.Vector3[]>([]);
-
-	// function createStoryCenterCurve() {
-	// 	if (clusterCentersStories.length === 0) return;
-
-	// 	const randomCurvePoints = [];
-	// 	for (let i = 0; i < clusterCentersStories.length; i++) {
-	// 		randomCurvePoints.push(
-	// 			new Vector3(
-	// 				clusterCentersStories[i].x,
-	// 				clusterCentersStories[i].y,
-	// 				clusterCentersStories[i].z
-	// 			)
-	// 		);
-	// 	}
-	// 	const curve = new CatmullRomCurve3(randomCurvePoints);
-	// 	randomPointsP = curve.getPoints(1000);
-	// }
 </script>
 
-<!-- <PerfMonitor anchorY="bottom" /> -->
 <T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 	<CameraControls bind:ref={controls} />
 </T.PerspectiveCamera>
+
+<!-- <PerfMonitor anchorY="bottom" /> -->
 
 <!-- Centroid -->
 <!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
@@ -775,21 +754,10 @@
 		</T.Mesh>
 	{/each}
 
-	<!-- <T.Mesh>
-		<MeshLineGeometry points={randomPointsP} />
-		<MeshLineMaterial
-			color={clusterConnectionColor}
-			width={clusterConnectionThickness}
-			opacity={clusterConnectionOpacity}
-			transparent={true}
-		/>
-	</T.Mesh> -->
-
 	<!-- Story target sphere -->
 	<InstancedMesh>
-		<T.SphereGeometry args={[1, 8, 8]} />
+		<T.SphereGeometry args={[maxStoryTouchSize, 8, 8]} />
 		<T.MeshBasicMaterial color="white" toneMapped={false} transparent={true} opacity={0} />
-
 		{#each instances as instance}
 			<Instance
 				position.y={instance.positions.y}
@@ -872,7 +840,6 @@
 	<InstancedMesh>
 		<T.SphereGeometry args={[minStoryGeometrySize, 3, 2]} />
 		<T.MeshBasicMaterial color="white" toneMapped={false} />
-
 		{#each instances as instance}
 			<Instance
 				position.y={instance.positions.y}
