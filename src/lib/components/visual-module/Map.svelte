@@ -57,10 +57,10 @@
 
 	// State
 	const worldScale: number = 25;
-	const minSphereScale: number = 2;
+	const minSphereScale: number = 1;
 	const minMapScale: number = 0.01;
-	const maxMapScale: number = 2;
-	const sphereResolution: number = 3;
+	const maxMapScale: number = 5;
+	// const sphereResolution: number = 3;
 	const cameraOffset: number = 10;
 	const centroidCameraOffset: number = 40;
 	let centroid = $state(new THREE.Vector3());
@@ -77,7 +77,9 @@
 	const lineThickness: number = 0.025;
 	const clusterConnectionThickness: number = 10;
 	const clusterConnectionOpacity: number = 0.0075;
-	const maxNumofPointsPerStory = 100;
+	const maxNumofPointsPerStory = 200;
+	const minPointDistancefromStory: number = 0.45;
+	const maxPointDistancefromStory: number = 0.65;
 	const curviness: number = 0.35;
 	const clusterCurviness: number = 0.25;
 	const clusterConnectionRadius: number = 50; // Global radius for cluster connections
@@ -136,12 +138,17 @@
 		const minRange = minMapScale;
 		const maxRange = maxMapScale;
 		const minTextLength = 0;
-		const maxTextLength = 500; // Adjust this based on your typical text lengths
+		const maxTextLength = maxNumofPointsPerStory; // Adjust this based on your typical text lengths
 
-		// Clamp the text length to the expected range
-		const clampedLength = Math.max(minTextLength, Math.min(maxTextLength, textLength));
+		// If textLength is larger than maxTextLength, return the maxRange
+		if (textLength > maxTextLength) {
+			return maxRange;
+		}
 
-		// Map from [minTextLength, maxTextLength] to [1, 5]
+		// Clamp the text length to the expected range (only clamp the lower bound)
+		const clampedLength = Math.max(minTextLength, textLength);
+
+		// Map from [minTextLength, maxTextLength] to [minRange, maxRange]
 		const mappedLength =
 			minRange +
 			((clampedLength - minTextLength) / (maxTextLength - minTextLength)) * (maxRange - minRange);
@@ -157,8 +164,8 @@
 		const characters = inputText.split('');
 
 		// Define spherical distribution parameters
-		const minRadius = scale * 0.35; // Minimum distance from story center
-		const maxRadius = scale; // Maximum distance from story center
+		const minRadius = scale * minPointDistancefromStory; // Minimum distance from story center
+		const maxRadius = scale * maxPointDistancefromStory; // Maximum distance from story center
 
 		// Create an instance for each character with spherical distribution
 		characters.forEach((char, index) => {
