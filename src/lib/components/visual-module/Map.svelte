@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import * as THREE from 'three';
-	import { CatmullRomCurve3, Vector3, Vector2, Color } from 'three';
+	import { CatmullRomCurve3, Vector3, Vector2, Color, Quaternion, Euler } from 'three';
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { EffectComposer } from 'threlte-postprocessing';
 	import {
@@ -12,7 +12,7 @@
 		VignetteEffect,
 		ChromaticAberrationEffect
 	} from 'threlte-postprocessing/effects';
-	import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
+	// import { Attractor, Collider, RigidBody, World } from '@threlte/rapier';
 	import { T, useTask } from '@threlte/core';
 	import {
 		interactivity,
@@ -28,7 +28,7 @@
 	import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
 	import { useAudio } from '$lib/composables/useAudio';
 
-	const { playBlip, playClusterSound } = useAudio();
+	const { playClusterSound } = useAudio();
 
 	// Props
 	let {
@@ -55,14 +55,37 @@
 		findStoryInstanceByStoryIdProp?: (storyId: string) => StoryInstance | null;
 	} = $props();
 
-	// State
+	// World constants
 	const worldScale: number = 25;
-	const minSphereScale: number = 2;
-	const minMapScale: number = 0.01;
-	const maxMapScale: number = 2;
-	const sphereResolution: number = 3;
-	const cameraOffset: number = 10;
-	const centroidCameraOffset: number = 40;
+	const cameraOffset: number = 10; // Camera offset for selected story
+	const centroidCameraOffset: number = 40; // Camera offset for world centroid
+	const minZoom: number = 5;
+	const maxZoom: number = 100;
+
+	// Cluster constants
+	const clusterSpread: number = 5;
+	const clusterConnectionThickness: number = 10;
+	const clusterConnectionOpacity: number = 0.0075;
+	const clusterCurviness: number = 0.25;
+	const clusterConnectionRadius: number = 50; // Global radius for cluster connections
+	const pointsPerClusterConnection: number = 400;
+
+	// Story constants
+	const minStoryGeometrySize: number = 0.15;
+	const maxStoryTouchSize: number = 1.25;
+	const minStoryScalingFactor: number = 1;
+	const minStoryScale: number = 0.01;
+	const maxStoryScale: number = 5;
+	const curviness: number = 0.35; // Curviness for story connections
+	const lineThickness: number = 0.025; // Thickness for story connections
+	const pointsPerStoryConnection: number = 100;
+
+	// Character constants
+	const maxNumofPointsPerStory = 200;
+	const minPointDistancefromStory: number = 0.4;
+	const maxPointDistancefromStory: number = 0.65;
+
+	// State
 	let centroid = $state(new THREE.Vector3());
 	let instances: StoryInstance[] = $state([]);
 	let previousSelectedStory: StoryInstance | null = $state(null);
@@ -70,24 +93,12 @@
 	let clusterCentersStories: { x: number; y: number; z: number }[] = $state([]);
 	let clusterConnectionLines: Vector3[][] = $state([]);
 
-	const minZoom: number = 5;
-	const maxZoom: number = 100;
-
-	const clusterSpread: number = 5;
-	const lineThickness: number = 0.025;
-	const clusterConnectionThickness: number = 10;
-	const clusterConnectionOpacity: number = 0.0075;
-	const maxNumofPointsPerStory = 100;
-	const curviness: number = 0.35;
-	const clusterCurviness: number = 0.25;
-	const clusterConnectionRadius: number = 50; // Global radius for cluster connections
-	const pointsPerStoryConnection: number = 100;
-	const pointsPerClusterConnection: number = 400;
-
 	// Jiggle movement variables
 	const storyJiggleIntensity: number = 0.02; // How much stories move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
+	const charNoiseSpeed: number = 5; // Speed of the char noise animation
+	const charNoiseIntensity: number = 10; // Intensity of the char noise animation
 
 	// Colours
 	const clusterConnectionColor: string = '#1457ff';
@@ -108,18 +119,16 @@
 	let time = $state(0);
 	let sphereTime = $state(0); // Separate time for sphere animation
 
-	// let font = useLoader(FontLoader).load('$lib/components/media/font/Roboto Thin_Regular.json')
+	// Character Rotation adjustment
+	let rotYOffset = $state(Math.PI); // animatedTheta - Math.PI / 2
+	let rotXOffset = $state(0); // animatedPhi
+	let rotZOffset = $state(0);
 
+	// Character font
 	const loader = new FontLoader();
 	let loadedFont = $state<Font | null>(null);
-
 	const font = loader.load('/Roboto_Thin_Regular_Latin.json', (font) => {
 		loadedFont = font;
-		// console.log('Font loaded successfully', loadedFont);
-		// Repopulate data now that font is loaded to get text geometries
-		// if (data) {
-		// 	populateFromData();
-		// }
 	});
 
 	// Interactivity
@@ -133,15 +142,20 @@
 	// Function to map text length to a range from 1 to 5
 	function mapTextLengthToRange(textLength: number): number {
 		// Define the expected range of text lengths (you may need to adjust these based on your data)
-		const minRange = minMapScale;
-		const maxRange = maxMapScale;
+		const minRange = minStoryScale;
+		const maxRange = maxStoryScale;
 		const minTextLength = 0;
-		const maxTextLength = 500; // Adjust this based on your typical text lengths
+		const maxTextLength = maxNumofPointsPerStory; // Adjust this based on your typical text lengths
 
-		// Clamp the text length to the expected range
-		const clampedLength = Math.max(minTextLength, Math.min(maxTextLength, textLength));
+		// If textLength is larger than maxTextLength, return the maxRange
+		if (textLength > maxTextLength) {
+			return maxRange;
+		}
 
-		// Map from [minTextLength, maxTextLength] to [1, 5]
+		// Clamp the text length to the expected range (only clamp the lower bound)
+		const clampedLength = Math.max(minTextLength, textLength);
+
+		// Map from [minTextLength, maxTextLength] to [minRange, maxRange]
 		const mappedLength =
 			minRange +
 			((clampedLength - minTextLength) / (maxTextLength - minTextLength)) * (maxRange - minRange);
@@ -157,8 +171,8 @@
 		const characters = inputText.split('');
 
 		// Define spherical distribution parameters
-		const minRadius = scale * 0.35; // Minimum distance from story center
-		const maxRadius = scale; // Maximum distance from story center
+		const minRadius = scale * minPointDistancefromStory; // Minimum distance from story center
+		const maxRadius = scale * maxPointDistancefromStory; // Maximum distance from story center
 
 		// Create an instance for each character with spherical distribution
 		characters.forEach((char, index) => {
@@ -174,7 +188,16 @@
 
 			textInstances.push({
 				position: new Vector3(storyPosition.x + x, storyPosition.y + y, storyPosition.z + z),
-				char: char
+				char: char,
+				// Store original spherical coordinates for orbital animation
+				originalSpherical: {
+					radius: radius,
+					theta: theta,
+					phi: phi,
+					centerX: storyPosition.x,
+					centerY: storyPosition.y,
+					centerZ: storyPosition.z
+				}
 			});
 		});
 
@@ -280,7 +303,7 @@
 			for (let j = 0; j < filteredStories.length; j += 1) {
 				const story = filteredStories[j];
 				const text_length = story[0].text.length;
-				const scale = minSphereScale + mapTextLengthToRange(text_length);
+				const scale = minStoryScalingFactor + mapTextLengthToRange(text_length);
 				const cluster_id = cluster.text;
 				const storyObject = story;
 
@@ -463,7 +486,6 @@
 
 		centroid = calculateCentroid();
 		lookAtCentroid();
-		// createStoryCenterCurve();
 	}
 
 	// Calculate centroid
@@ -673,32 +695,13 @@
 			}
 		});
 	});
-
-	// create a smooth curve from story centers
-	// let randomPointsP = $state<THREE.Vector3[]>([]);
-
-	// function createStoryCenterCurve() {
-	// 	if (clusterCentersStories.length === 0) return;
-
-	// 	const randomCurvePoints = [];
-	// 	for (let i = 0; i < clusterCentersStories.length; i++) {
-	// 		randomCurvePoints.push(
-	// 			new Vector3(
-	// 				clusterCentersStories[i].x,
-	// 				clusterCentersStories[i].y,
-	// 				clusterCentersStories[i].z
-	// 			)
-	// 		);
-	// 	}
-	// 	const curve = new CatmullRomCurve3(randomCurvePoints);
-	// 	randomPointsP = curve.getPoints(1000);
-	// }
 </script>
 
-<!-- <PerfMonitor anchorY="bottom" /> -->
 <T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 	<CameraControls bind:ref={controls} />
 </T.PerspectiveCamera>
+
+<!-- <PerfMonitor anchorY="bottom" /> -->
 
 <!-- Centroid -->
 <!-- <T.Mesh position={[centroid.x, centroid.y, centroid.z]}>
@@ -751,21 +754,10 @@
 		</T.Mesh>
 	{/each}
 
-	<!-- <T.Mesh>
-		<MeshLineGeometry points={randomPointsP} />
-		<MeshLineMaterial
-			color={clusterConnectionColor}
-			width={clusterConnectionThickness}
-			opacity={clusterConnectionOpacity}
-			transparent={true}
-		/>
-	</T.Mesh> -->
-
 	<!-- Story target sphere -->
 	<InstancedMesh>
-		<T.SphereGeometry args={[1, 8, 8]} />
-		<T.MeshBasicMaterial color="white" toneMapped={false} transparent={true} opacity={0.001} />
-
+		<T.SphereGeometry args={[maxStoryTouchSize, 8, 8]} />
+		<T.MeshBasicMaterial color="white" toneMapped={false} transparent={true} opacity={0} />
 		{#each instances as instance}
 			<Instance
 				position.y={instance.positions.y}
@@ -846,9 +838,8 @@
 
 	<!-- Story geometry -->
 	<InstancedMesh>
-		<T.SphereGeometry args={[0.15, 3, 2]} />
+		<T.SphereGeometry args={[minStoryGeometrySize, 3, 2]} />
 		<T.MeshBasicMaterial color="white" toneMapped={false} />
-
 		{#each instances as instance}
 			<Instance
 				position.y={instance.positions.y}
@@ -880,45 +871,61 @@
 
 			{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
 				{#each instance.text_instances as character, index}
-					{@const { animatedX, animatedY, animatedZ } = (() => {
-						// Store original character positions if not already stored
-						if (!character.originalPosition) {
-							character.originalPosition = {
-								x: character.position.x,
-								y: character.position.y,
-								z: character.position.z
-							};
-						}
+					{@const { animatedX, animatedY, animatedZ, rotationX, rotationY, rotationZ } = (() => {
+						// Animate the spherical angles using noise for orbital motion
+						const thetaOffset =
+							noise.noise3d(index * 200, time * charNoiseSpeed, 300) * charNoiseIntensity; // Reduced intensity for smoother orbital motion
+						const phiOffset =
+							noise.noise3d(index * 200, time * charNoiseSpeed, 400) * charNoiseIntensity; // Slightly less phi movement for more natural motion
 
-						// Use different noise seeds for each character and axis
-						const charNoiseOffsetX =
-							noise.noise3d(index * 200, time * storyJiggleTime * 2, 300) *
-							storyJiggleIntensity *
-							2.0;
-						const charNoiseOffsetY =
-							noise.noise3d(index * 200, time * storyJiggleTime * 2, 400) *
-							storyJiggleIntensity *
-							2.0;
-						const charNoiseOffsetZ =
-							noise.noise3d(index * 200, time * storyJiggleTime * 2, 500) *
-							storyJiggleIntensity *
-							2.0;
+						// Calculate animated spherical coordinates
+						const animatedTheta = character.originalSpherical.theta + thetaOffset;
+						const animatedPhi = character.originalSpherical.phi + phiOffset;
+						const radius = character.originalSpherical.radius; // Keep radius constant
 
-						// Calculate animated position
+						// Convert animated spherical coordinates back to cartesian
+						const x = radius * Math.sin(animatedPhi) * Math.cos(animatedTheta);
+						const y = radius * Math.sin(animatedPhi) * Math.sin(animatedTheta);
+						const z = radius * Math.cos(animatedPhi);
+
+						const worldX = character.originalSpherical.centerX + x;
+						const worldY = character.originalSpherical.centerY + y;
+						const worldZ = character.originalSpherical.centerZ + z;
+
+						// Use Three.js Quaternion for proper "look at" rotation
+						const characterPos = new Vector3(worldX, worldY, worldZ);
+						const centerPos = new Vector3(
+							character.originalSpherical.centerX,
+							character.originalSpherical.centerY,
+							character.originalSpherical.centerZ
+						);
+
+						// Create a quaternion that makes the character look at the center
+						const lookAtMatrix = new THREE.Matrix4();
+						lookAtMatrix.lookAt(characterPos, centerPos, new Vector3(0, 1, 0));
+						const lookAtQuaternion = new Quaternion();
+						lookAtQuaternion.setFromRotationMatrix(lookAtMatrix);
+
+						// Convert quaternion to Euler angles and apply slider offsets
+						const euler = new Euler();
+						euler.setFromQuaternion(lookAtQuaternion, 'XYZ');
+						const rotX = euler.x + rotXOffset;
+						const rotY = euler.y + rotYOffset;
+						const rotZ = euler.z + rotZOffset;
+
 						return {
-							animatedX: character.originalPosition.x + charNoiseOffsetX,
-							animatedY: character.originalPosition.y + charNoiseOffsetY,
-							animatedZ: character.originalPosition.z + charNoiseOffsetZ
+							animatedX: worldX,
+							animatedY: worldY,
+							animatedZ: worldZ,
+							rotationX: rotX,
+							rotationY: rotY,
+							rotationZ: rotZ
 						};
 					})()}
 					{#if loadedFont}
 						<T.Mesh
 							position={[animatedX, animatedY, animatedZ]}
-							rotation={[
-								Math.random() * Math.PI * 2,
-								Math.random() * Math.PI * 2,
-								Math.random() * Math.PI * 2
-							]}
+							rotation={[rotationX, rotationY, rotationZ]}
 						>
 							<Text3DGeometry
 								font={loadedFont}
