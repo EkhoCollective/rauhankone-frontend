@@ -81,7 +81,7 @@
 	const pointsPerStoryConnection: number = 100;
 
 	// Character constants
-	const maxNumofPointsPerStory = 200;
+	const maxNumofPointsPerStory = 100;
 	const minPointDistancefromStory: number = 0.4;
 	const maxPointDistancefromStory: number = 0.65;
 
@@ -736,7 +736,7 @@
 	/>
 	<VignetteEffect eskil={false} offset={0.05} darkness={1.1} />
 	<ChromaticAberrationEffect
-		offset={new Vector2(0.001, 0.001)}
+		offset={new Vector2(0.00125, 0.00125)}
 		radialModulation={false}
 		modulationOffset={0.15}
 	/>
@@ -755,7 +755,7 @@
 	{/each}
 
 	<!-- Story target sphere -->
-	<InstancedMesh>
+	<!-- <InstancedMesh>
 		<T.SphereGeometry args={[maxStoryTouchSize, 8, 8]} />
 		<T.MeshBasicMaterial color="white" toneMapped={false} transparent={true} opacity={0} />
 		{#each instances as instance}
@@ -763,6 +763,33 @@
 				position.y={instance.positions.y}
 				position.x={instance.positions.x}
 				position.z={instance.positions.z}
+				
+				onpointerenter={() => {
+					// Only animate if not selected
+					if (!instance.selected) {
+						instance.tw.set(1);
+					}
+				}}
+				onpointerleave={() => {
+					// Only reset if not selected
+					if (!instance.selected) {
+						instance.tw.set(0);
+					}
+				}}
+			/>
+		{/each}
+	</InstancedMesh> -->
+
+	<!-- Story geometry -->
+	<InstancedMesh>
+		<T.SphereGeometry args={[minStoryGeometrySize, 3, 2]} />
+		<T.MeshBasicMaterial color="white" toneMapped={false} />
+		{#each instances as instance}
+			<Instance
+				position.y={instance.positions.y}
+				position.x={instance.positions.x}
+				position.z={instance.positions.z}
+				scale={instance.scale}
 				onclick={() => {
 					// Store the previous selected story before changing
 					if (selectedStory) {
@@ -786,8 +813,8 @@
 					instance.selected = true;
 					instance.tw.set(1);
 
-					// Initialize character trails for the selected story
-					instance.initializeCharacterTrails();
+					// Mark that trails need to be initialized on next frame
+					instance.needsTrailInitialization = true;
 
 					// Start pulsing for all stories in the same cluster with unique parameters
 					instances.forEach((inst, index) => {
@@ -838,32 +865,6 @@
 					}
 				}}
 			/>
-		{/each}
-	</InstancedMesh>
-
-	<!-- Story geometry -->
-	<InstancedMesh>
-		<T.SphereGeometry args={[minStoryGeometrySize, 3, 2]} />
-		<T.MeshBasicMaterial color="white" toneMapped={false} />
-		{#each instances as instance}
-			<Instance
-				position.y={instance.positions.y}
-				position.x={instance.positions.x}
-				position.z={instance.positions.z}
-				scale={instance.scale}
-				onpointerenter={() => {
-					// Only animate if not selected
-					if (!instance.selected) {
-						instance.tw.set(1);
-					}
-				}}
-				onpointerleave={() => {
-					// Only reset if not selected
-					if (!instance.selected) {
-						instance.tw.set(0);
-					}
-				}}
-			/>
 
 			{#if instance.curve && instance.curve.length > 0 && instance.tw.current > 0}
 				{#each instance.curve as pairCurvePoints}
@@ -875,6 +876,7 @@
 			{/if}
 
 			{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
+				{@const animatedPositions = []}
 				{#each instance.text_instances as character, index}
 					{@const { animatedX, animatedY, animatedZ, rotationX, rotationY, rotationZ } = (() => {
 						// Animate the spherical angles using noise for orbital motion
@@ -897,9 +899,14 @@
 						const worldY = character.originalSpherical.centerY + y;
 						const worldZ = character.originalSpherical.centerZ + z;
 
-						// Update trail with current position
+						// Store animated position for potential trail initialization
 						const currentPos = new Vector3(worldX, worldY, worldZ);
-						instance.updateCharacterTrails(index, currentPos);
+						animatedPositions.push(currentPos);
+
+						// Update trail with current position (only if trails are already initialized)
+						if (instance.characterTrails.size > 0) {
+							instance.updateCharacterTrails(index, currentPos);
+						}
 
 						// Use Three.js Quaternion for proper "look at" rotation
 						const characterPos = new Vector3(worldX, worldY, worldZ);
@@ -952,6 +959,11 @@
 						</T.Mesh>
 					{/if}
 				{/each}
+
+				<!-- Initialize trails if needed (after all positions are calculated) -->
+				{#if instance.needsTrailInitialization && animatedPositions.length === instance.text_instances.length}
+					{instance.initializeCharacterTrailsWithAnimatedPositions(animatedPositions)}
+				{/if}
 
 				<!-- Character particle trails -->
 				{#each instance.getTrailLines() as trailLine}

@@ -48,14 +48,14 @@ export default class {
     positions: Vector3[],
     geometry: BufferGeometry,
     line: Line,
-    colors: number[],
-    hue: number // Unique hue for each character trail
+    colors: number[]
   }> = $state(new Map())
   
   // Trail configuration
-  trailLength: number = 100 // Number of trail points per character
-  trailFadeSpeed: number = 0.005 // How fast trails fade
+  trailLength: number = 250 // Number of trail points per character
+  trailFadeSpeed: number = 0.01 // How fast trails fade
   trailUpdateCounter: number = 0 // Counter to control trail update frequency
+  needsTrailInitialization: boolean = false // Flag to initialize trails on next animation frame
   
   get scale() {
     // Add pulsing effect to scale when pulsing
@@ -99,8 +99,7 @@ export default class {
       const positions: Vector3[] = []
       const colors: number[] = []
       
-      // Generate a unique hue for each character (varied colors)
-      const hue = (0.6 + (index * 0.1)) % 1.0 // Start from blue and vary
+      // No longer need unique hue - using white trails
       
       for (let i = 0; i < this.trailLength; i++) {
         positions.push(new Vector3(
@@ -109,11 +108,9 @@ export default class {
           character.position.z
         ))
         
-        // Create fading color with HSL like in the example
-        const color = new Color()
+        // Create fading white color
         const intensity = (1 - i / (this.trailLength - 1)) ** 4 // Exponential fade
-        color.setHSL(hue, 1, intensity)
-        colors.push(color.r, color.g, color.b)
+        colors.push(intensity, intensity, intensity) // White RGB with fade
       }
       
       // Create geometry and line
@@ -143,10 +140,69 @@ export default class {
         positions,
         geometry,
         line,
-        colors,
-        hue
+        colors
       })
     })
+  }
+  
+  // Initialize trails with animated positions to prevent visual jumps
+  initializeCharacterTrailsWithAnimatedPositions(animatedPositions: Vector3[]): void {
+    if (!this.text_instances || animatedPositions.length !== this.text_instances.length) return
+    
+    // Clear existing trails first
+    this.disposeTrails()
+    
+    this.text_instances.forEach((character, index) => {
+      // Create initial trail positions (all at current animated position)
+      const positions: Vector3[] = []
+      const colors: number[] = []
+      
+      const currentAnimatedPos = animatedPositions[index]
+      
+      for (let i = 0; i < this.trailLength; i++) {
+        positions.push(new Vector3(
+          currentAnimatedPos.x,
+          currentAnimatedPos.y,
+          currentAnimatedPos.z
+        ))
+        
+        // Create fading white color
+        const intensity = (1 - i / (this.trailLength - 1)) ** 4 // Exponential fade
+        colors.push(intensity, intensity, intensity) // White RGB with fade
+      }
+      
+      // Create geometry and line
+      const geometry = new BufferGeometry()
+      const positionArray = new Float32Array(positions.length * 3)
+      const colorArray = new Float32Array(colors)
+      
+      positions.forEach((pos, i) => {
+        positionArray[i * 3] = pos.x
+        positionArray[i * 3 + 1] = pos.y
+        positionArray[i * 3 + 2] = pos.z
+      })
+      
+      geometry.setAttribute('position', new Float32BufferAttribute(positionArray, 3))
+      geometry.setAttribute('color', new Float32BufferAttribute(colorArray, 3))
+      
+      const material = new LineBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: 1.0,
+        blending: AdditiveBlending
+      })
+      
+      const line = new Line(geometry, material)
+      
+      this.characterTrails.set(index, {
+        positions,
+        geometry,
+        line,
+        colors
+      })
+    })
+    
+    this.needsTrailInitialization = false
   }
   
   // Update character trail positions
@@ -173,13 +229,11 @@ export default class {
     })
     positionArray.needsUpdate = true
     
-    // Update colors for fading effect using the character's unique hue
+    // Update colors for fading white effect
     const colorArray = trail.geometry.getAttribute('color') as Float32BufferAttribute
-    const color = new Color()
     for (let i = 0; i < this.trailLength; i++) {
       const intensity = (1 - i / (this.trailLength - 1)) ** 4
-      color.setHSL(trail.hue, 1, intensity) // Use character's unique hue
-      colorArray.setXYZ(i, color.r, color.g, color.b)
+      colorArray.setXYZ(i, intensity, intensity, intensity) // White RGB with fade
     }
     colorArray.needsUpdate = true
   }
