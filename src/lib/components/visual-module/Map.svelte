@@ -57,7 +57,8 @@
 
 	// State
 	const worldScale: number = 25;
-	const minSphereScale: number = 1;
+	const minStoryGeometrySize: number = 0.15;
+	const minStoryScalingFactor: number = 1;
 	const minMapScale: number = 0.01;
 	const maxMapScale: number = 5;
 	// const sphereResolution: number = 3;
@@ -78,7 +79,7 @@
 	const clusterConnectionThickness: number = 10;
 	const clusterConnectionOpacity: number = 0.0075;
 	const maxNumofPointsPerStory = 200;
-	const minPointDistancefromStory: number = 0.65;
+	const minPointDistancefromStory: number = 0.45;
 	const maxPointDistancefromStory: number = 0.65;
 	const curviness: number = 0.35;
 	const clusterCurviness: number = 0.25;
@@ -303,7 +304,7 @@
 			for (let j = 0; j < filteredStories.length; j += 1) {
 				const story = filteredStories[j];
 				const text_length = story[0].text.length;
-				const scale = minSphereScale + mapTextLengthToRange(text_length);
+				const scale = minStoryScalingFactor + mapTextLengthToRange(text_length);
 				const cluster_id = cluster.text;
 				const storyObject = story;
 
@@ -718,58 +719,6 @@
 	// }
 </script>
 
-<!-- Rotation Control Sliders -->
-<div
-	style="position: absolute; top: 100px; left: 20px; z-index: 4000; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; color: white; font-family: monospace;"
->
-	<h3 style="margin: 0 0 10px 0; font-size: 14px;">Character Rotation Controls</h3>
-
-	<div style="margin-bottom: 10px;">
-		<label for="rotY" style="display: block; font-size: 12px; margin-bottom: 5px;">
-			Y Rotation Offset: {(rotYOffset / Math.PI).toFixed(2)}π
-		</label>
-		<input
-			id="rotY"
-			type="range"
-			bind:value={rotYOffset}
-			min="0"
-			max={2 * Math.PI}
-			step="0.01"
-			style="width: 200px;"
-		/>
-	</div>
-
-	<div style="margin-bottom: 10px;">
-		<label for="rotX" style="display: block; font-size: 12px; margin-bottom: 5px;">
-			X Rotation Offset: {(rotXOffset / Math.PI).toFixed(2)}π
-		</label>
-		<input
-			id="rotX"
-			type="range"
-			bind:value={rotXOffset}
-			min="0"
-			max={2 * Math.PI}
-			step="0.01"
-			style="width: 200px;"
-		/>
-	</div>
-
-	<div style="margin-bottom: 10px;">
-		<label for="rotZ" style="display: block; font-size: 12px; margin-bottom: 5px;">
-			Z Rotation Offset: {(rotZOffset / Math.PI).toFixed(2)}π
-		</label>
-		<input
-			id="rotZ"
-			type="range"
-			bind:value={rotZOffset}
-			min="0"
-			max={2 * Math.PI}
-			step="0.01"
-			style="width: 200px;"
-		/>
-	</div>
-</div>
-
 <!-- <PerfMonitor anchorY="bottom" /> -->
 <T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 	<CameraControls bind:ref={controls} />
@@ -839,7 +788,7 @@
 	<!-- Story target sphere -->
 	<InstancedMesh>
 		<T.SphereGeometry args={[1, 8, 8]} />
-		<T.MeshBasicMaterial color="white" toneMapped={false} transparent={true} opacity={0.001} />
+		<T.MeshBasicMaterial color="white" toneMapped={false} transparent={true} opacity={0} />
 
 		{#each instances as instance}
 			<Instance
@@ -921,7 +870,7 @@
 
 	<!-- Story geometry -->
 	<InstancedMesh>
-		<T.SphereGeometry args={[0.15, 3, 2]} />
+		<T.SphereGeometry args={[minStoryGeometrySize, 3, 2]} />
 		<T.MeshBasicMaterial color="white" toneMapped={false} />
 
 		{#each instances as instance}
