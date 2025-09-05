@@ -3,7 +3,7 @@
 	import StoryInstance from '$lib/components/visual-module/StoryInstance.svelte';
 	import { getLocaleFullName } from '$lib/utils/locale_handler';
 	import * as THREE from 'three';
-	import { CatmullRomCurve3, Vector3, Vector2, Color } from 'three';
+	import { CatmullRomCurve3, Vector3, Vector2, Color, Quaternion, Euler } from 'three';
 	import { SimplexNoise } from 'three/examples/jsm/Addons.js';
 	import { EffectComposer } from 'threlte-postprocessing';
 	import {
@@ -78,7 +78,7 @@
 	const clusterConnectionThickness: number = 10;
 	const clusterConnectionOpacity: number = 0.0075;
 	const maxNumofPointsPerStory = 200;
-	const minPointDistancefromStory: number = 0.45;
+	const minPointDistancefromStory: number = 0.65;
 	const maxPointDistancefromStory: number = 0.65;
 	const curviness: number = 0.35;
 	const clusterCurviness: number = 0.25;
@@ -90,6 +90,8 @@
 	const storyJiggleIntensity: number = 0.02; // How much stories move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
+	const charNoiseSpeed: number = 5; // Speed of the char noise animation
+	const charNoiseIntensity: number = 10; // Intensity of the char noise animation
 
 	// Colours
 	const clusterConnectionColor: string = '#1457ff';
@@ -109,6 +111,11 @@
 	let noise = new SimplexNoise();
 	let time = $state(0);
 	let sphereTime = $state(0); // Separate time for sphere animation
+
+	// Rotation adjustment sliders
+	let rotYOffset = $state(Math.PI); // animatedTheta - Math.PI / 2
+	let rotXOffset = $state(0); // animatedPhi
+	let rotZOffset = $state(0);
 
 	// let font = useLoader(FontLoader).load('$lib/components/media/font/Roboto Thin_Regular.json')
 
@@ -181,7 +188,16 @@
 
 			textInstances.push({
 				position: new Vector3(storyPosition.x + x, storyPosition.y + y, storyPosition.z + z),
-				char: char
+				char: char,
+				// Store original spherical coordinates for orbital animation
+				originalSpherical: {
+					radius: radius,
+					theta: theta,
+					phi: phi,
+					centerX: storyPosition.x,
+					centerY: storyPosition.y,
+					centerZ: storyPosition.z
+				}
 			});
 		});
 
@@ -702,6 +718,58 @@
 	// }
 </script>
 
+<!-- Rotation Control Sliders -->
+<div
+	style="position: absolute; top: 100px; left: 20px; z-index: 4000; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; color: white; font-family: monospace;"
+>
+	<h3 style="margin: 0 0 10px 0; font-size: 14px;">Character Rotation Controls</h3>
+
+	<div style="margin-bottom: 10px;">
+		<label for="rotY" style="display: block; font-size: 12px; margin-bottom: 5px;">
+			Y Rotation Offset: {(rotYOffset / Math.PI).toFixed(2)}π
+		</label>
+		<input
+			id="rotY"
+			type="range"
+			bind:value={rotYOffset}
+			min="0"
+			max={2 * Math.PI}
+			step="0.01"
+			style="width: 200px;"
+		/>
+	</div>
+
+	<div style="margin-bottom: 10px;">
+		<label for="rotX" style="display: block; font-size: 12px; margin-bottom: 5px;">
+			X Rotation Offset: {(rotXOffset / Math.PI).toFixed(2)}π
+		</label>
+		<input
+			id="rotX"
+			type="range"
+			bind:value={rotXOffset}
+			min="0"
+			max={2 * Math.PI}
+			step="0.01"
+			style="width: 200px;"
+		/>
+	</div>
+
+	<div style="margin-bottom: 10px;">
+		<label for="rotZ" style="display: block; font-size: 12px; margin-bottom: 5px;">
+			Z Rotation Offset: {(rotZOffset / Math.PI).toFixed(2)}π
+		</label>
+		<input
+			id="rotZ"
+			type="range"
+			bind:value={rotZOffset}
+			min="0"
+			max={2 * Math.PI}
+			step="0.01"
+			style="width: 200px;"
+		/>
+	</div>
+</div>
+
 <!-- <PerfMonitor anchorY="bottom" /> -->
 <T.PerspectiveCamera makeDefault position={[10, 0, 0]}>
 	<CameraControls bind:ref={controls} />
@@ -887,45 +955,61 @@
 
 			{#if instance.text_instances && instance.text_instances.length > 0 && instance.selected}
 				{#each instance.text_instances as character, index}
-					{@const { animatedX, animatedY, animatedZ } = (() => {
-						// Store original character positions if not already stored
-						if (!character.originalPosition) {
-							character.originalPosition = {
-								x: character.position.x,
-								y: character.position.y,
-								z: character.position.z
-							};
-						}
+					{@const { animatedX, animatedY, animatedZ, rotationX, rotationY, rotationZ } = (() => {
+						// Animate the spherical angles using noise for orbital motion
+						const thetaOffset =
+							noise.noise3d(index * 200, time * charNoiseSpeed, 300) * charNoiseIntensity; // Reduced intensity for smoother orbital motion
+						const phiOffset =
+							noise.noise3d(index * 200, time * charNoiseSpeed, 400) * charNoiseIntensity; // Slightly less phi movement for more natural motion
 
-						// Use different noise seeds for each character and axis
-						const charNoiseOffsetX =
-							noise.noise3d(index * 200, time * storyJiggleTime * 2, 300) *
-							storyJiggleIntensity *
-							2.0;
-						const charNoiseOffsetY =
-							noise.noise3d(index * 200, time * storyJiggleTime * 2, 400) *
-							storyJiggleIntensity *
-							2.0;
-						const charNoiseOffsetZ =
-							noise.noise3d(index * 200, time * storyJiggleTime * 2, 500) *
-							storyJiggleIntensity *
-							2.0;
+						// Calculate animated spherical coordinates
+						const animatedTheta = character.originalSpherical.theta + thetaOffset;
+						const animatedPhi = character.originalSpherical.phi + phiOffset;
+						const radius = character.originalSpherical.radius; // Keep radius constant
 
-						// Calculate animated position
+						// Convert animated spherical coordinates back to cartesian
+						const x = radius * Math.sin(animatedPhi) * Math.cos(animatedTheta);
+						const y = radius * Math.sin(animatedPhi) * Math.sin(animatedTheta);
+						const z = radius * Math.cos(animatedPhi);
+
+						const worldX = character.originalSpherical.centerX + x;
+						const worldY = character.originalSpherical.centerY + y;
+						const worldZ = character.originalSpherical.centerZ + z;
+
+						// Use Three.js Quaternion for proper "look at" rotation
+						const characterPos = new Vector3(worldX, worldY, worldZ);
+						const centerPos = new Vector3(
+							character.originalSpherical.centerX,
+							character.originalSpherical.centerY,
+							character.originalSpherical.centerZ
+						);
+
+						// Create a quaternion that makes the character look at the center
+						const lookAtMatrix = new THREE.Matrix4();
+						lookAtMatrix.lookAt(characterPos, centerPos, new Vector3(0, 1, 0));
+						const lookAtQuaternion = new Quaternion();
+						lookAtQuaternion.setFromRotationMatrix(lookAtMatrix);
+
+						// Convert quaternion to Euler angles and apply slider offsets
+						const euler = new Euler();
+						euler.setFromQuaternion(lookAtQuaternion, 'XYZ');
+						const rotX = euler.x + rotXOffset;
+						const rotY = euler.y + rotYOffset;
+						const rotZ = euler.z + rotZOffset;
+
 						return {
-							animatedX: character.originalPosition.x + charNoiseOffsetX,
-							animatedY: character.originalPosition.y + charNoiseOffsetY,
-							animatedZ: character.originalPosition.z + charNoiseOffsetZ
+							animatedX: worldX,
+							animatedY: worldY,
+							animatedZ: worldZ,
+							rotationX: rotX,
+							rotationY: rotY,
+							rotationZ: rotZ
 						};
 					})()}
 					{#if loadedFont}
 						<T.Mesh
 							position={[animatedX, animatedY, animatedZ]}
-							rotation={[
-								Math.random() * Math.PI * 2,
-								Math.random() * Math.PI * 2,
-								Math.random() * Math.PI * 2
-							]}
+							rotation={[rotationX, rotationY, rotationZ]}
 						>
 							<Text3DGeometry
 								font={loadedFont}
