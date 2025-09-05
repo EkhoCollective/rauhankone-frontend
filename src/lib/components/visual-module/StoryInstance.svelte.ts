@@ -1,4 +1,4 @@
-import { Color } from 'three'
+import { Color, Vector3, BufferGeometry, Float32BufferAttribute, Line, LineBasicMaterial, AdditiveBlending } from 'three'
 import { Tween } from 'svelte/motion'
 import { cubicOut } from 'svelte/easing'
 
@@ -43,6 +43,20 @@ export default class {
   closestStory: any = null
   furthestStory: any = null
   
+  // Particle trail system
+  characterTrails: Map<number, {
+    positions: Vector3[],
+    geometry: BufferGeometry,
+    line: Line,
+    colors: number[],
+    hue: number // Unique hue for each character trail
+  }> = $state(new Map())
+  
+  // Trail configuration
+  trailLength: number = 100 // Number of trail points per character
+  trailFadeSpeed: number = 0.005 // How fast trails fade
+  trailUpdateCounter: number = 0 // Counter to control trail update frequency
+  
   get scale() {
     // Add pulsing effect to scale when pulsing
     const pulseScale = this.isPulsing ? 1 + Math.sin(this.pulseTime * Math.PI * 2 + this.pulsePhase) * this.pulseIntensity : 1
@@ -74,6 +88,120 @@ export default class {
     this.pulseFrequency = frequency
     this.pulseIntensity = intensity
     this.pulsePhase = phase
+  }
+  
+  // Initialize trails for all characters
+  initializeCharacterTrails(): void {
+    if (!this.text_instances) return
+    
+    this.text_instances.forEach((character, index) => {
+      // Create initial trail positions (all at current character position)
+      const positions: Vector3[] = []
+      const colors: number[] = []
+      
+      // Generate a unique hue for each character (varied colors)
+      const hue = (0.6 + (index * 0.1)) % 1.0 // Start from blue and vary
+      
+      for (let i = 0; i < this.trailLength; i++) {
+        positions.push(new Vector3(
+          character.position.x,
+          character.position.y,
+          character.position.z
+        ))
+        
+        // Create fading color with HSL like in the example
+        const color = new Color()
+        const intensity = (1 - i / (this.trailLength - 1)) ** 4 // Exponential fade
+        color.setHSL(hue, 1, intensity)
+        colors.push(color.r, color.g, color.b)
+      }
+      
+      // Create geometry and line
+      const geometry = new BufferGeometry()
+      const positionArray = new Float32Array(positions.length * 3)
+      const colorArray = new Float32Array(colors)
+      
+      positions.forEach((pos, i) => {
+        positionArray[i * 3] = pos.x
+        positionArray[i * 3 + 1] = pos.y
+        positionArray[i * 3 + 2] = pos.z
+      })
+      
+      geometry.setAttribute('position', new Float32BufferAttribute(positionArray, 3))
+      geometry.setAttribute('color', new Float32BufferAttribute(colorArray, 3))
+      
+      const material = new LineBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: 1.0,
+        blending: AdditiveBlending
+      })
+      
+      const line = new Line(geometry, material)
+      
+      this.characterTrails.set(index, {
+        positions,
+        geometry,
+        line,
+        colors,
+        hue
+      })
+    })
+  }
+  
+  // Update character trail positions
+  updateCharacterTrails(characterIndex: number, newPosition: Vector3): void {
+    const trail = this.characterTrails.get(characterIndex)
+    if (!trail) return
+    
+    // Only update trail every few frames to create gaps (like in the example)
+    this.trailUpdateCounter++
+    if (this.trailUpdateCounter % 2 !== 0) return // Update every 2 frames
+    
+    // Shift existing positions back
+    for (let i = trail.positions.length - 1; i > 0; i--) {
+      trail.positions[i].copy(trail.positions[i - 1])
+    }
+    
+    // Add new position at the front
+    trail.positions[0].copy(newPosition)
+    
+    // Update geometry
+    const positionArray = trail.geometry.getAttribute('position') as Float32BufferAttribute
+    trail.positions.forEach((pos, i) => {
+      positionArray.setXYZ(i, pos.x, pos.y, pos.z)
+    })
+    positionArray.needsUpdate = true
+    
+    // Update colors for fading effect using the character's unique hue
+    const colorArray = trail.geometry.getAttribute('color') as Float32BufferAttribute
+    const color = new Color()
+    for (let i = 0; i < this.trailLength; i++) {
+      const intensity = (1 - i / (this.trailLength - 1)) ** 4
+      color.setHSL(trail.hue, 1, intensity) // Use character's unique hue
+      colorArray.setXYZ(i, color.r, color.g, color.b)
+    }
+    colorArray.needsUpdate = true
+  }
+  
+  // Get all trail lines for rendering
+  getTrailLines(): Line[] {
+    const lines: Line[] = []
+    this.characterTrails.forEach(trail => {
+      lines.push(trail.line)
+    })
+    return lines
+  }
+  
+  // Clean up trails when story is deselected
+  disposeTrails(): void {
+    this.characterTrails.forEach(trail => {
+      trail.geometry.dispose()
+      if (trail.line.material instanceof LineBasicMaterial) {
+        trail.line.material.dispose()
+      }
+    })
+    this.characterTrails.clear()
   }
   
   // Calculate distance to another story instance

@@ -778,11 +778,16 @@
 					instances.forEach((inst) => {
 						inst.selected = false;
 						inst.tw.set(0);
+						// Clean up trails for deselected stories
+						inst.disposeTrails();
 					});
 
 					// Set this instance as selected and keep it highlighted
 					instance.selected = true;
 					instance.tw.set(1);
+
+					// Initialize character trails for the selected story
+					instance.initializeCharacterTrails();
 
 					// Start pulsing for all stories in the same cluster with unique parameters
 					instances.forEach((inst, index) => {
@@ -892,6 +897,10 @@
 						const worldY = character.originalSpherical.centerY + y;
 						const worldZ = character.originalSpherical.centerZ + z;
 
+						// Update trail with current position
+						const currentPos = new Vector3(worldX, worldY, worldZ);
+						instance.updateCharacterTrails(index, currentPos);
+
 						// Use Three.js Quaternion for proper "look at" rotation
 						const characterPos = new Vector3(worldX, worldY, worldZ);
 						const centerPos = new Vector3(
@@ -942,6 +951,11 @@
 							<T.MeshBasicMaterial color="white" toneMapped={false} />
 						</T.Mesh>
 					{/if}
+				{/each}
+
+				<!-- Character particle trails -->
+				{#each instance.getTrailLines() as trailLine}
+					<T.Line geometry={trailLine.geometry} material={trailLine.material} />
 				{/each}
 			{/if}
 		{/each}

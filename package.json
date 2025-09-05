@@ -2,7 +2,7 @@
 	"name": "rauhankone-frontend",
 	"version": "0.0.2",
 	"scripts": {
-		"dev": "NODE_ENV=development vite dev --mode development",
+		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
 		"gh-pages": "npm run build && npx gh-pages -d build --cname peacemachine.eu",
 		"preview": "vite preview",
