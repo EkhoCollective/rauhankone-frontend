@@ -910,7 +910,7 @@
 						const euler = new Euler();
 						euler.setFromQuaternion(lookAtQuaternion, 'XYZ');
 						const rotX = euler.x + rotXOffset;
-						const rotY = euler.y + rotYOffset;
+						const rotY = euler.y + rotYOffset + Math.PI;
 						const rotZ = euler.z + rotZOffset;
 
 						return {
