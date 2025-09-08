@@ -63,7 +63,7 @@
 	const maxZoom: number = 100;
 
 	// Cluster constants
-	const clusterSpread: number = 5;
+	const clusterSpread: number = 7;
 	const clusterConnectionThickness: number = 10;
 	const clusterConnectionOpacity: number = 0.0075;
 	const clusterCurviness: number = 0.25;
@@ -82,8 +82,8 @@
 
 	// Character constants
 	const maxNumofPointsPerStory = 100;
-	const minPointDistancefromStory: number = 0.4;
-	const maxPointDistancefromStory: number = 0.65;
+	const minPointDistancefromStory: number = 0.35;
+	const maxPointDistancefromStory: number = 0.55;
 
 	// State
 	let centroid = $state(new THREE.Vector3());
@@ -97,7 +97,7 @@
 	const storyJiggleIntensity: number = 0.02; // How much stories move
 	const jiggleSpeed: number = 0.001; // Speed of the jiggle animation
 	const storyJiggleTime: number = 250; // Speed of the jiggle animation
-	const charNoiseSpeed: number = 5; // Speed of the char noise animation
+	const charNoiseSpeed: number = 10; // Speed of the char noise animation
 	const charNoiseIntensity: number = 10; // Intensity of the char noise animation
 
 	// Colours
@@ -926,7 +926,7 @@
 						const euler = new Euler();
 						euler.setFromQuaternion(lookAtQuaternion, 'XYZ');
 						const rotX = euler.x + rotXOffset;
-						const rotY = euler.y + rotYOffset;
+						const rotY = euler.y + rotYOffset + Math.PI;
 						const rotZ = euler.z + rotZOffset;
 
 						return {

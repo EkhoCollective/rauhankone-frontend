@@ -52,8 +52,8 @@ export default class {
   }> = $state(new Map())
   
   // Trail configuration
-  trailLength: number = 250 // Number of trail points per character
-  trailFadeSpeed: number = 0.01 // How fast trails fade
+  trailLength: number = 35 // Number of trail points per character
+  // trailFadeSpeed: number = 0.1 // How fast trails fade
   trailUpdateCounter: number = 0 // Counter to control trail update frequency
   needsTrailInitialization: boolean = false // Flag to initialize trails on next animation frame
   
@@ -103,7 +103,7 @@ export default class {
       
       for (let i = 0; i < this.trailLength; i++) {
         positions.push(new Vector3(
-          character.position.x,
+          character.position.x ,
           character.position.y,
           character.position.z
         ))
