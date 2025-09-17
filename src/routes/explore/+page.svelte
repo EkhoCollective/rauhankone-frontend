@@ -37,6 +37,11 @@
 		setTranslateStories: (value: boolean) => void;
 	};
 
+	// Get language selector context from layout
+	const languageSelectorContext = getContext('languageSelector') as {
+		showLang: boolean;
+	};
+
 	let response_clusters: any = $state(null);
 	let currentLocale: string = $state('');
 	let requestLanguage: string = $state('');
@@ -112,11 +117,11 @@
 
 		// Determine what to send to API
 		if (getOnlyTranslated === true) {
-			console.log("getOnlyTranslate is True, so getting only on target lang");
+			console.log('getOnlyTranslate is True, so getting only on target lang');
 			requestLanguage = getLocaleFullName();
 		} else {
-			console.log("getOnlyTranslate is False, so getting all languages");
-			requestLanguage = "Any";
+			console.log('getOnlyTranslate is False, so getting all languages');
+			requestLanguage = 'Any';
 		}
 		return requestLanguage;
 	}
@@ -340,6 +345,13 @@
 	$effect(() => {
 		getOnlyTranslated = translationContext.translateStories;
 	});
+
+	// Close modal when language selector opens
+	$effect(() => {
+		if (languageSelectorContext.showLang && selectedStory !== null) {
+			selectedStory = null;
+		}
+	});
 </script>
 
 <svelte:head>
@@ -347,7 +359,7 @@
 </svelte:head>
 
 {#if navigationData.source === 'submit' && toastEnabled}
-	<div transition:blur={{duration: 1000}} class="toast-container">
+	<div transition:blur={{ duration: 1000 }} class="toast-container">
 		<p>{$_('explore_toast_from_submit')}</p>
 	</div>
 {/if}
@@ -414,13 +426,11 @@
 		transform: translate(-50%, -50%);
 	}
 
-
 	.scene-container {
 		width: 100%;
 		height: 100vh;
 		background-color: black;
 	}
-
 
 	.navigation-icons-container {
 		position: absolute;
