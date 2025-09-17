@@ -52,12 +52,15 @@
 		}
 	});
 
+	// Set language selector context
+	setContext('languageSelector', {
+		get showLang() {
+			return showLang;
+		}
+	});
+
 	// Set context at component initialization
 	// setContext('questions', () => questions);
-
-
-
-
 
 	async function handleGetToken() {
 		await getAuthToken().catch((err) => {
@@ -74,7 +77,6 @@
 		window.scrollTo(0, 0);
 		handleGetToken();
 		pathName = window.location.origin;
-
 	});
 
 	// $inspect(questions);
