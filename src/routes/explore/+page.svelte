@@ -346,11 +346,20 @@
 		getOnlyTranslated = translationContext.translateStories;
 	});
 
-	// Close modal when language selector opens
+	// Track previous language selector state to detect changes
+	let previousShowLang = $state(false);
+
+	// Close modal when language selector opens (only on state change)
 	$effect(() => {
-		if (languageSelectorContext.showLang && selectedStory !== null) {
+		const currentShowLang = languageSelectorContext.showLang;
+
+		// Only close modal if language selector just opened (changed from false to true)
+		if (currentShowLang && !previousShowLang && selectedStory !== null) {
 			selectedStory = null;
 		}
+
+		// Update previous state
+		previousShowLang = currentShowLang;
 	});
 </script>
 
