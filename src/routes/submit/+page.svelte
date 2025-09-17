@@ -239,6 +239,8 @@
 	$effect(() => {
 		$locale;
 		// console.log('locale changed', localStorage.getItem('locale'));
+		// Update the current locale when it changes
+		localeNow = getLocaleFullName();
 		if (getQuestionsData) {
 			handleGetQuestion();
 		}
