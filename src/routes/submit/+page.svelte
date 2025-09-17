@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Imports
 	import { _, locale } from 'svelte-i18n';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { base, resolve } from '$app/paths';
 	import { apiRequest } from '$lib/utils/api_request';
@@ -241,8 +241,13 @@
 		// console.log('locale changed', localStorage.getItem('locale'));
 		// Update the current locale when it changes
 		localeNow = getLocaleFullName();
+
+		// Use untrack to prevent circular dependencies when calling handleGetQuestion
+		// This ensures the effect doesn't re-trigger when handleGetQuestion reads localeNow
 		if (getQuestionsData) {
-			handleGetQuestion();
+			untrack(() => {
+				handleGetQuestion();
+			});
 		}
 	});
 
