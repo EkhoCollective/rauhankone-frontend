@@ -25,3 +25,4 @@ vite.config.ts.timestamp-*
 .timetracker
 .github/*
 25_Rauhankone_geoblock/block_russia_firewall.txt.gz
+src/lib/translations/redundant.json
