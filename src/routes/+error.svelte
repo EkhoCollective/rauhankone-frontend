@@ -51,15 +51,21 @@
 		align-items: center;
 		height: 100%;
 		margin: 0;
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	.error-container {
 		color: #ffbcbc;
 		max-width: 75%;
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	.button-container {
 		margin-top: 50px;
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 
