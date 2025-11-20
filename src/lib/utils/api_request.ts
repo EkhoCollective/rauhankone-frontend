@@ -10,8 +10,8 @@ export interface ApiRequestOptions {
 
 export async function apiRequest(OPTIONS: ApiRequestOptions) {
   try {
-    // Get token from localStorage
-    const token = localStorage.getItem('accessToken');
+    // Get token from sessionStorage
+    const token = sessionStorage.getItem('accessToken');
     
     if (!token) {
       throw new Error('No authentication token found. Get a token first.');

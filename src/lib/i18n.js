@@ -1,6 +1,6 @@
 // import { browser } from '$app/environment';
 import { browser } from '$app/environment';
-import { register, getLocaleFromNavigator, init } from 'svelte-i18n';
+import { register, init } from 'svelte-i18n';
 
 const defaultLocale = 'en';
 
@@ -16,7 +16,7 @@ const supportedLocales = ['en', 'fi', 'en-GB', 'fi-FI', 'sv', 'sv-fi', 'sa'];
 
 export const getLocaleFromNavigatorSafe = () => {
 	if (browser) {
-		const possibleSavedLocale = localStorage.getItem('locale') || 'en';
+		const possibleSavedLocale = sessionStorage.getItem('locale') || 'en';
 		//const localeFromBrowser = getLocaleFromNavigator()?.slice(0, 2) || defaultLocale;
 		//const finalLocale = possibleSavedLocale || localeFromBrowser;
 		//return supportedLocales.includes(finalLocale) ? finalLocale : defaultLocale;

@@ -22,13 +22,13 @@
 			rel="stylesheet"
 		/>
 		<script>
-			// Set the localstorage locale if not set
-			if (!localStorage.getItem('locale')) {
+			// Set the sessionStorage locale if not set
+			if (!sessionStorage.getItem('locale')) {
 				const userLang = navigator.language || navigator.userLanguage;
 				if (userLang.startsWith('fi')) {
-					localStorage.setItem('locale', 'fi');
+					sessionStorage.setItem('locale', 'fi');
 				} else {
-					localStorage.setItem('locale', 'en');
+					sessionStorage.setItem('locale', 'en');
 				}
 			}
 		</script>

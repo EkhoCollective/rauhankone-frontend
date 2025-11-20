@@ -1,12 +1,12 @@
 export function getLocaleFullName(): string {
-    const localeShort = localStorage.getItem('locale') || 'en';
-    console.log(`Retrieved locale from localStorage: ${localeShort}`);
+    const localeShort = sessionStorage.getItem('locale') || 'en';
+    console.log(`Retrieved locale from sessionStorage: ${localeShort}`);
     const allowedLocales = ['en', 'fi', 'sv', 'sa'];
     if (!allowedLocales.includes(localeShort)) {
         // If locale is not English or Finnish, raise an error
         console.error(`Unsupported locale: ${localeShort}`);
         console.log('Falling back to English locale.');
-        localStorage.setItem('locale', 'en'); // Reset to default
+        sessionStorage.setItem('locale', 'en'); // Reset to default
     } else {
         console.log(`Locale ${localeShort} is supported.`);
     }

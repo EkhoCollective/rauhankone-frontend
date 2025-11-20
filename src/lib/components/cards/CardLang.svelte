@@ -19,7 +19,7 @@
 
 	async function handleLocaleChange(lang_code: string) {
 		locale.set(lang_code);
-		localStorage.setItem('locale', lang_code);
+		sessionStorage.setItem('locale', lang_code);
 		await waitLocale().then(() => {
 			closeLangCard(false);
 

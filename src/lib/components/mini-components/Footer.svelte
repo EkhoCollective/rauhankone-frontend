@@ -4,7 +4,7 @@
 	import logoEng from '../media/Oulu2026_logo_white_RGB_FIN_horizontal.png'; // 640 × 259
 
 
-	const locale = localStorage.getItem('locale') || 'en';
+	const locale = sessionStorage.getItem('locale') || 'en';
 	// Set correct logo based on locale
 	const logo = locale === 'fi' ? logoFin : logoEng;
 

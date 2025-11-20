@@ -16,8 +16,8 @@ export async function getAuthToken() {
     const data = await response.json();
     
     // Store tokens if needed
-    localStorage.setItem('accessToken', data.access_token);
-    localStorage.setItem('refreshToken', data.refresh_token);
+    sessionStorage.setItem('accessToken', data.access_token);
+    sessionStorage.setItem('refreshToken', data.refresh_token);
     
     return data;
   } catch (error) {
