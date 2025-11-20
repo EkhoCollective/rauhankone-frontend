@@ -2,6 +2,7 @@
 
 
 	import { _, locale, waitLocale } from 'svelte-i18n';
+	import { onDestroy } from 'svelte';
 	import CheckIcon from '../mini-components/CheckIcon.svelte';
 	import { X } from 'lucide-svelte';
 	import { Dialog } from 'bits-ui';
@@ -12,8 +13,8 @@
 	const languages = [
 		{ code: 'en', name: 'English' },
 		{ code: 'fi', name: 'Suomi' },
-		/* { code: 'sv', name: 'Svenska' },
-		{ code: 'sa', name: 'Sámegiella' } */
+		{ code: 'sv', name: 'Svenska' },
+		{ code: 'sa', name: 'Sámegiella'}
 	];
 
 	async function handleLocaleChange(lang_code: string) {
@@ -35,6 +36,16 @@
 	function playUISound() {
 		playBlip();
 	}
+
+
+// If locale is northern sami, set translate to false by subscribing to the locale store
+const unsubscribeLocale = locale.subscribe((val) => {
+	if (val === 'sa') {
+		translate = true;
+	}
+});
+
+onDestroy(() => unsubscribeLocale());
 </script>
 
 <!-- Header/Language Selector -->
@@ -72,11 +83,13 @@
 	</div>
 
 	<div class="card-extra-container">
+		{#if ($locale !== 'sa')}
 		<CheckIcon
 		translateIdForCheckbox="header_btn_translate_all"
 		bind:checkValue={translate}
 		hideLabel={false}
 		/>
+		{/if}
 	</div>
 </DialogContent>
 

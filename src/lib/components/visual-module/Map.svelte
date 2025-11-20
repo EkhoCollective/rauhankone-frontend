@@ -232,6 +232,10 @@
 			});
 			// Filter stories based on isTranslated flag and current language
 			let filteredStories = cluster.stories;
+			let _isTranslated = isTranslated;
+			let _culocale = currentLocale;
+			console.log('isTranslated:', _isTranslated, 'currentLocale:', _culocale);
+
 			if (isTranslated) {
 				const currentLanguage = getLocaleFullName();
 				filteredStories = cluster.stories.filter((story: any) => {

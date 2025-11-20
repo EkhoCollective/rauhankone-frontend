@@ -9,17 +9,18 @@ register('en', () => import('$lib/translations/en.json'));
 register('fi-FI', () => import('$lib/translations/fi.json')); */
 register('fi', () => import('$lib/translations/fi.json'));
 
-//register('sv', () => import('$lib/translations/sv.json'));
-//register('sa', () => import('$lib/translations/sa.json'));
+register('sv', () => import('$lib/translations/sv.json'));
+register('sa', () => import('$lib/translations/sa.json'));
 
-const supportedLocales = ['en', 'fi', 'en-GB'];
+const supportedLocales = ['en', 'fi', 'en-GB', 'fi-FI', 'sv', 'sv-fi', 'sa'];
 
 export const getLocaleFromNavigatorSafe = () => {
 	if (browser) {
-		const possibleSavedLocale = localStorage.getItem('locale');
-		const localeFromBrowser = getLocaleFromNavigator()?.slice(0, 2) || defaultLocale;
-		const finalLocale = possibleSavedLocale || localeFromBrowser;
-		return supportedLocales.includes(finalLocale) ? finalLocale : defaultLocale;
+		const possibleSavedLocale = localStorage.getItem('locale') || 'en';
+		//const localeFromBrowser = getLocaleFromNavigator()?.slice(0, 2) || defaultLocale;
+		//const finalLocale = possibleSavedLocale || localeFromBrowser;
+		//return supportedLocales.includes(finalLocale) ? finalLocale : defaultLocale;
+		return supportedLocales.includes(possibleSavedLocale) ? possibleSavedLocale : defaultLocale;
 	}
 	return defaultLocale;
 }

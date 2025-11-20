@@ -158,7 +158,7 @@
 
 		if (!filteredQuestion) {
 			console.error('No suitable question found');
-			customErrorHandler($_('error_description_general'), 500);
+			/* customErrorHandler($_('error_description_general'), 500); */
 		}
 		question = filteredQuestion.text;
 		questionOriginalId = filteredQuestion.original_id;
@@ -280,6 +280,7 @@
 	</div>
 	<div class="card-left-col-container">
 		<!-- Main Text -->
+		<!-- {#if question && ($locale !== 'sa')} -->
 		{#if question}
 			<div
 				in:fade={{ duration: transitionDuration }}
@@ -288,6 +289,7 @@
 			>
 				<span id="question-label-main">{question}</span>
 			</div>
+		{/if}
 
 			<div class="input-container" out:slide={{ duration: transitionDuration }}>
 				<Textarea
@@ -341,7 +343,9 @@
 					>
 						<p>{$_('submit_please_extend')}</p>
 						<br />
-						<p>{suggestion}</p>
+						{#if $locale !== 'sa'}
+							<p>{suggestion}</p>
+						{/if}
 					</div>
 				{/if}
 				<!-- Show thank you message if user has finished the story -->
@@ -356,7 +360,6 @@
 				{/if}
 			</div>
 			<!-- Input Area -->
-		{/if}
 	</div>
 	<!-- Actions -->
 
