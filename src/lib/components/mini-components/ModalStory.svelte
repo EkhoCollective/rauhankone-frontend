@@ -27,23 +27,24 @@
 	aria-modal="true"
 	aria-label="Modal for story {story}"
 >
-	{#if story}
-		<div class="modal-story-content">
-			<div class="modal-story-header">
-				<!-- <h1>{story.cluster_id}</h1> -->
-				<button
-					class="btn-close"
-					onclick={(e) => {
-						e.stopPropagation();
-						playBlip();
-						closeModal();
-					}}
+<div class="modal-story-content">
+	<div class="modal-story-header">
+		<!-- <h1>{story.cluster_id}</h1> -->
+		<button
+		class="btn-close"
+		onclick={(e) => {
+			e.stopPropagation();
+			playBlip();
+			closeModal();
+		}}
 				>
-					<X color="#ffffff" />
-				</button>
-			</div>
-			<div class="modal-story-body">
+				<X color="#ffffff" />
+			</button>
+		</div>
+		<div class="modal-story-body">
+				{#if story}
 				<p>{story}</p>
+				{/if}
 			</div>
 
 			<div class="modal-story-actions">
@@ -67,7 +68,6 @@
 				</button>
 			</div>
 		</div>
-	{/if}
 </div>
 
 <style>

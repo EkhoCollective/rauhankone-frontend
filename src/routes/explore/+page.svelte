@@ -92,23 +92,61 @@
 		REQUEST_BODY: {
 			language: handleGetTranslate(),
 			max_stories: 400,
+			verbose_output: false,
 			story: null,
 			grid_size: [dimValue(), dimValue(), dimValue()]
 		}
 	});
 
+			interface storyItem {
+			language: "English" | "Finnish" | "Swedish" | "North Sámi";
+			text: string;
+		}
+
+		interface clusterItem {
+			language: "Any" | "English" | "Finnish" | "Swedish" | "North Sámi";
+			text: string;
+			som: [number, number, number];
+			stories: Array<storyItem[]>;
+		}
+		interface ClusterResponse {
+			clusters: clusterItem[];
+			created_ad: number;
+			id: string;
+		}
+
 	async function fetchClusters() {
 		await apiRequest(API_CLUSTERS_OPTIONS())
-			.then((response) => {
-				response_clusters = response;
+			.then((response: ClusterResponse) => {
+				
+				// We'll filter out clusters to only include those stories that have a story in the current language
+				if (response.clusters && Array.isArray(response.clusters)) {
+					const filteredClusters = response.clusters.map((cluster) => {
+						// Filter stories within the cluster based on current locale
+						const filteredStories = cluster.stories.filter((story) => {
+							return story.some((s) => s.language === getLocaleFullName());
+						});
+						let parsedClusters = {
+							...cluster,
+							stories: filteredStories
+						};
+						return parsedClusters;
+						
+					});
+				response_clusters = {...response, clusters: filteredClusters};
+				} else {
+					response_clusters = response.clusters;
+				}
 				// console.log('Fetched clusters:', response_clusters);
 				// console.log('Navigation data at fetch time:', navigationData);
 				// responsefromDB = true;
 			})
 			.catch((err) => {
-				// console.error('Failed to get clusters:', err);
+				console.error('Failed to get clusters:', err);
+
 				customErrorHandler($_('error_description_general'), 500);
 			});
+		return;
 	}
 
 	function handleGetTranslate() {
@@ -199,6 +237,7 @@
 	});
 
 	$effect(() => {
+	
 		if (selectedStory !== null) {
 			const currentLanguage = getLocaleFullName();
 
@@ -206,9 +245,15 @@
 			if (selectedStory.story && Array.isArray(selectedStory.story)) {
 				// StoryInstance - story is an array
 				// Loop through stories to find the first one that matches the current language
-				const matchingStory = selectedStory.story.find(
+				let matchingStory = selectedStory.story.find(
 					(story: any) => story?.language === currentLanguage
 				);
+				if (!matchingStory) {
+					console.warn(
+						`No matching story found for language ${currentLanguage} in StoryInstance, using default language.`
+					);
+					matchingStory = selectedStory.story[0];
+				}
 				selectedStoryLanguageText = matchingStory?.text || null;
 			} else if (Array.isArray(selectedStory)) {
 				// Raw story data - selectedStory itself is an array
@@ -227,6 +272,7 @@
 				}
 			}
 		}
+
 	});
 
 	// Handle navigation to closest story
@@ -341,9 +387,31 @@
 			previousLocale = newLocale;
 		}
 	});
-
+	
+	
+	// Watch for translation setting changes from context and refetch clusters
 	$effect(() => {
-		getOnlyTranslated = translationContext.translateStories;
+		let prevSet = sessionStorage.getItem('translate_stories') === 'true' ? true : false;
+		console.log('Current translation setting:', translationContext.translateStories);	
+		console.log('Previous translation setting:', prevSet);
+		if (translationContext.translateStories !== prevSet) {
+			
+			console.log('Translation setting changed to:', translationContext.translateStories);
+			// Refetch clusters when translation setting changes
+			if (response_clusters !== null) {
+				// console.log('Refetching clusters due to translation setting change...');
+				response_clusters = null;
+				// console.log('getLocaleFullName', getLocaleFullName());
+			} 
+			fetchClusters().then(() => {
+				// Update sessionStorage after successful fetch
+				sessionStorage.setItem('translate_stories', translationContext.translateStories.toString());
+			});
+
+		} else {
+			// No change in translation setting
+			console.log('No change in translation setting detected.');
+		}
 	});
 
 	// Track previous language selector state to detect changes
@@ -381,7 +449,8 @@
 
 <div class="scene-container">
 	<div>
-		{#if selectedStory}<div>
+		{#if selectedStory}
+		<div>
 				<ModalStory
 					story={selectedStoryLanguageText}
 					closeModal={() => (selectedStory = null)}

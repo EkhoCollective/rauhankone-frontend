@@ -38,14 +38,12 @@
 	}
 
 
-// If locale is northern sami, set translate to false by subscribing to the locale store
-const unsubscribeLocale = locale.subscribe((val) => {
-	if (val === 'sa') {
+// If locale is northern sami or swedish, set translate to true
+$effect(() => {
+	if ($locale === 'sa' || $locale === 'sv') {
 		translate = true;
 	}
 });
-
-onDestroy(() => unsubscribeLocale());
 </script>
 
 <!-- Header/Language Selector -->
@@ -83,7 +81,7 @@ onDestroy(() => unsubscribeLocale());
 	</div>
 
 	<div class="card-extra-container">
-		{#if ($locale !== 'sa')}
+		{#if (!['sa', 'sv'].includes($locale))}
 		<CheckIcon
 		translateIdForCheckbox="header_btn_translate_all"
 		bind:checkValue={translate}
