@@ -14,7 +14,7 @@
 		{ code: 'en', name: 'English' },
 		{ code: 'fi', name: 'Suomi' },
 		{ code: 'sv', name: 'Svenska' },
-		{ code: 'sa', name: 'Sámegiella'}
+		{ code: 'sa', name: 'Davvisámegiella'}
 	];
 
 	async function handleLocaleChange(lang_code: string) {
